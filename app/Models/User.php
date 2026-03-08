@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +19,13 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'nombre',
+        'apellidos',
         'email',
         'password',
+        'rol',
+        'id_responsable',
+        'id_zona',
     ];
 
     /**
@@ -44,5 +49,45 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Responsable del usuario (supervisor)
+     */
+    public function responsable(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_responsable');
+    }
+
+    /**
+     * Usuarios bajo su responsabilidad
+     */
+    public function subordinados(): HasMany
+    {
+        return $this->hasMany(User::class, 'id_responsable');
+    }
+
+    /**
+     * Zona asignada al usuario
+     */
+    public function zona(): BelongsTo
+    {
+        return $this->belongsTo(Zona::class, 'id_zona');
+    }
+
+    /**
+     * Clientes asignados al usuario
+     */
+    public function clientes(): HasMany
+    {
+        return $this->hasMany(Cliente::class, 'id_usuario_asignado');
+    }
+
+    /**
+     * Visitas del usuario
+     */
+    public function visitas(): HasMany
+    {
+        return $this->hasMany(Visita::class, 'id_usuario');
     }
 }
