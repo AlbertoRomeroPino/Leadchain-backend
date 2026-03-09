@@ -17,11 +17,24 @@ DROP TABLE IF EXISTS zonas CASCADE;
 
 -- =============================================
 -- TABLA: ZONAS
+-- Define cuadrículas/zonas donde los usuarios no-admin se mueven
+-- Cada zona tiene 4 esquinas (coordenadas)
 -- =============================================
 CREATE TABLE zonas (
     id SERIAL PRIMARY KEY,
     nombre_zona VARCHAR(100) NOT NULL,
-    poligono_coordenadas GEOMETRY(Point, 4326) NOT NULL,
+    -- Esquina Noroeste (NW)
+    lat_noroeste DECIMAL(10, 7) NOT NULL,
+    lng_noroeste DECIMAL(10, 7) NOT NULL,
+    -- Esquina Noreste (NE)
+    lat_noreste DECIMAL(10, 7) NOT NULL,
+    lng_noreste DECIMAL(10, 7) NOT NULL,
+    -- Esquina Suroeste (SW)
+    lat_suroeste DECIMAL(10, 7) NOT NULL,
+    lng_suroeste DECIMAL(10, 7) NOT NULL,
+    -- Esquina Sureste (SE)
+    lat_sureste DECIMAL(10, 7) NOT NULL,
+    lng_sureste DECIMAL(10, 7) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -119,8 +132,7 @@ CREATE INDEX idx_visitas_usuario ON visitas(id_usuario);
 CREATE INDEX idx_visitas_cliente ON visitas(id_cliente);
 CREATE INDEX idx_visitas_fecha ON visitas(fecha_hora);
 
--- Índices espaciales para columnas geometry
-CREATE INDEX idx_zonas_poligono ON zonas USING GIST(poligono_coordenadas);
+-- Índice espacial para edificios
 CREATE INDEX idx_edificios_ubicacion ON edificios USING GIST(ubicacion);
 
 -- =============================================
@@ -136,12 +148,12 @@ INSERT INTO estados_visita (etiqueta, color_hex) VALUES
     ('Reprogramada', '#6C757D');
 
 -- Zonas de Córdoba (España)
--- ST_SetSRID(ST_MakePoint(longitud, latitud), 4326) para crear puntos geográficos
-INSERT INTO zonas (nombre_zona, poligono_coordenadas) VALUES
-    ('Centro', ST_GeomFromText('POINT(-4.7794 37.8882)', 4326)),
-    ('La Judería', ST_GeomFromText('POINT(-4.7822 37.8794)', 4326)),
-    ('San Basilio', ST_GeomFromText('POINT(-4.7856 37.8756)', 4326)),
-    ('La Ribera', ST_GeomFromText('POINT(-4.7731 37.8856)', 4326));
+-- Cada zona es una cuadrícula definida por 4 esquinas (lat/lng)
+INSERT INTO zonas (nombre_zona, lat_noroeste, lng_noroeste, lat_noreste, lng_noreste, lat_suroeste, lng_suroeste, lat_sureste, lng_sureste) VALUES
+    ('Centro', 37.8920, -4.7850, 37.8920, -4.7740, 37.8850, -4.7850, 37.8850, -4.7740),
+    ('La Judería', 37.8830, -4.7870, 37.8830, -4.7780, 37.8760, -4.7870, 37.8760, -4.7780),
+    ('San Basilio', 37.8790, -4.7900, 37.8790, -4.7810, 37.8720, -4.7900, 37.8720, -4.7810),
+    ('La Ribera', 37.8900, -4.7780, 37.8900, -4.7680, 37.8820, -4.7780, 37.8820, -4.7680);
 
 -- Usuario de pruebas (root / root)
 -- Hash bcrypt de "root"

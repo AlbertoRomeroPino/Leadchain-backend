@@ -13,14 +13,30 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// Rutas públicas (sin autenticación)
-Route::apiResource('zonas', ZonaController::class);
-Route::apiResource('estados-visita', EstadoVisitaController::class);
-
 // Rutas protegidas con Sanctum
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('users', UserController::class);
-    Route::apiResource('clientes', ClienteController::class);
-    Route::apiResource('edificios', EdificioController::class);
-    Route::apiResource('visitas', VisitaController::class);
+
+    // Route::apiResource('estados-visita', EstadoVisitaController::class);
+
+    Route::get('visitas', [VisitaController::class, 'index']);
+    Route::get('visitas/{visita}', [VisitaController::class, 'show']);
+
+    Route::get('clientes', [ClienteController::class, 'index']);
+    Route::get('clientes/{cliente}', [ClienteController::class, 'show']);
+
+    //ToDo: Los edificios que se ubican en tu zona
+    Route::get('edificios', [EdificioController::class, 'index']);
+    Route::get('edificios/{edificio}', [EdificioController::class, 'show']);
+
+    /**
+     * Rutas protegidas solo para usuarios con rol 'admin'
+     */
+    Route::middleware('login.admin')->group(function () {
+        Route::apiResource('zonas', ZonaController::class);
+        Route::apiResource('users', UserController::class);
+        Route::apiResource('clientes', ClienteController::class);
+        Route::apiResource('edificios', EdificioController::class);
+        Route::apiResource('visitas', VisitaController::class);
+    });
+
 });

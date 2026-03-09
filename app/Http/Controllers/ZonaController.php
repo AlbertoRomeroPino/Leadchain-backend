@@ -22,7 +22,15 @@ class ZonaController extends Controller
     {
         $validated = $request->validate([
             'nombre_zona' => 'required|string|max:100',
-            'poligono_coordenadas' => 'required',
+            // Coordenadas de las 4 esquinas de la zona
+            'lat_noroeste' => 'required|numeric|between:-90,90',
+            'lng_noroeste' => 'required|numeric|between:-180,180',
+            'lat_noreste' => 'required|numeric|between:-90,90',
+            'lng_noreste' => 'required|numeric|between:-180,180',
+            'lat_suroeste' => 'required|numeric|between:-90,90',
+            'lng_suroeste' => 'required|numeric|between:-180,180',
+            'lat_sureste' => 'required|numeric|between:-90,90',
+            'lng_sureste' => 'required|numeric|between:-180,180',
         ]);
 
         $zona = Zona::create($validated);
@@ -34,7 +42,15 @@ class ZonaController extends Controller
     {
         $validated = $request->validate([
             'nombre_zona' => 'sometimes|string|max:100',
-            'poligono_coordenadas' => 'sometimes',
+            // Coordenadas de las 4 esquinas de la zona
+            'lat_noroeste' => 'sometimes|numeric|between:-90,90',
+            'lng_noroeste' => 'sometimes|numeric|between:-180,180',
+            'lat_noreste' => 'sometimes|numeric|between:-90,90',
+            'lng_noreste' => 'sometimes|numeric|between:-180,180',
+            'lat_suroeste' => 'sometimes|numeric|between:-90,90',
+            'lng_suroeste' => 'sometimes|numeric|between:-180,180',
+            'lat_sureste' => 'sometimes|numeric|between:-90,90',
+            'lng_sureste' => 'sometimes|numeric|between:-180,180',
         ]);
 
         $zona->update($validated);

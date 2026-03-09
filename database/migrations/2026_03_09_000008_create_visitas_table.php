@@ -20,10 +20,7 @@ return new class extends Migration
             $table->foreignId('id_estado')->constrained('estados_visita')->restrictOnDelete();
             $table->text('observaciones')->nullable();
             $table->timestamps();
-        });
 
-        // Índices
-        Schema::table('visitas', function (Blueprint $table) {
             $table->index('id_usuario', 'idx_visitas_usuario');
             $table->index('id_cliente', 'idx_visitas_cliente');
             $table->index('fecha_hora', 'idx_visitas_fecha');

@@ -21,15 +21,12 @@ return new class extends Migration
             $table->string('tipo', 50);
             $table->foreignId('id_cliente')->nullable()->constrained('clientes')->nullOnDelete();
             $table->timestamps();
+
+            $table->index('id_zona', 'idx_edificios_zona');
         });
 
         // Añadir columna geometry con PostGIS
         DB::statement("ALTER TABLE edificios ADD COLUMN ubicacion GEOMETRY(Point, 4326) NOT NULL");
-
-        // Índices
-        Schema::table('edificios', function (Blueprint $table) {
-            $table->index('id_zona', 'idx_edificios_zona');
-        });
 
         // Índice espacial
         DB::statement('CREATE INDEX idx_edificios_ubicacion ON edificios USING GIST(ubicacion)');

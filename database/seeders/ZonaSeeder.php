@@ -9,20 +9,43 @@ class ZonaSeeder extends Seeder
 {
     public function run(): void
     {
+        // Zonas de Córdoba como cuadrículas con 4 esquinas
         $zonas = [
-            ['nombre_zona' => 'Centro', 'lng' => -4.7794, 'lat' => 37.8882],
-            ['nombre_zona' => 'La Judería', 'lng' => -4.7822, 'lat' => 37.8794],
-            ['nombre_zona' => 'San Basilio', 'lng' => -4.7856, 'lat' => 37.8756],
-            ['nombre_zona' => 'La Ribera', 'lng' => -4.7731, 'lat' => 37.8856],
+            [
+                'nombre_zona' => 'Centro',
+                'lat_noroeste' => 37.8920, 'lng_noroeste' => -4.7850,
+                'lat_noreste' => 37.8920, 'lng_noreste' => -4.7740,
+                'lat_suroeste' => 37.8850, 'lng_suroeste' => -4.7850,
+                'lat_sureste' => 37.8850, 'lng_sureste' => -4.7740,
+            ],
+            [
+                'nombre_zona' => 'La Judería',
+                'lat_noroeste' => 37.8830, 'lng_noroeste' => -4.7870,
+                'lat_noreste' => 37.8830, 'lng_noreste' => -4.7780,
+                'lat_suroeste' => 37.8760, 'lng_suroeste' => -4.7870,
+                'lat_sureste' => 37.8760, 'lng_sureste' => -4.7780,
+            ],
+            [
+                'nombre_zona' => 'San Basilio',
+                'lat_noroeste' => 37.8790, 'lng_noroeste' => -4.7900,
+                'lat_noreste' => 37.8790, 'lng_noreste' => -4.7810,
+                'lat_suroeste' => 37.8720, 'lng_suroeste' => -4.7900,
+                'lat_sureste' => 37.8720, 'lng_sureste' => -4.7810,
+            ],
+            [
+                'nombre_zona' => 'La Ribera',
+                'lat_noroeste' => 37.8900, 'lng_noroeste' => -4.7780,
+                'lat_noreste' => 37.8900, 'lng_noreste' => -4.7680,
+                'lat_suroeste' => 37.8820, 'lng_suroeste' => -4.7780,
+                'lat_sureste' => 37.8820, 'lng_sureste' => -4.7680,
+            ],
         ];
 
         foreach ($zonas as $zona) {
-            DB::table('zonas')->insert([
-                'nombre_zona' => $zona['nombre_zona'],
-                'poligono_coordenadas' => DB::raw("ST_GeomFromText('POINT({$zona['lng']} {$zona['lat']})', 4326)"),
+            DB::table('zonas')->insert(array_merge($zona, [
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ]));
         }
     }
 }

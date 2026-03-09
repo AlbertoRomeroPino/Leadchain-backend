@@ -18,14 +18,21 @@ return new class extends Migration
         Schema::create('zonas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre_zona', 100);
+            // 4 coordenadas que definen las esquinas de la zona (cuadrícula)
+            // Esquina Noroeste (NW)
+            $table->decimal('lat_noroeste', 10, 7);
+            $table->decimal('lng_noroeste', 10, 7);
+            // Esquina Noreste (NE)
+            $table->decimal('lat_noreste', 10, 7);
+            $table->decimal('lng_noreste', 10, 7);
+            // Esquina Suroeste (SW)
+            $table->decimal('lat_suroeste', 10, 7);
+            $table->decimal('lng_suroeste', 10, 7);
+            // Esquina Sureste (SE)
+            $table->decimal('lat_sureste', 10, 7);
+            $table->decimal('lng_sureste', 10, 7);
             $table->timestamps();
         });
-
-        // Añadir columna geometry con PostGIS
-        DB::statement("ALTER TABLE zonas ADD COLUMN poligono_coordenadas GEOMETRY(Point, 4326) NOT NULL");
-        
-        // Índice espacial
-        DB::statement('CREATE INDEX idx_zonas_poligono ON zonas USING GIST(poligono_coordenadas)');
     }
 
     /**

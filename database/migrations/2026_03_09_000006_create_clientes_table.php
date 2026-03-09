@@ -19,10 +19,7 @@ return new class extends Migration
             $table->string('email', 255)->nullable();
             $table->foreignId('id_usuario_asignado')->constrained('users')->restrictOnDelete();
             $table->timestamps();
-        });
 
-        // Índice
-        Schema::table('clientes', function (Blueprint $table) {
             $table->index('id_usuario_asignado', 'idx_clientes_usuario');
         });
     }

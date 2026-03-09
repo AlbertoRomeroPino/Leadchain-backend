@@ -14,7 +14,29 @@ class Zona extends Model
 
     protected $fillable = [
         'nombre_zona',
-        'poligono_coordenadas',
+        // Esquina Noroeste
+        'lat_noroeste',
+        'lng_noroeste',
+        // Esquina Noreste
+        'lat_noreste',
+        'lng_noreste',
+        // Esquina Suroeste
+        'lat_suroeste',
+        'lng_suroeste',
+        // Esquina Sureste
+        'lat_sureste',
+        'lng_sureste',
+    ];
+
+    protected $casts = [
+        'lat_noroeste' => 'float',
+        'lng_noroeste' => 'float',
+        'lat_noreste' => 'float',
+        'lng_noreste' => 'float',
+        'lat_suroeste' => 'float',
+        'lng_suroeste' => 'float',
+        'lat_sureste' => 'float',
+        'lng_sureste' => 'float',
     ];
 
     /**
