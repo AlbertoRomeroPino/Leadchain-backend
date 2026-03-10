@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class AuthController extends Controller
+{
+    /**
+     * Login de usuario con JWT
+     */
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Datos de validación incorrectos',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $credentials = $request->only('email', 'password');
+
+        if (!$token = auth('api')->attempt($credentials)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Credenciales inválidas'
+            ], 401);
+        }
+
+        return $this->respondWithToken($token);
+    }
+
+    /**
+     * Cerrar sesión (invalidar token)
+     */
+    public function logout()
+    {
+        auth('api')->logout();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sesión cerrada correctamente'
+        ]);
+    }
+
+    /**
+     * Refrescar token JWT
+     */
+    public function refresh()
+    {
+        return $this->respondWithToken(auth('api')->refresh());
+    }
+
+    /**
+     * Obtener usuario autenticado
+     */
+    public function me()
+    {
+        $user = auth('api')->user();
+
+        return response()->json([
+            'success' => true,
+            'user' => [
+                'id' => $user->id,
+                'nombre' => $user->nombre,
+                'apellidos' => $user->apellidos,
+                'email' => $user->email,
+                'rol' => $user->rol,
+                'id_zona' => $user->id_zona,
+            ],
+            'dashboard' => $this->getDashboardByRole($user->rol)
+        ]);
+    }
+
+    /**
+     * Respuesta estructurada con token
+     */
+    protected function respondWithToken($token)
+    {
+        $user = auth('api')->user();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login exitoso',
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'user' => [
+                'id' => $user->id,
+                'nombre' => $user->nombre,
+                'apellidos' => $user->apellidos,
+                'email' => $user->email,
+                'rol' => $user->rol,
+                'id_zona' => $user->id_zona,
+            ],
+            'dashboard' => $this->getDashboardByRole($user->rol)
+        ]);
+    }
+
+    /**
+     * Determinar dashboard según rol
+     */
+    protected function getDashboardByRole(string $rol): string
+    {
+        return match ($rol) {
+            'admin' => '/admin/dashboard',
+            'comercial' => '/comercial/dashboard',
+            default => '/dashboard',
+        };
+    }
+}

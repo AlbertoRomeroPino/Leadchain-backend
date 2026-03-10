@@ -18,21 +18,14 @@ return new class extends Migration
         Schema::create('zonas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre_zona', 100);
-            // 4 coordenadas que definen las esquinas de la zona (cuadrícula)
-            // Esquina Noroeste (NW)
-            $table->decimal('lat_noroeste', 10, 7);
-            $table->decimal('lng_noroeste', 10, 7);
-            // Esquina Noreste (NE)
-            $table->decimal('lat_noreste', 10, 7);
-            $table->decimal('lng_noreste', 10, 7);
-            // Esquina Suroeste (SW)
-            $table->decimal('lat_suroeste', 10, 7);
-            $table->decimal('lng_suroeste', 10, 7);
-            // Esquina Sureste (SE)
-            $table->decimal('lat_sureste', 10, 7);
-            $table->decimal('lng_sureste', 10, 7);
             $table->timestamps();
         });
+
+        // Añadir columnas geometry para las 4 esquinas de la zona (cuadrícula)
+        DB::statement('ALTER TABLE zonas ADD COLUMN esquina_noroeste geometry(Point, 4326)');
+        DB::statement('ALTER TABLE zonas ADD COLUMN esquina_noreste geometry(Point, 4326)');
+        DB::statement('ALTER TABLE zonas ADD COLUMN esquina_suroeste geometry(Point, 4326)');
+        DB::statement('ALTER TABLE zonas ADD COLUMN esquina_sureste geometry(Point, 4326)');
     }
 
     /**

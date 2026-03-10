@@ -9,15 +9,21 @@ use Symfony\Component\HttpFoundation\Response;
 class LoginAdmin
 {
     /**
-     * Handle an incoming request.
+     * Verificar que el usuario sea administrador.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || !$request->user()->rol == 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        $user = $request->user();
+
+        if (!$user || $user->rol !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Acceso denegado. Se requiere rol de administrador.'
+            ], 403);
         }
+
         return $next($request);
     }
 }

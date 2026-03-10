@@ -101,5 +101,13 @@ La API responde en formato JSON. Algunos de los recursos disponibles son:
 * `/init-db`: Contiene el script `db-leadchain.sql` con la estructura geográfica inicial.
 * `/routes`: Definición de los endpoints de la API.
 * `docker-compose.yml`: Configuración del contenedor de PostgreSQL + PostGIS.
-"# Leadchain-backend" 
-# Leadchain-backend
+  "# Leadchain-backend"
+
+
+| Recurso   | Admin      | Comercial |
+| --------- | ---------- | --------- |
+| Clientes  | CRUD       | R         |
+| Zonas     | CRUD       | R         |
+| Usuarios  | CRUD       | -         |
+| Edificios | CRUD       | R         |
+| Visitas   | R + Delete | CRU       |
