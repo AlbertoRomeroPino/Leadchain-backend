@@ -5,9 +5,20 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 
 class AuthController extends Controller
 {
+    /**
+     * Obtener guard JWT tipado
+     */
+    protected function guard(): JWTGuard
+    {
+        /** @var JWTGuard $guard */
+        $guard = auth('api');
+        return $guard;
+    }
+
     /**
      * Login de usuario con JWT
      */
@@ -28,7 +39,7 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (!$token = auth('api')->attempt($credentials)) {
+        if (!$token = $this->guard()->attempt($credentials)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Credenciales inválidas'
@@ -43,7 +54,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth('api')->logout();
+        $this->guard()->logout();
 
         return response()->json([
             'success' => true,
@@ -56,7 +67,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth('api')->refresh());
+        return $this->respondWithToken($this->guard()->refresh());
     }
 
     /**
@@ -64,7 +75,7 @@ class AuthController extends Controller
      */
     public function me()
     {
-        $user = auth('api')->user();
+        $user = $this->guard()->user();
 
         return response()->json([
             'success' => true,
@@ -85,14 +96,14 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        $user = auth('api')->user();
+        $user = $this->guard()->user();
 
         return response()->json([
             'success' => true,
             'message' => 'Login exitoso',
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'expires_in' => $this->guard()->factory()->getTTL() * 60,
             'user' => [
                 'id' => $user->id,
                 'nombre' => $user->nombre,

@@ -56,7 +56,7 @@ Route::middleware('auth:api')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Rutas para COMERCIALES (CRU visitas)
+    | Rutas para Anunciantes (CRU visitas)
     |--------------------------------------------------------------------------
     */
     Route::middleware('role:comercial,admin')->group(function () {
