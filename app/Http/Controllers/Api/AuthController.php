@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\AuthRequest;
 use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 
 class AuthController extends Controller
@@ -22,21 +21,8 @@ class AuthController extends Controller
     /**
      * Login de usuario con JWT
      */
-    public function login(Request $request)
+    public function login(AuthRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Datos de validación incorrectos',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         $credentials = $request->only('email', 'password');
 
         if (!$token = $this->guard()->attempt($credentials)) {

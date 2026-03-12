@@ -6,7 +6,7 @@ LeadChain es una **API-Rest** diseñada para la gestión de clientes, edificios 
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## Tecnologías utilizadas
 
 * **Lenguaje:** PHP 8.x (Laravel Framework)
 * **Base de Datos:** PostgreSQL 15 + PostGIS (Extensión espacial)
@@ -15,7 +15,7 @@ LeadChain es una **API-Rest** diseñada para la gestión de clientes, edificios 
 
 ---
 
-## 🚀 Instalación y Despliegue
+## Instalación y Despliegue
 
 Sigue estos pasos para tener el entorno funcionando en menos de 5 minutos:
 
@@ -25,29 +25,57 @@ Asegúrate de tener instalados:
 
 * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 * [Git](https://git-scm.com/)
+* [Composer](https://getcomposer.org/)
 
-### 2. Clonar el proyecto
+Comprueba que php.ini tenga descomentado las lineas:
 
-**Bash**
+- `extension=sodium`
+- `extension=pdo_pgsql`
 
-```
-git clone https://github.com/tu-usuario/leadchain-backend.git
+> ⚠️ Descomentado significa sin el `;` delante
+
+### 2. Clonar y Preparar el Proyecto
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/AlbertoRomeroPino/Leadchain-backend.git
 cd leadchain-backend
+
+# Instalar dependencias de PHP
+composer install
 ```
 
-### 3. Configurar variables de entorno
+### 3. Configurar Entorno y Seguridad
 
-Copia el archivo de ejemplo y configura tus credenciales (por defecto ya vienen preparadas para el Docker):
+Copia el archivo de `.env.example`, modificalo a `.env` y genera las claves necesarias:
 
-**Bash**
-
-```
+```bash
 cp .env.example .env
+
+# Generar clave de la aplicación y el secreto para JWT
+php artisan key:generate
+php artisan jwt:secret
+```
+
+**Verificación en el `.env`:**
+Asegúrate de que las variables de la base de datos coincidan con el entorno Docker y que el algoritmo JWT sea el correcto:
+
+**Fragmento de código**
+
+```
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=leadchain
+DB_USERNAME=root
+DB_PASSWORD=root
+
+JWT_ALGO=HS256
 ```
 
 ### 4. Levantar la infraestructura (Docker)
 
-Este comando descargará la imagen de **PostGIS** y ejecutará automáticamente el script de creación de tablas de Córdoba (`init-db/db-leadchain.sql`).
+Este comando levanta el contenedor de **PostgreSQL/PostGIS** necesario para el almacenamiento de datos geográficos.
 
 **Bash**
 
@@ -55,13 +83,37 @@ Este comando descargará la imagen de **PostGIS** y ejecutará automáticamente 
 docker-compose up -d
 ```
 
-> **💡 Nota importante:** Si realizas cambios manuales en el archivo `.sql` de la carpeta `init-db`, debes reiniciar el contenedor borrando los volúmenes para que los cambios surtan efecto:
->
-> `docker-compose down -v && docker-compose up -d`
+> **Nota sobre persistencia:** Si decides descomentar la sección de `volumes` en tu `docker-compose.yml`, los datos se mantendrán aunque borres el contenedor. Si usas el script de inicialización automático (`init-db`), es posible que no necesites el siguiente paso.
+
+### 5. Migraciones y Datos (Seeders)
+
+Si prefieres construir la estructura de la base de datos desde Laravel y cargar los datos de prueba iniciales, ejecuta:
+
+**Bash**
+
+```
+# Crear la estructura de tablas
+php artisan migrate
+
+# Cargar datos de prueba (Seeders)
+php artisan db:seed
+```
+
+### 6. Ejecutar la API
+
+Una vez que la base de datos está lista y las dependencias instaladas, puedes poner en marcha el servidor de desarrollo:
+
+**Bash**
+
+```
+php artisan serve
+```
+
+La API estará disponible en: `http://127.0.0.1:8000`
 
 ---
 
-## 🗄️ Conexión a la Base de Datos
+## Conexión a la Base de Datos
 
 Para gestionar los datos y ver los  **mapas de Córdoba** , conecta **DBeaver** con los siguientes datos:
 
@@ -71,43 +123,111 @@ Para gestionar los datos y ver los  **mapas de Córdoba** , conecta **DBeaver** 
 * **Usuario:** `root`
 * **Contraseña:** `root`
 
-### Visualización Espacial
-
-Para ver los edificios en el mapa:
-
-1. Abre la tabla `edificios` en DBeaver.
-2. Ve a la pestaña  **Datos** .
-3. Selecciona una celda de la columna `ubicacion`.
-4. Abre el panel lateral derecho ( **F7** ) y selecciona la pestaña  **Spatial** .
-
 ---
 
-## 🛣️ Endpoints Principales (API)
+## Endpoints Principales (API)
 
 La API responde en formato JSON. Algunos de los recursos disponibles son:
 
-| **Método** | **Endpoint** | **Descripción**                                |
-| ----------------- | ------------------ | ----------------------------------------------------- |
-| `GET`           | `/api/usuarios`  | Listado de comerciales y responsables.                |
-| `GET`           | `/api/edificios` | Lista de edificios con coordenadas geográficas.      |
-| `POST`          | `/api/visitas`   | Registrar una nueva visita comercial.                 |
-| `GET`           | `/api/zonas`     | Ver los sectores de Córdoba (Centro, Judería, etc). |
+CRUD = Create, Read, Update, Delete
+
+
+## Postman:
+
+|    Header    |                                          |
+| :-----------: | :--------------------------------------: |
+| Content-Type |             application/json             |
+| Authorization |                                          |
+| Bearer Token | Token recibido cuando se manda el login. |
+
+POST: `http://127.0.0.1:8000/api/auth/login`
+
+|  Recurso  |  Admin  | Comercial |
+| :-------: | :-----: | :-------: |
+| Clientes |  CRUD  |  - R - -  |
+|   Zonas   |  CRUD  |  - R - -  |
+| Usuarios |  CRUD  |  - - - -  |
+| Edificios |  CRUD  |  - R - -  |
+|  Visitas  | - R - D |  C-R-U -  |
+
+`http://127.0.0.1:8000`
+
+Ruta de login
+
+| **Método** | **Endpoint**  |       **Descripción**       | Body                                                                 | Token |
+| :---------------: | ------------------- | :---------------------------------: | -------------------------------------------------------------------- | ----- |
+|       POST       | `/api/auth/login` | Iniciar sesión y obtener token JWT | {<br />"email": "root@leadchain.com",<br />"password": "root"<br />} | NO    |
+
+Rutas protegidas con JWT (Se necesita el apartado de Authorization). Cada vez que se use  logout o refresh va a hacer falta modificar los tokens guardados en `Bearer Token`
+
+| **Método** | **Endpoint**    |        **Descripción**        | Body     | Token |
+| :---------------: | --------------------- | :-----------------------------------: | -------- | ----- |
+|       POST       | `/api/auth/logout`  |   Cerrar sesión e invalidar token   | No tiene | SI    |
+|       POST       | `/api/auth/refresh` |          Refrescar token JWT          | No tiene | SI    |
+|        GET        | `/api/auth/me`      | Obtener datos del usuario autenticado | No tiene | SI    |
+
+Rutas compartidas por ambos roles
+
+| Método | Endpoint                         |        Descripción        | Body     | Token |
+| :-----: | -------------------------------- | :------------------------: | -------- | ----- |
+|   GET   | `/api/clientes`                | Listar todos los clientes | No tiene | SI    |
+|   GET   | `/api/clientes/{id_cliente}`   | Obtener un cliente por ID | No tiene | SI    |
+|   GET   | `/api/zonas`                   |   Listar todas las zonas   | No tiene | SI    |
+|   GET   | `/api/zonas/{id_zona}`         |  Obtener una zona por ID  | No tiene | SI    |
+|   GET   | `/api/edificios`               | Listar todos los edificios | No tiene | SI    |
+|   GET   | `/api/edificios/{id_edificio}` | Obtener un edificio por ID | No tiene | SI    |
+|   GET   | `/api/visitas`                 |  Listar todas las visitas  | No tiene | SI    |
+|   GET   | `/api/visitas/{id_visita}`     | Obtener una visita por ID | No tiene | SI    |
+
+Rutas del comercial (anunciante)
+
+| Método | Endpoint                     |            Descripción            | Body                                                                                                                                                                                                                                                         | Token |
+| :-----: | ---------------------------- | :--------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- |
+|  POST  | `/api/visitas`             |       Crear una nueva visita       | {<br />      "id_usuario": 2,<br />      "id_cliente": 1,<br />      "fecha_hora": "2026-03-15 10:30:00",<br />      "hora_visita": "10:30:00",<br />      "id_estado": 1,<br />      "observaciones": "Primera visita al cliente"<br />} | Si    |
+|   PUT   | `/api/visitas/{id_visita}` |   Actualizar una visita completa   |                                                                                                                                                                                                                                                              |       |
+|  PATCH  | `/api/visitas/{id_visita}` | Actualizar parcialmente una visita |                                                                                                                                                                                                                                                              |       |
+
+Rutas del administrador
+
+|   Método   |             Endpoint             |            Descripción            |
+| :---------: | :------------------------------: | :---------------------------------: |
+|    POST    |          `/api/zonas`          |        Crear una nueva zona        |
+|     PUT     |     `/api/zonas/{id_zona}`     |    Actualizar una zona completa    |
+|    PATCH    |     `/api/zonas/{id_zona}`     |  Actualizar parcialmente una zona  |
+|   DELETE   |     `/api/zonas/{id_zona}`     |          Eliminar una zona          |
+| apiResource |          `/api/users`          |      CRUD completo de usuarios      |
+|    POST    |        `/api/clientes`        |       Crear un nuevo cliente       |
+|     PUT     |  `/api/clientes/{id_cliente}`  |   Actualizar un cliente completo   |
+|    PATCH    |  `/api/clientes/{id_cliente}`  | Actualizar parcialmente un cliente |
+|   DELETE   |  `/api/clientes/{id_cliente}`  |         Eliminar un cliente         |
+|    POST    |        `/api/edificios`        |       Crear un nuevo edificio       |
+|     PUT     | `/api/edificios/{id_edificio}` |   Actualizar un edificio completo   |
+|    PATCH    | `/api/edificios/{id_edificio}` | Actualizar parcialmente un edificio |
+|   DELETE   | `/api/edificios/{id_edificio}` |        Eliminar un edificio        |
+|   DELETE   |   `/api/visitas/{id_visita}`   |         Eliminar una visita         |
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
-* `/app`: Lógica interna de la API (Modelos, Controladores).
-* `/init-db`: Contiene el script `db-leadchain.sql` con la estructura geográfica inicial.
-* `/routes`: Definición de los endpoints de la API.
-* `docker-compose.yml`: Configuración del contenedor de PostgreSQL + PostGIS.
-  "# Leadchain-backend"
+```json
 
+```
 
-| Recurso   | Admin      | Comercial |
-| --------- | ---------- | --------- |
-| Clientes  | CRUD       | R         |
-| Zonas     | CRUD       | R         |
-| Usuarios  | CRUD       | -         |
-| Edificios | CRUD       | R         |
-| Visitas   | R + Delete | CRU       |
+Return:
+
+```json
+{"success":true,"message":"Login exitoso",
+"access_token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NzMzMDc0OTcsImV4cCI6MTc3MzMxMTA5NywibmJmIjoxNzczMzA3NDk3LCJqdGkiOiJRRm9qUGg1TnhJR2Z4Q0lGIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.i2ovStcKS90DQk2iEZNQ7DT6Y-F3XDLqL1EvGRXMlNI",
+"token_type":"bearer","expires_in":3600,
+"user":
+{
+	"id":1,
+	"nombre":"Admin",
+	"apellidos":"Root",
+	"email":"root@leadchain.com",
+	"rol":"admin",
+	"id_zona":1
+},
+"dashboard":"\/admin\/dashboard"}
+```
