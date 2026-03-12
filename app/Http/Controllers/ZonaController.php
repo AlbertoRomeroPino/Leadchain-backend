@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ZonaRequest;
 use App\Models\Zona;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ZonaController extends Controller
 {
@@ -18,44 +20,47 @@ class ZonaController extends Controller
         return response()->json($zona);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(ZonaRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'nombre_zona' => 'required|string|max:100',
-            // Coordenadas de las 4 esquinas de la zona
-            'lat_noroeste' => 'required|numeric|between:-90,90',
-            'lng_noroeste' => 'required|numeric|between:-180,180',
-            'lat_noreste' => 'required|numeric|between:-90,90',
-            'lng_noreste' => 'required|numeric|between:-180,180',
-            'lat_suroeste' => 'required|numeric|between:-90,90',
-            'lng_suroeste' => 'required|numeric|between:-180,180',
-            'lat_sureste' => 'required|numeric|between:-90,90',
-            'lng_sureste' => 'required|numeric|between:-180,180',
+
+        $zona = Zona::create(['nombre_zona' => $request['nombre_zona']]);
+
+        DB::statement("
+            UPDATE zonas SET
+                esquina_noroeste = ST_SetSRID(ST_MakePoint(?, ?), 4326),
+                esquina_noreste  = ST_SetSRID(ST_MakePoint(?, ?), 4326),
+                esquina_suroeste = ST_SetSRID(ST_MakePoint(?, ?), 4326),
+                esquina_sureste  = ST_SetSRID(ST_MakePoint(?, ?), 4326)
+            WHERE id = ?
+        ", [
+            $request['esquina_noroeste']['lng'], $request['esquina_noroeste']['lat'],
+            $request['esquina_noreste']['lng'], $request['esquina_noreste']['lat'],
+            $request['esquina_suroeste']['lng'], $request['esquina_suroeste']['lat'],
+            $request['esquina_sureste']['lng'], $request['esquina_sureste']['lat'],
+            $zona->id,
         ]);
 
-        $zona = Zona::create($validated);
-
-        return response()->json($zona, 201);
+        return response()->json($zona->fresh(), 201);
     }
 
-    public function update(Request $request, Zona $zona): JsonResponse
+    public function update(ZonaRequest $request, Zona $zona): JsonResponse
     {
-        $validated = $request->validate([
-            'nombre_zona' => 'sometimes|string|max:100',
-            // Coordenadas de las 4 esquinas de la zona
-            'lat_noroeste' => 'sometimes|numeric|between:-90,90',
-            'lng_noroeste' => 'sometimes|numeric|between:-180,180',
-            'lat_noreste' => 'sometimes|numeric|between:-90,90',
-            'lng_noreste' => 'sometimes|numeric|between:-180,180',
-            'lat_suroeste' => 'sometimes|numeric|between:-90,90',
-            'lng_suroeste' => 'sometimes|numeric|between:-180,180',
-            'lat_sureste' => 'sometimes|numeric|between:-90,90',
-            'lng_sureste' => 'sometimes|numeric|between:-180,180',
-        ]);
 
-        $zona->update($validated);
+        if (isset($validated['nombre_zona'])) {
+            $zona->update(['nombre_zona' => $validated['nombre_zona']]);
+        }
 
-        return response()->json($zona);
+        $esquinas = ['esquina_noroeste', 'esquina_noreste', 'esquina_suroeste', 'esquina_sureste'];
+        foreach ($esquinas as $esquina) {
+            if (isset($validated[$esquina])) {
+                DB::statement(
+                    "UPDATE zonas SET {$esquina} = ST_SetSRID(ST_MakePoint(?, ?), 4326) WHERE id = ?",
+                    [$request[$esquina]['lng'], $request[$esquina]['lat'], $zona->id]
+                );
+            }
+        }
+
+        return response()->json($zona->fresh());
     }
 
     public function destroy(Zona $zona): JsonResponse

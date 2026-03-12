@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Zona extends Model
 {
@@ -14,30 +15,54 @@ class Zona extends Model
 
     protected $fillable = [
         'nombre_zona',
-        // Esquina Noroeste
-        'lat_noroeste',
-        'lng_noroeste',
-        // Esquina Noreste
-        'lat_noreste',
-        'lng_noreste',
-        // Esquina Suroeste
-        'lat_suroeste',
-        'lng_suroeste',
-        // Esquina Sureste
-        'lat_sureste',
-        'lng_sureste',
     ];
 
-    protected $casts = [
-        'lat_noroeste' => 'float',
-        'lng_noroeste' => 'float',
-        'lat_noreste' => 'float',
-        'lng_noreste' => 'float',
-        'lat_suroeste' => 'float',
-        'lng_suroeste' => 'float',
-        'lat_sureste' => 'float',
-        'lng_sureste' => 'float',
+    protected $appends = [
+        'esquina_noroeste',
+        'esquina_noreste',
+        'esquina_suroeste',
+        'esquina_sureste',
     ];
+
+    protected $hidden = [
+        'esquina_noroeste_raw',
+        'esquina_noreste_raw',
+        'esquina_suroeste_raw',
+        'esquina_sureste_raw',
+    ];
+
+    /**
+     * Parsear geometry Point a array [lat, lng]
+     */
+    private function parsePoint(?string $column): ?array
+    {
+        if (!$this->id) return null;
+        $result = DB::selectOne(
+            "SELECT ST_Y({$column}) as lat, ST_X({$column}) as lng FROM zonas WHERE id = ?",
+            [$this->id]
+        );
+        return $result ? ['lat' => (float) $result->lat, 'lng' => (float) $result->lng] : null;
+    }
+
+    public function getEsquinaNorosteAttribute(): ?array
+    {
+        return $this->parsePoint('esquina_noroeste');
+    }
+
+    public function getEsquinaNoresteAttribute(): ?array
+    {
+        return $this->parsePoint('esquina_noreste');
+    }
+
+    public function getEsquinaSuroesteAttribute(): ?array
+    {
+        return $this->parsePoint('esquina_suroeste');
+    }
+
+    public function getEsquinaSuresteAttribute(): ?array
+    {
+        return $this->parsePoint('esquina_sureste');
+    }
 
     /**
      * Usuarios asignados a esta zona
