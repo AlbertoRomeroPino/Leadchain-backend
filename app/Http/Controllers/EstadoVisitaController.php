@@ -2,44 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EstadoVisitaRequest;
+use App\Http\Resources\EstadoVisitaResource;
 use App\Models\EstadoVisita;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class EstadoVisitaController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(EstadoVisita::all());
+        return response()->json(EstadoVisitaResource::collection(EstadoVisita::all()));
     }
 
     public function show(EstadoVisita $estadoVisita): JsonResponse
     {
-        return response()->json($estadoVisita);
+        return response()->json(new EstadoVisitaResource($estadoVisita));
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(EstadoVisitaRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'etiqueta' => 'required|string|max:50',
-            'color_hex' => 'required|string|max:7',
-        ]);
 
-        $estadoVisita = EstadoVisita::create($validated);
 
-        return response()->json($estadoVisita, 201);
+        $estadoVisita = EstadoVisita::create($request->validated());
+
+        return response()->json(new EstadoVisitaResource($estadoVisita), 201);
     }
 
-    public function update(Request $request, EstadoVisita $estadoVisita): JsonResponse
+    public function update(EstadoVisitaRequest $request, EstadoVisita $estadoVisita): JsonResponse
     {
-        $validated = $request->validate([
-            'etiqueta' => 'sometimes|string|max:50',
-            'color_hex' => 'sometimes|string|max:7',
-        ]);
 
-        $estadoVisita->update($validated);
 
-        return response()->json($estadoVisita);
+        $estadoVisita->update($request->validated());
+
+        return response()->json(new EstadoVisitaResource($estadoVisita));
     }
 
     public function destroy(EstadoVisita $estadoVisita): JsonResponse
