@@ -225,6 +225,12 @@ Creado para poder hacer una estrutura de proyecto personalizada para mostrar los
 php artisan api:tree
 ```
 
+Comando que resetea la base de datos, ejecuta Seeders y lanza los tests
+
+```bash
+php artisan retest
+```
+
 ## Estructura del Proyecto
 
 ```bash
@@ -301,3 +307,10 @@ Estructura del proyecto (filtrada):
     ├── console.php
     └── web.php
 ```
+
+## Test Realizado
+
+Antes de hacerlo hay que comprobar que phpunit.xml tenga los datos referentes a tu base de datos. sino considerara que estas usando sqlite y daria fallo al estar usando posgre.
+Estos campos hay que modificar:
+
+![1773406853725](image/README/1773406853725.png)

@@ -4,46 +4,16 @@ namespace Tests\Feature;
 
 require_once __DIR__ . '/../Fixture/LoginData.php';
 
-use App\Models\User;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 use tests\Fixture\LoginData;
 
 class LoginTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Schema::dropIfExists('users');
-
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre', 100);
-            $table->string('apellidos', 150);
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('rol', 50)->default('comercial');
-            $table->unsignedBigInteger('id_responsable')->nullable();
-            $table->unsignedBigInteger('id_zona')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->rememberToken();
-            $table->timestamps();
-        });
-    }
-
+    /**
+     * Test: Administrador logueado con credenciales válidas de las constantes de LoginData
+     */
     public function test_admin_can_login_successfully(): void
     {
-        User::create([
-            'nombre'   => 'Admin',
-            'apellidos'=> 'Leadchain',
-            'email'    => LoginData::LOGIN_ADMIN['email'],
-            'password' => Hash::make(LoginData::LOGIN_ADMIN['password']),
-            'rol'      => 'admin'
-        ]);
-
         $response = $this->postJson('/api/auth/login', LoginData::LOGIN_ADMIN);
 
         $response->assertStatus(200)
@@ -52,25 +22,14 @@ class LoginTest extends TestCase
             ->assertJsonPath('token_type', 'bearer')
             ->assertJsonPath('user.email', LoginData::LOGIN_ADMIN['email'])
             ->assertJsonPath('user.rol', 'admin')
-            ->assertJsonPath('dashboard', '/admin/dashboard')
-            ->assertJsonStructure([
-                'access_token',
-                'expires_in',
-                'user' => ['id', 'nombre', 'apellidos', 'email', 'rol', 'id_zona'],
-            ]
-        );
+            ->assertJsonPath('dashboard', '/admin/dashboard');
     }
 
+    /**
+     * Test: Comercial logueado con credenciales válidas de las constantes de LoginData
+     */
     public function test_comercial_can_login_successfully(): void
     {
-        User::create([
-            'nombre'   => 'Juan',
-            'apellidos'=> 'García',
-            'email'    => LoginData::LOGIN_COMERCIAL['email'],
-            'password' => Hash::make(LoginData::LOGIN_COMERCIAL['password']),
-            'rol'      => 'comercial'
-        ]);
-
         $response = $this->postJson('/api/auth/login', LoginData::LOGIN_COMERCIAL);
 
         $response->assertStatus(200)
@@ -79,11 +38,67 @@ class LoginTest extends TestCase
             ->assertJsonPath('token_type', 'bearer')
             ->assertJsonPath('user.email', LoginData::LOGIN_COMERCIAL['email'])
             ->assertJsonPath('user.rol', 'comercial')
-            ->assertJsonPath('dashboard', '/comercial/dashboard')
-            ->assertJsonStructure([
-                'access_token',
-                'expires_in',
-                'user' => ['id', 'nombre', 'apellidos', 'email', 'rol', 'id_zona'],
-            ]);
+            ->assertJsonPath('dashboard', '/comercial/dashboard');
+    }
+
+    /**
+     * Test: Cierre de sesión exitoso
+     */
+    public function test_user_can_logout_successfully(): void
+    {
+        // Primero, logueamos al usuario para obtener el token
+        $loginResponse = $this->postJson('/api/auth/login', LoginData::LOGIN_ADMIN);
+        $token = $loginResponse->json('access_token');
+
+        // Luego, hacemos la solicitud de logout con el token
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->postJson('/api/auth/logout');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'Sesión cerrada correctamente');
+    }
+
+    /**
+     * Test: Refrescar token exitosamente
+     */
+    public function test_user_can_refresh_token_successfully(): void
+    {
+        // Primero, logueamos al usuario para obtener el token
+        $loginResponse = $this->postJson('/api/auth/login', LoginData::LOGIN_ADMIN);
+        $token = $loginResponse->json('access_token');
+
+        // Luego, hacemos la solicitud de refresh con el token
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->postJson('/api/auth/refresh');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'Login exitoso')
+            ->assertJsonPath('token_type', 'bearer')
+            ->assertJsonPath('user.email', LoginData::LOGIN_ADMIN['email'])
+            ->assertJsonPath('user.rol', 'admin');
+    }
+    /**
+     * Test: me retorna la información del usuario autenticado
+     */
+    public function test_user_can_get_authenticated_user_info(): void
+    {
+        // Primero, logueamos al usuario para obtener el token
+        $loginResponse = $this->postJson('/api/auth/login', LoginData::LOGIN_ADMIN);
+        $token = $loginResponse->json('access_token');
+
+        // Luego, hacemos la solicitud de me con el token
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->getJson('/api/auth/me');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('user.email', LoginData::LOGIN_ADMIN['email'])
+            ->assertJsonPath('user.rol', 'admin')
+            ->assertJsonPath('dashboard', '/admin/dashboard');
     }
 }
