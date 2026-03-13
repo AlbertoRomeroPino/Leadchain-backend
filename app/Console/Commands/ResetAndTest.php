@@ -41,7 +41,7 @@ class ResetAndTest extends Command
         // 3. Resultado final
         if ($process->isSuccessful()) {
             $this->newLine();
-            $this->success('¡Todo perfecto! Base de datos lista y tests pasados.');
+            $this->info('Todo perfecto! Base de datos lista y tests pasados.');
         } else {
             $this->newLine();
             $this->error('Los tests han fallado. Revisa los errores arriba.');

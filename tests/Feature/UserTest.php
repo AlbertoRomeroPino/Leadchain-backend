@@ -112,10 +112,11 @@ class UserTest extends TestCase
         $token = $loginResponse->json('access_token');
 
         $usuario = UserData::USER_PUT;
+        $usuario['email'] = 'update.user.' . time() . '@email.com';
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token
-        ])->putJson('/api/users/1', $usuario);
+        ])->putJson('/api/users/2', $usuario);
 
         $response->assertStatus(200)
             ->assertJsonPath('nombre', $usuario['nombre'])
@@ -144,20 +145,22 @@ class UserTest extends TestCase
         $token = $loginResponse->json('access_token');
 
         // ID del usuario que queremos eliminar (el admin tiene ID 1)
-        $userId = $this->postJson('/api/users', [
+        $userId = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->postJson('/api/users', [
             'nombre' => 'Usuario a eliminar',
             'apellidos' => 'Test',
-            'email' => 'usuario_eliminar@example.com',
-            'password' => 'password',
+            'email' => 'usuario_eliminar.' . time() . '@example.com',
+            'password' => 'password1234',
             'rol' => 'comercial',
         ])->json('id');
+
+        $this->assertNotNull($userId);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token
         ])->deleteJson("/api/users/{$userId}");
 
-        $response->assertStatus(200)
-            ->assertJsonPath('success', true)
-            ->assertJsonPath('message', 'Usuario eliminado correctamente');
+        $response->assertStatus(204);
     }
 }

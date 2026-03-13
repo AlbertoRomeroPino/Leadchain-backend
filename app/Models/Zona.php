@@ -44,7 +44,7 @@ class Zona extends Model
         return $result ? ['lat' => (float) $result->lat, 'lng' => (float) $result->lng] : null;
     }
 
-    public function getEsquinaNorosteAttribute(): ?array
+    public function getEsquinaNoroesteAttribute(): ?array
     {
         return $this->parsePoint('esquina_noroeste');
     }

@@ -85,19 +85,7 @@ docker-compose up -d
 
 > **Nota sobre persistencia:** Si decides descomentar la sección de `volumes` en tu `docker-compose.yml`, los datos se mantendrán aunque borres el contenedor. Si usas el script de inicialización automático (`init-db`), es posible que no necesites el siguiente paso.
 
-### 5.1 Migraciones y Datos (Seeders)
-
-Si prefieres construir la estructura de la base de datos desde Laravel y cargar los datos de prueba iniciales, ejecuta:
-
-```bash
-# Crear la estructura de tablas
-php artisan migrate
-
-# Cargar datos de prueba (Seeders)
-php artisan db:seed
-```
-
-### 5.2 Lanzar de golpe migraciones, seeder y test
+### 5 Lanzar migraciones, seeder y test
 
 Esto no es un comando nativo pero lo e creado para lanzarlo. Esto realiza las 3 acciones al mismo tiempo y te muestra si los test a finalizado correctamente.
 
