@@ -85,18 +85,24 @@ docker-compose up -d
 
 > **Nota sobre persistencia:** Si decides descomentar la sección de `volumes` en tu `docker-compose.yml`, los datos se mantendrán aunque borres el contenedor. Si usas el script de inicialización automático (`init-db`), es posible que no necesites el siguiente paso.
 
-### 5. Migraciones y Datos (Seeders)
+### 5.1 Migraciones y Datos (Seeders)
 
 Si prefieres construir la estructura de la base de datos desde Laravel y cargar los datos de prueba iniciales, ejecuta:
 
-**Bash**
-
-```
+```bash
 # Crear la estructura de tablas
 php artisan migrate
 
 # Cargar datos de prueba (Seeders)
 php artisan db:seed
+```
+
+### 5.2 Lanzar de golpe migraciones, seeder y test
+
+Esto no es un comando nativo pero lo e creado para lanzarlo. Esto realiza las 3 acciones al mismo tiempo y te muestra si los test a finalizado correctamente.
+
+```bash
+php artisan retest
 ```
 
 ### 6. Ejecutar la API
@@ -122,6 +128,22 @@ Para gestionar los datos y ver los  **mapas de Córdoba** , conecta **DBeaver** 
 * **Base de datos:** `leadchain`
 * **Usuario:** `root`
 * **Contraseña:** `root`
+
+---
+
+## Comando creado
+
+Creado para poder hacer una estrutura de proyecto personalizada para mostrar los apartados que yo queria y quitar los inecesario.
+
+```bash
+php artisan api:tree
+```
+
+Comando que resetea la base de datos, ejecuta Seeders y lanza los tests
+
+```bash
+php artisan retest
+```
 
 ---
 
@@ -216,20 +238,6 @@ Cada vez que se use logout o refresh va a hacer falta modificar los tokens guard
 | DELETE |   `/api/visitas/{id_visita}`   |         Eliminar una visita         | No tiene                                                                                                                                                                                                                                                            | Administrador |
 
 ---
-
-## Comando creado
-
-Creado para poder hacer una estrutura de proyecto personalizada para mostrar los apartados que yo queria y quitar los inecesario.
-
-```bash
-php artisan api:tree
-```
-
-Comando que resetea la base de datos, ejecuta Seeders y lanza los tests
-
-```bash
-php artisan retest
-```
 
 ## Estructura del Proyecto
 
