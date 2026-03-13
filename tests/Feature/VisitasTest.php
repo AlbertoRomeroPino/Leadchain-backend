@@ -18,6 +18,20 @@ class VisitasTest extends TestCase
         return $loginResponse->json('access_token');
     }
 
+    private function createVisita(string $token): int
+    {
+        $visita = VisitasData::VISITA_POST;
+        $visita['observaciones'] = 'Visita Base ' . uniqid();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/visitas', $visita);
+
+        $response->assertStatus(201);
+
+        return $response->json('id');
+    }
+
     public function test_get_all_visitas(): void
     {
         $token = $this->adminToken();
@@ -81,12 +95,14 @@ class VisitasTest extends TestCase
     public function test_update_visita_with_put(): void
     {
         $token = $this->adminToken();
+        $visitaId = $this->createVisita($token);
+
         $visita = VisitasData::VISITA_PUT;
-        $visita['observaciones'] = 'PUT visita ' . time();
+        $visita['observaciones'] = 'PUT visita ' . uniqid();
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->putJson('/api/visitas/1', $visita);
+        ])->putJson('/api/visitas/' . $visitaId, $visita);
 
         $response->assertStatus(200)
             ->assertJsonPath('id_estado', $visita['id_estado'])
@@ -96,13 +112,15 @@ class VisitasTest extends TestCase
     public function test_update_visita_with_patch(): void
     {
         $token = $this->adminToken();
+        $visitaId = $this->createVisita($token);
+
         $visita = VisitasData::VISITA_PUT;
         $visita['id_estado'] = 3;
-        $visita['observaciones'] = 'PATCH visita ' . time();
+        $visita['observaciones'] = 'PATCH visita ' . uniqid();
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->patchJson('/api/visitas/1', $visita);
+        ])->patchJson('/api/visitas/' . $visitaId, $visita);
 
         $response->assertStatus(200)
             ->assertJsonPath('id_estado', $visita['id_estado'])
@@ -112,14 +130,7 @@ class VisitasTest extends TestCase
     public function test_delete_visita(): void
     {
         $token = $this->adminToken();
-        $visita = VisitasData::VISITA_POST;
-        $visita['observaciones'] = 'Delete visita ' . time();
-
-        $visitaCreada = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/visitas', $visita);
-
-        $visitaId = $visitaCreada->json('id');
+        $visitaId = $this->createVisita($token);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,

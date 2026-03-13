@@ -18,6 +18,20 @@ class ClienteTest extends TestCase
         return $loginResponse->json('access_token');
     }
 
+    private function createCliente(string $token): int
+    {
+        $cliente = ClienteData::CLIENTE_POST;
+        $cliente['email'] = 'cliente.base.' . uniqid() . '@example.com';
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/clientes', $cliente);
+
+        $response->assertStatus(201);
+
+        return $response->json('id');
+    }
+
     public function test_get_all_clientes(): void
     {
         $token = $this->adminToken();
@@ -90,12 +104,14 @@ class ClienteTest extends TestCase
     public function test_update_cliente_with_put(): void
     {
         $token = $this->adminToken();
+        $clienteId = $this->createCliente($token);
+
         $cliente = ClienteData::CLIENTE_PUT;
-        $cliente['email'] = 'cliente.put.' . time() . '@example.com';
+        $cliente['email'] = 'cliente.put.' . uniqid() . '@example.com';
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->putJson('/api/clientes/1', $cliente);
+        ])->putJson('/api/clientes/' . $clienteId, $cliente);
 
         $response->assertStatus(200)
             ->assertJsonPath('nombre', $cliente['nombre'])
@@ -105,6 +121,8 @@ class ClienteTest extends TestCase
     public function test_update_cliente_with_patch(): void
     {
         $token = $this->adminToken();
+        $clienteId = $this->createCliente($token);
+
         $clientePatch = [
             'nombre' => 'Cliente Patch',
             'telefono' => '699999999',
@@ -112,7 +130,7 @@ class ClienteTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->patchJson('/api/clientes/1', $clientePatch);
+        ])->patchJson('/api/clientes/' . $clienteId, $clientePatch);
 
         $response->assertStatus(200)
             ->assertJsonPath('nombre', $clientePatch['nombre'])
@@ -122,14 +140,7 @@ class ClienteTest extends TestCase
     public function test_delete_cliente(): void
     {
         $token = $this->adminToken();
-        $cliente = ClienteData::CLIENTE_POST;
-        $cliente['email'] = 'cliente.delete.' . time() . '@example.com';
-
-        $clienteCreado = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/clientes', $cliente);
-
-        $clienteId = $clienteCreado->json('id');
+        $clienteId = $this->createCliente($token);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,

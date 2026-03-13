@@ -18,6 +18,20 @@ class EdificioTest extends TestCase
         return $loginResponse->json('access_token');
     }
 
+    private function createEdificio(string $token): int
+    {
+        $edificio = EdificioData::EDIFICIO_POST;
+        $edificio['direccion_completa'] = 'Direccion Base ' . uniqid();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/edificios', $edificio);
+
+        $response->assertStatus(201);
+
+        return $response->json('id');
+    }
+
     public function test_get_all_edificios(): void
     {
         $token = $this->adminToken();
@@ -85,12 +99,14 @@ class EdificioTest extends TestCase
     public function test_update_edificio_with_put(): void
     {
         $token = $this->adminToken();
+        $edificioId = $this->createEdificio($token);
+
         $edificio = EdificioData::EDIFICIO_PUT;
-        $edificio['direccion_completa'] = 'Direccion PUT ' . time();
+        $edificio['direccion_completa'] = 'Direccion PUT ' . uniqid();
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->putJson('/api/edificios/1', $edificio);
+        ])->putJson('/api/edificios/' . $edificioId, $edificio);
 
         $response->assertStatus(200)
             ->assertJsonPath('direccion_completa', $edificio['direccion_completa'])
@@ -101,11 +117,13 @@ class EdificioTest extends TestCase
     public function test_update_edificio_with_patch(): void
     {
         $token = $this->adminToken();
+        $edificioId = $this->createEdificio($token);
+
         $edificioPatch = EdificioData::EDIFICIO_PATCH;
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->patchJson('/api/edificios/1', $edificioPatch);
+        ])->patchJson('/api/edificios/' . $edificioId, $edificioPatch);
 
         $response->assertStatus(200)
             ->assertJsonPath('planta', $edificioPatch['planta'])
@@ -115,14 +133,7 @@ class EdificioTest extends TestCase
     public function test_delete_edificio(): void
     {
         $token = $this->adminToken();
-        $edificio = EdificioData::EDIFICIO_POST;
-        $edificio['direccion_completa'] = 'Direccion Delete ' . time();
-
-        $edificioCreado = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/edificios', $edificio);
-
-        $edificioId = $edificioCreado->json('id');
+        $edificioId = $this->createEdificio($token);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,

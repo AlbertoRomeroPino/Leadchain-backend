@@ -18,6 +18,20 @@ class ZonaTest extends TestCase
         return $loginResponse->json('access_token');
     }
 
+    private function createZona(string $token): int
+    {
+        $zona = ZonaData::ZONA_POST;
+        $zona['nombre_zona'] = 'Zona Base ' . uniqid();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/zonas', $zona);
+
+        $response->assertStatus(201);
+
+        return $response->json('id');
+    }
+
     public function test_get_all_zonas(): void
     {
         $token = $this->adminToken();
@@ -79,12 +93,14 @@ class ZonaTest extends TestCase
     public function test_update_zona_with_put(): void
     {
         $token = $this->adminToken();
+        $zonaId = $this->createZona($token);
+
         $zona = ZonaData::ZONA_PUT;
-        $zona['nombre_zona'] = 'Zona PUT ' . time();
+        $zona['nombre_zona'] = 'Zona PUT ' . uniqid();
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->putJson('/api/zonas/1', $zona);
+        ])->putJson('/api/zonas/' . $zonaId, $zona);
 
         $response->assertStatus(200)
             ->assertJsonPath('nombre_zona', $zona['nombre_zona']);
@@ -93,12 +109,14 @@ class ZonaTest extends TestCase
     public function test_update_zona_with_patch(): void
     {
         $token = $this->adminToken();
+        $zonaId = $this->createZona($token);
+
         $zona = ZonaData::ZONA_PUT;
-        $zona['nombre_zona'] = 'Zona PATCH ' . time();
+        $zona['nombre_zona'] = 'Zona PATCH ' . uniqid();
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->patchJson('/api/zonas/1', $zona);
+        ])->patchJson('/api/zonas/' . $zonaId, $zona);
 
         $response->assertStatus(200)
             ->assertJsonPath('nombre_zona', $zona['nombre_zona']);
@@ -107,14 +125,7 @@ class ZonaTest extends TestCase
     public function test_delete_zona(): void
     {
         $token = $this->adminToken();
-        $zona = ZonaData::ZONA_POST;
-        $zona['nombre_zona'] = 'Zona Delete ' . time();
-
-        $zonaCreada = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/zonas', $zona);
-
-        $zonaId = $zonaCreada->json('id');
+        $zonaId = $this->createZona($token);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
