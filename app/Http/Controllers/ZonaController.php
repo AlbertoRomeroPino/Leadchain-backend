@@ -23,9 +23,13 @@ class ZonaController extends Controller
     public function store(ZonaRequest $request): JsonResponse
     {
 
-        $zona = Zona::create(['nombre_zona' => $request['nombre_zona']]);
 
-        DB::statement("
+        try {
+            DB::beginTransaction();
+
+            $zona = Zona::create(['nombre_zona' => $request['nombre_zona']]);
+
+            DB::statement("
             UPDATE zonas SET
                 esquina_noroeste = ST_SetSRID(ST_MakePoint(?, ?), 4326),
                 esquina_noreste  = ST_SetSRID(ST_MakePoint(?, ?), 4326),
@@ -33,12 +37,23 @@ class ZonaController extends Controller
                 esquina_sureste  = ST_SetSRID(ST_MakePoint(?, ?), 4326)
             WHERE id = ?
         ", [
-            $request['esquina_noroeste']['lng'], $request['esquina_noroeste']['lat'],
-            $request['esquina_noreste']['lng'], $request['esquina_noreste']['lat'],
-            $request['esquina_suroeste']['lng'], $request['esquina_suroeste']['lat'],
-            $request['esquina_sureste']['lng'], $request['esquina_sureste']['lat'],
-            $zona->id,
-        ]);
+                $request['esquina_noroeste']['lng'],
+                $request['esquina_noroeste']['lat'],
+                $request['esquina_noreste']['lng'],
+                $request['esquina_noreste']['lat'],
+                $request['esquina_suroeste']['lng'],
+                $request['esquina_suroeste']['lat'],
+                $request['esquina_sureste']['lng'],
+                $request['esquina_sureste']['lat'],
+                $zona->id,
+            ]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['error' => 'Error al crear la zona', 'message' => $e->getMessage()], 500);
+        }
+
 
         return response()->json(new ZonaResource($zona->fresh()), 201);
     }
@@ -66,7 +81,7 @@ class ZonaController extends Controller
     public function destroy(Zona $zona): JsonResponse
     {
         $zona->delete();
-
+        // No devuelve nada, solo un código 204 No Content
         return response()->json(null, 204);
     }
 }

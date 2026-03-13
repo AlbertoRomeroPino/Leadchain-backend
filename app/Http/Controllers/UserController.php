@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +30,7 @@ class UserController extends Controller
         return response()->json(new UserResource($user), 201);
     }
 
-    public function update(UserRequest $request, User $user): JsonResponse
+    public function update(UserUpdateRequest $request, User $user): JsonResponse
     {
         if (isset($request['password'])) {
             $request['password'] = Hash::make($request['password']);

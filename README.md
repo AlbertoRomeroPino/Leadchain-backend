@@ -155,13 +155,15 @@ La API responde en formato JSON. Algunos de los recursos disponibles son:
 
 `http://127.0.0.1:8000`
 
-Ruta de login
+### Ruta de login
 
 | **Método** | **Endpoint**  |       **Descripción**       | Body                                                                 | Token |
 | :---------------: | ------------------- | :---------------------------------: | -------------------------------------------------------------------- | ----- |
 |       POST       | `/api/auth/login` | Iniciar sesión y obtener token JWT | {<br />"email": "root@leadchain.com",<br />"password": "root"<br />} | NO    |
 
-Rutas protegidas con JWT. Cada vez que se use  logout o refresh va a hacer falta modificar los tokens guardados en `Bearer Token` de todos los que tengan Token Si
+### Rutas protegidas con JWT.
+
+Cada vez que se use logout o refresh va a hacer falta modificar los tokens guardados en `Bearer Token` de todos.
 
 | **Método** | **Endpoint**    |        **Descripción**        | Body     | Token |
 | :---------------: | --------------------- | :-----------------------------------: | -------- | ----- |
@@ -169,7 +171,7 @@ Rutas protegidas con JWT. Cada vez que se use  logout o refresh va a hacer falta
 |       POST       | `/api/auth/refresh` |          Refrescar token JWT          | No tiene | SI    |
 |        GET        | `/api/auth/me`      | Obtener datos del usuario autenticado | No tiene | SI    |
 
-Rutas compartidas por ambos roles
+### Rutas compartidas por ambos roles (comercial - administrador)
 
 | Método | Endpoint                         |        Descripción        | Body     | Token |
 | :-----: | -------------------------------- | :------------------------: | -------- | ----- |
@@ -182,40 +184,120 @@ Rutas compartidas por ambos roles
 |   GET   | `/api/visitas`                 |  Listar todas las visitas  | No tiene | SI    |
 |   GET   | `/api/visitas/{id_visita}`     | Obtener una visita por ID | No tiene | SI    |
 
-Rutas del comercial (anunciante)
+### Rutas del comercial (anunciante)
 
-| Método | Endpoint                     |            Descripción            | Body                                                                                                                                                                                                                                                                                              | Token |
-| :-----: | ---------------------------- | :--------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-|  POST  | `/api/visitas`             |       Crear una nueva visita       | {<br />      "id_usuario": 2,<br />      "id_cliente": 1,<br />      "fecha_hora": "2026-03-15 10:30:00",<br />      "hora_visita": "10:30:00",<br />      "id_estado": 1,<br />      "observaciones": "Primera visita al cliente"<br />}                                      | Si    |
-|   PUT   | `/api/visitas/{id_visita}` |   Actualizar una visita completa   | {<br />      "id_usuario": 2,<br />      "id_cliente": 1,<br />      "fecha_hora": "2026-03-15 11:00:00",<br />      "hora_visita": "11:00:00",<br />      "id_estado": 2,<br />      "observaciones": "El cliente no estaba, se reprogramó para media hora después."<br />} | Si    |
-|  PATCH  | `/api/visitas/{id_visita}` | Actualizar parcialmente una visita | Es lo mismo que el PUT solo que puedes elegir los campos que quieres<br /> modificar sin tener que mandar el objeto completo<br />Ej1:<br />{<br />      "id_estado":2<br />}<br />Ej2:{<br />      "hora_visita": "11:00:00",<br />      "observaciones": "Cualquier cosa"<br />}       | Si    |
+| Método | Endpoint                     |            Descripción            | Body                                                                                                                                                                                                                                                                                              | Token      |
+| :-----: | ---------------------------- | :--------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+|  POST  | `/api/visitas`             |       Crear una nueva visita       | {<br />      "id_usuario": 2,<br />      "id_cliente": 1,<br />      "fecha_hora": "2026-03-15 10:30:00",<br />      "hora_visita": "10:30:00",<br />      "id_estado": 1,<br />      "observaciones": "Primera visita al cliente"<br />}                                      | Anunciante |
+|   PUT   | `/api/visitas/{id_visita}` |   Actualizar una visita completa   | {<br />      "id_usuario": 2,<br />      "id_cliente": 1,<br />      "fecha_hora": "2026-03-15 11:00:00",<br />      "hora_visita": "11:00:00",<br />      "id_estado": 2,<br />      "observaciones": "El cliente no estaba, se reprogramó para media hora después."<br />} | Anunciante |
+|  PATCH  | `/api/visitas/{id_visita}` | Actualizar parcialmente una visita | Es lo mismo que el PUT solo que puedes elegir los campos que quieres<br /> modificar sin tener que mandar el objeto completo<br />Ej1:<br />{<br />      "id_estado":2<br />}<br />Ej2:{<br />      "hora_visita": "11:00:00",<br />      "observaciones": "Cualquier cosa"<br />}       | Anunciante |
 
-Rutas del administrador 
+### Rutas del administrador
 
-# //TODO: Falta testear
-
-| Método |             Endpoint             |            Descripción            | Body                                                                                                                                                                                                                                                                | Token |
-| :-----: | :------------------------------: | :---------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-|  POST  |          `/api/zonas`          |        Crear una nueva zona        | {<br />"nombre_zona": "Zona Norte",<br />"esquina_noroeste": {"lat": 37.90, "lng": -4.80},<br />"esquina_noreste": {"lat": 37.90, "lng": -4.75},<br />"esquina_suroeste": {"lat": 37.87, "lng": -4.80},<br />"esquina_sureste": {"lat": 37.87, "lng": -4.75}<br />} | SI    |
-|   PUT   |     `/api/zonas/{id_zona}`     |    Actualizar una zona completa    | Mismo body que POST con todos los campos                                                                                                                                                                                                                            | SI    |
-|  PATCH  |     `/api/zonas/{id_zona}`     |  Actualizar parcialmente una zona  | Solo los campos a modificar.<br />Ej: {<br />"nombre_zona": "Zona Actualizada"<br />}                                                                                                                                                                               | SI    |
-| DELETE |     `/api/zonas/{id_zona}`     |          Eliminar una zona          | No tiene                                                                                                                                                                                                                                                            | SI    |
-|   GET   |          `/api/users`          |      Listar todos los usuarios      | No tiene                                                                                                                                                                                                                                                            | SI    |
-|   GET   |       `/api/users/{id}`       |      Obtener un usuario por ID      | No tiene                                                                                                                                                                                                                                                            | SI    |
-|  POST  |          `/api/users`          |       Crear un nuevo usuario       | {<br />"nombre": "Carlos",<br />"apellidos": "López Ruiz",<br />"email": "carlos@leadchain.com",<br />"password": "root1234",<br />"rol": "comercial",<br />"id_responsable": 1,<br />"id_zona": 1<br />}                                                          | SI    |
-|   PUT   |       `/api/users/{id}`       |   Actualizar un usuario completo   | Mismo body que POST con todos los campos                                                                                                                                                                                                                            | SI    |
-|  PATCH  |       `/api/users/{id}`       | Actualizar parcialmente un usuario | Solo los campos a modificar.<br />Ej: {<br />"nombre": "Carlos Editado"<br />}                                                                                                                                                                                      | SI    |
-| DELETE |       `/api/users/{id}`       |         Eliminar un usuario         | No tiene                                                                                                                                                                                                                                                            | SI    |
-|  POST  |        `/api/clientes`        |       Crear un nuevo cliente       | {<br />"nombre": "Antonio",<br />"apellidos": "Pérez García",<br />"telefono": "612345678",<br />"email": "antonio@ejemplo.com",<br />"id_usuario_asignado": 2<br />}                                                                                             | SI    |
-|   PUT   |  `/api/clientes/{id_cliente}`  |   Actualizar un cliente completo   | Mismo body que POST con todos los campos                                                                                                                                                                                                                            | SI    |
-|  PATCH  |  `/api/clientes/{id_cliente}`  | Actualizar parcialmente un cliente | Solo los campos a modificar.<br />Ej: {<br />"telefono": "698765432"<br />}                                                                                                                                                                                         | SI    |
-| DELETE |  `/api/clientes/{id_cliente}`  |         Eliminar un cliente         | No tiene                                                                                                                                                                                                                                                            | SI    |
-|  POST  |        `/api/edificios`        |       Crear un nuevo edificio       | {<br />"direccion_completa": "Calle Gran Capitán 10",<br />"planta": "3",<br />"puerta": "A",<br />"ubicacion": "POINT(-4.779 37.884)",<br />"id_zona": 1,<br />"tipo": "residencial",<br />"id_cliente": 1<br />}                                                 | SI    |
-|   PUT   | `/api/edificios/{id_edificio}` |   Actualizar un edificio completo   | Mismo body que POST con todos los campos                                                                                                                                                                                                                            | SI    |
-|  PATCH  | `/api/edificios/{id_edificio}` | Actualizar parcialmente un edificio | Solo los campos a modificar.<br />Ej: {<br />"planta": "5",<br />"puerta": "B"<br />}                                                                                                                                                                               | SI    |
-| DELETE | `/api/edificios/{id_edificio}` |        Eliminar un edificio        | No tiene                                                                                                                                                                                                                                                            | SI    |
-| DELETE |   `/api/visitas/{id_visita}`   |         Eliminar una visita         | No tiene                                                                                                                                                                                                                                                            | SI    |
+| Método |             Endpoint             |            Descripción            | Body                                                                                                                                                                                                                                                                | Token         |
+| :-----: | :------------------------------: | :---------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+|  POST  |          `/api/zonas`          |        Crear una nueva zona        | {<br />"nombre_zona": "Zona Norte",<br />"esquina_noroeste": {"lat": 37.90, "lng": -4.80},<br />"esquina_noreste": {"lat": 37.90, "lng": -4.75},<br />"esquina_suroeste": {"lat": 37.87, "lng": -4.80},<br />"esquina_sureste": {"lat": 37.87, "lng": -4.75}<br />} | Administrador |
+|   PUT   |     `/api/zonas/{id_zona}`     |    Actualizar una zona completa    | Mismo body que POST con todos los campos                                                                                                                                                                                                                            | Administrador |
+| DELETE |     `/api/zonas/{id_zona}`     |          Eliminar una zona          | No tiene                                                                                                                                                                                                                                                            | Administrador |
+|   GET   |          `/api/users`          |      Listar todos los usuarios      | No tiene                                                                                                                                                                                                                                                            | Administrador |
+|   GET   |       `/api/users/{id}`       |      Obtener un usuario por ID      | No tiene                                                                                                                                                                                                                                                            | Administrador |
+|  POST  |          `/api/users`          |       Crear un nuevo usuario       | {<br />"nombre": "Alejandro",<br />"apellidos": "García Martínez",<br />"email": "ale.garcia@email.com",<br />"password": "password1234",<br />"rol": "comercial",<br />"id_responsable": 1,<br />"id_zona": 2<br />}                                             | Administrador |
+|   PUT   |       `/api/users/{id}`       |   Actualizar un usuario completo   | Mismo body que POST con todos los campos                                                                                                                                                                                                                            | Administrador |
+|  PATCH  |       `/api/users/{id}`       | Actualizar parcialmente un usuario | Solo los campos a modificar.<br />Ej: {<br />"nombre": "Carlos Editado"<br />}                                                                                                                                                                                      | Administrador |
+| DELETE |       `/api/users/{id}`       |         Eliminar un usuario         | No tiene                                                                                                                                                                                                                                                            | Administrador |
+|  POST  |        `/api/clientes`        |       Crear un nuevo cliente       | {<br />"nombre": "Antonio",<br />"apellidos": "Pérez García",<br />"telefono": "612345678",<br />"email": "antonio@ejemplo.com",<br />"id_usuario_asignado": 2<br />}                                                                                             | Administrador |
+|   PUT   |  `/api/clientes/{id_cliente}`  |   Actualizar un cliente completo   | Mismo body que POST con todos los campos                                                                                                                                                                                                                            | Administrador |
+|  PATCH  |  `/api/clientes/{id_cliente}`  | Actualizar parcialmente un cliente | Solo los campos a modificar.<br />Ej: {<br />"telefono": "698765432"<br />}                                                                                                                                                                                         | Administrador |
+| DELETE |  `/api/clientes/{id_cliente}`  |         Eliminar un cliente         | No tiene                                                                                                                                                                                                                                                            | Administrador |
+|  POST  |        `/api/edificios`        |       Crear un nuevo edificio       | {<br />"direccion_completa": "Calle Gran Capitán 10",<br />"planta": "3",<br />"puerta": "A",<br />"ubicacion": { "lat": 40.4168, "lng": -3.7038 }<br />"id_zona": 1,<br />"tipo": "residencial",<br />"id_cliente": 1<br />}                                      | Administrador |
+|   PUT   | `/api/edificios/{id_edificio}` |   Actualizar un edificio completo   | Mismo body que POST con todos los campos                                                                                                                                                                                                                            | Administrador |
+|  PATCH  | `/api/edificios/{id_edificio}` | Actualizar parcialmente un edificio | Solo los campos a modificar.<br />Ej: {<br />"planta": "5",<br />"puerta": "B"<br />}                                                                                                                                                                               | Administrador |
+| DELETE | `/api/edificios/{id_edificio}` |        Eliminar un edificio        | No tiene                                                                                                                                                                                                                                                            | Administrador |
+| DELETE |   `/api/visitas/{id_visita}`   |         Eliminar una visita         | No tiene                                                                                                                                                                                                                                                            | Administrador |
 
 ---
 
+## Comando creado
+
+Creado para poder hacer una estrutura de proyecto personalizada para mostrar los apartados que yo queria y quitar los inecesario.
+
+```bash
+php artisan api:tree
+```
+
 ## Estructura del Proyecto
+
+```bash
+Estructura del proyecto (filtrada):
+├── .env
+├── .env.example
+├── README.md
+├── app
+│   ├── Console
+│   │   └── Commands
+│   │       └── EstructuraProyecto.php
+│   ├── Http
+│   │   ├── Controllers
+│   │   │   ├── Api
+│   │   │   │   └── AuthController.php
+│   │   │   ├── ClienteController.php
+│   │   │   ├── Controller.php
+│   │   │   ├── EdificioController.php
+│   │   │   ├── EstadoVisitaController.php
+│   │   │   ├── UserController.php
+│   │   │   ├── VisitaController.php
+│   │   │   └── ZonaController.php
+│   │   ├── Middleware
+│   │   │   ├── CheckRole.php
+│   │   │   └── LoginAdmin.php
+│   │   ├── Requests
+│   │   │   ├── AuthRequest.php
+│   │   │   ├── ClienteRequest.php
+│   │   │   ├── EdificioRequest.php
+│   │   │   ├── EstadoVisitaRequest.php
+│   │   │   ├── UserRequest.php
+│   │   │   ├── UserUpdateRequest.php
+│   │   │   ├── VisitaRequest.php
+│   │   │   └── ZonaRequest.php
+│   │   └── Resources
+│   │       ├── ClienteResource.php
+│   │       ├── EdificioResource.php
+│   │       ├── EstadoVisitaResource.php
+│   │       ├── UserResource.php
+│   │       ├── VisitaResource.php
+│   │       └── ZonaResource.php
+│   └── Models
+│       ├── Cliente.php
+│       ├── Edificio.php
+│       ├── EstadoVisita.php
+│       ├── User.php
+│       ├── Visita.php
+│       └── Zona.php
+├── config
+│   ├── auth.php
+│   └── jwt.php
+├── database
+│   ├── migrations
+│   │   ├── 2026_03_09_000001_create_zonas_table.php
+│   │   ├── 2026_03_09_000002_create_estados_visita_table.php
+│   │   ├── 2026_03_09_000003_create_users_table.php
+│   │   ├── 2026_03_09_000006_create_clientes_table.php
+│   │   ├── 2026_03_09_000007_create_edificios_table.php
+│   │   └── 2026_03_09_000008_create_visitas_table.php
+│   └── seeders
+│       ├── ClienteSeeder.php
+│       ├── DatabaseSeeder.php
+│       ├── EdificioSeeder.php
+│       ├── EstadoVisitaSeeder.php
+│       ├── UserSeeder.php
+│       ├── VisitaSeeder.php
+│       └── ZonaSeeder.php
+├── docker-compose.yml
+├── init-db
+│   └── db-leadchain.sql
+├── package.json
+└── routes
+    ├── api.php
+    ├── console.php
+    └── web.php
+```

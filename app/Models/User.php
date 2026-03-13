@@ -29,6 +29,7 @@ class User extends Authenticatable implements JWTSubject
         'id_zona',
     ];
 
+
     /**
      * The attributes that should be hidden for serialization.
      *

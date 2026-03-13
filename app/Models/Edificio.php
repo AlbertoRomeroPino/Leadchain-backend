@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class Edificio extends Model
 {
@@ -16,11 +17,27 @@ class Edificio extends Model
         'direccion_completa',
         'planta',
         'puerta',
-        'ubicacion',
         'id_zona',
         'tipo',
         'id_cliente',
     ];
+
+    /**
+     * Parsear geometry Point a array [lat, lng]
+     */
+    public function getUbicacionAttribute(): ?array
+    {
+        if (!$this->id) {
+            return null;
+        }
+
+        $result = DB::selectOne(
+            'SELECT ST_Y(ubicacion) as lat, ST_X(ubicacion) as lng FROM edificios WHERE id = ?',
+            [$this->id]
+        );
+
+        return $result ? ['lat' => (float) $result->lat, 'lng' => (float) $result->lng] : null;
+    }
 
     /**
      * Zona donde está el edificio
