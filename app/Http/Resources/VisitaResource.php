@@ -19,7 +19,6 @@ class VisitaResource extends JsonResource
             'id_usuario' => $this->id_usuario,
             'id_cliente' => $this->id_cliente,
             'fecha_hora' => $this->fecha_hora,
-            'hora_visita' => $this->hora_visita,
             'id_estado' => $this->id_estado,
             'observaciones' => $this->observaciones,
             'created_at' => $this->created_at,

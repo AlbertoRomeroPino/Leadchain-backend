@@ -25,7 +25,6 @@ class VisitaRequest extends FormRequest
             'id_usuario' => 'required|exists:users,id',
             'id_cliente' => 'required|exists:clientes,id',
             'fecha_hora' => 'required|date',
-            'hora_visita' => 'nullable|date_format:H:i:s',
             'id_estado' => 'required|exists:estados_visita,id',
             'observaciones' => 'nullable|string',
         ];

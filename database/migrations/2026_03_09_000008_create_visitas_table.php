@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('id_usuario')->constrained('users')->restrictOnDelete();
             $table->foreignId('id_cliente')->constrained('clientes')->restrictOnDelete();
             $table->timestamp('fecha_hora');
-            $table->time('hora_visita')->nullable();
             $table->foreignId('id_estado')->constrained('estados_visita')->restrictOnDelete();
             $table->text('observaciones')->nullable();
             $table->timestamps();

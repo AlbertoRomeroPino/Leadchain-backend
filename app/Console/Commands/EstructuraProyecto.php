@@ -35,7 +35,6 @@ class EstructuraProyecto extends Command
         '.git',
         'Providers',
         'factories',
-        'tests'
     ];
     private $excludeFiles = [
         '.editorconfig',
