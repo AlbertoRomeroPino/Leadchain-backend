@@ -25,6 +25,52 @@
       background: #fafafa;
     }
     </style>
+    <style>
+    /* ── LeadChain branding ── */
+    .swagger-ui .topbar {
+        background: linear-gradient(135deg, #0a2540 0%, #1e3a5f 100%);
+        padding: 10px 0;
+    }
+    .swagger-ui .topbar-wrapper a.link svg,
+    .swagger-ui .topbar-wrapper a.link img {
+        display: none;
+    }
+    .swagger-ui .topbar-wrapper a.link::after {
+        content: 'LeadChain  |  API Docs';
+        color: #f0c040;
+        font-size: 1.4em;
+        font-weight: 700;
+        letter-spacing: 2px;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    .swagger-ui .info .title {
+        color: #0a2540;
+    }
+    .swagger-ui .info .title small.version-stamp {
+        background: #0a2540;
+    }
+    .swagger-ui .opblock-tag {
+        border-bottom: 2px solid #c0a83a !important;
+    }
+    .swagger-ui .btn.authorize {
+        border-color: #0a2540;
+        color: #0a2540;
+    }
+    .swagger-ui .btn.authorize svg {
+        fill: #0a2540;
+    }
+    .swagger-ui .opblock.opblock-get    { border-color: #2563eb; }
+    .swagger-ui .opblock.opblock-post   { border-color: #16a34a; }
+    .swagger-ui .opblock.opblock-put    { border-color: #d97706; }
+    .swagger-ui .opblock.opblock-patch  { border-color: #d97706; }
+    .swagger-ui .opblock.opblock-delete { border-color: #dc2626; }
+    .swagger-ui .opblock.opblock-get    .opblock-summary-method { background: #2563eb; }
+    .swagger-ui .opblock.opblock-post   .opblock-summary-method { background: #16a34a; }
+    .swagger-ui .opblock.opblock-put    .opblock-summary-method { background: #d97706; }
+    .swagger-ui .opblock.opblock-patch  .opblock-summary-method { background: #b45309; }
+    .swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #dc2626; }
+    </style>
+
     @if(config('l5-swagger.defaults.ui.display.dark_mode'))
         <style>
             body#dark-mode,
