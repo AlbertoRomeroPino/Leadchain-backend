@@ -113,9 +113,9 @@ Para gestionar los datos y ver los  **mapas de Córdoba** , conecta **DBeaver** 
 
 * **Host:** `localhost`
 * **Puerto:** `5432`
-* **Base de datos:** `leadchain`
-* **Usuario:** `root`
-* **Contraseña:** `root`
+* **Base de datos:** ????
+* **Usuario:** ????
+* **Contraseña:** ?
 
 ---
 

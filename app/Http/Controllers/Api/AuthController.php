@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRequest;
+use OpenApi\Attributes as OA;
 use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 
 class AuthController extends Controller
@@ -18,9 +19,15 @@ class AuthController extends Controller
         return $guard;
     }
 
-    /**
-     * Login de usuario con JWT
-     */
+    #[OA\Post(
+        path: '/api/auth/login',
+        summary: 'Iniciar sesión',
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(response: 401, description: 'No autorizado'),
+        ]
+    )]
     public function login(AuthRequest $request)
     {
         $credentials = $request->only('email', 'password');

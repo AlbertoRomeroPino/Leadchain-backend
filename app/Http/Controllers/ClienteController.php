@@ -6,9 +6,19 @@ use App\Http\Requests\ClienteRequest;
 use App\Http\Resources\ClienteResource;
 use App\Models\Cliente;
 use Illuminate\Http\JsonResponse;
+use OpenApi\Annotations as OA;
 
 class ClienteController extends Controller
 {
+    /**
+     * @OA\Get(
+     * path="/api/clientes",
+     * summary="Listar clientes",
+     * tags={"Clientes"},
+     * @OA\Response(response=200, description="OK"),
+     * security={{"bearerAuth":{}}}
+     * )
+     */
     public function index(): JsonResponse
     {
         return response()->json(ClienteResource::collection(Cliente::with('usuarioAsignado')->get()));
