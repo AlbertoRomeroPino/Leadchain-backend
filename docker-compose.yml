@@ -1,18 +1,59 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: laravel_leadchain
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - app_source:/var/www/html
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_KEY: ${APP_KEY:-base64:KlAZySTfmFdzK4yr8509iuigPTcXZlFSo/yumu/JQ7A=}
+      DB_CONNECTION: ${DB_CONNECTION:-pgsql}
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-5432}
+      DB_DATABASE: ${DB_DATABASE:-leadchain}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      JWT_ALGO: ${JWT_ALGO:-HS256}
+      JWT_SECRET: ${JWT_SECRET:-abPjIWHtPNVc1M7R4Lbb68ESf8N5f9sqWByU4k3x1Lx0YZmazYlnwCnugIyVOdZy}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "if [ ! -f /var/www/html/artisan ]; then
+      git clone https://github.com/AlbertoRomeroPino/Leadchain-backend.git /tmp/leadchain
+      && cp -a /tmp/leadchain/. /var/www/html
+      && rm -rf /tmp/leadchain;
+      fi
+      && composer install --no-interaction --prefer-dist
+      && until pg_isready -h \"$$DB_HOST\" -p \"$$DB_PORT\" -U \"$$DB_USERNAME\" -d \"$$DB_DATABASE\"; do echo 'Esperando la base de datos...'; sleep 2; done
+      && php artisan migrate --force
+      && php artisan serve --host=0.0.0.0 --port=8000"
+
   db:
-    image: postgis/postgis:15-3.3 # Postgres 15 con PostGIS 3.3
+    image: postgis/postgis:15-3.3
     container_name: postgres_leadchain
     restart: always
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: leadchain
+      POSTGRES_USER: ${DB_USERNAME:-root}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-root}
+      POSTGRES_DB: ${DB_DATABASE:-leadchain}
     ports:
       - "5432:5432"
-    # volumes:
-      # PostgreSQL ejecuta automáticamente los .sql en /docker-entrypoint-initdb.d/
-      # - ./init-db/db-leadchain.sql:/docker-entrypoint-initdb.d/db-leadchain.sql
-      # - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-root} -d ${DB_DATABASE:-leadchain}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
+  app_source:
   postgres_data:
