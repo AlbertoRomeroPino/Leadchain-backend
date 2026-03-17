@@ -12,7 +12,7 @@ class ClienteController extends Controller
 {
     #[OA\Get(
         path: '/api/clientes',
-        tags: ['Clientes', 'Listado', 'clientes', 'cliente'],
+        tags: ['Clientes'],
         summary: 'Listar todos los clientes',
         security: [['bearerAuth' => []]],
         responses: [
@@ -27,7 +27,7 @@ class ClienteController extends Controller
 
     #[OA\Get(
         path: '/api/clientes/{cliente}',
-        tags: ['Clientes', 'Detalle', 'clientes', 'cliente'],
+        tags: ['Clientes'],
         summary: 'Obtener un cliente por ID',
         security: [['bearerAuth' => []]],
         parameters: [new OA\Parameter(name: 'cliente', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
@@ -44,7 +44,7 @@ class ClienteController extends Controller
 
     #[OA\Post(
         path: '/api/clientes',
-        tags: ['Clientes', 'Creación', 'clientes', 'cliente'],
+        tags: ['Clientes'],
         summary: 'Crear un nuevo cliente',
         security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
@@ -75,7 +75,7 @@ class ClienteController extends Controller
 
     #[OA\Put(
         path: '/api/clientes/{cliente}',
-        tags: ['Clientes', 'Actualización', 'clientes', 'cliente'],
+        tags: ['Clientes'],
         summary: 'Actualizar un cliente completo',
         security: [['bearerAuth' => []]],
         parameters: [new OA\Parameter(name: 'cliente', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
@@ -89,7 +89,7 @@ class ClienteController extends Controller
     )]
     #[OA\Patch(
         path: '/api/clientes/{cliente}',
-        tags: ['Clientes', 'Actualización', 'clientes', 'cliente'],
+        tags: ['Clientes'],
         summary: 'Actualizar parcialmente un cliente',
         security: [['bearerAuth' => []]],
         parameters: [new OA\Parameter(name: 'cliente', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
@@ -110,7 +110,7 @@ class ClienteController extends Controller
 
     #[OA\Delete(
         path: '/api/clientes/{cliente}',
-        tags: ['Clientes', 'Eliminación', 'clientes', 'cliente'],
+        tags: ['Clientes'],
         summary: 'Eliminar un cliente',
         security: [['bearerAuth' => []]],
         parameters: [new OA\Parameter(name: 'cliente', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
