@@ -1,0 +1,117 @@
+<?php
+
+namespace App\OpenApi;
+
+use OpenApi\Attributes as OA;
+
+#[OA\Info(
+    version: '1.0.0',
+    title: 'LeadChain API',
+    description: 'API REST de LeadChain para la gestión comercial de clientes, edificios y visitas. Autenticación mediante JWT (Bearer token). Incluye soporte para coordenadas geográficas PostGIS.',
+    contact: new OA\Contact(name: 'Alberto Romero Pino', email: 'albertoromeropino2004@gmail.com')
+)]
+#[OA\Server(
+    url: 'http://localhost:8000',
+    description: 'Servidor local'
+)]
+#[OA\SecurityScheme(
+    securityScheme: 'bearerAuth',
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT'
+)]
+#[OA\Schema(
+    schema: 'GeoPoint',
+    required: ['lat', 'lng'],
+    properties: [
+        new OA\Property(property: 'lat', type: 'number', format: 'float', example: 37.90),
+        new OA\Property(property: 'lng', type: 'number', format: 'float', example: -4.80),
+    ],
+    type: 'object'
+)]
+#[OA\Schema(
+    schema: 'ZonaInput',
+    required: ['nombre_zona', 'esquina_noroeste', 'esquina_noreste', 'esquina_suroeste', 'esquina_sureste'],
+    properties: [
+        new OA\Property(property: 'nombre_zona', type: 'string', example: 'Zona Norte'),
+        new OA\Property(property: 'esquina_noroeste', ref: '#/components/schemas/GeoPoint'),
+        new OA\Property(property: 'esquina_noreste', ref: '#/components/schemas/GeoPoint'),
+        new OA\Property(property: 'esquina_suroeste', ref: '#/components/schemas/GeoPoint'),
+        new OA\Property(property: 'esquina_sureste', ref: '#/components/schemas/GeoPoint'),
+    ],
+    type: 'object'
+)]
+#[OA\Schema(
+    schema: 'ClienteResource',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'nombre', type: 'string', example: 'Antonio'),
+        new OA\Property(property: 'apellidos', type: 'string', example: 'Perez Garcia'),
+        new OA\Property(property: 'telefono', type: 'string', example: '612345678'),
+        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'antonio@ejemplo.com'),
+        new OA\Property(property: 'id_usuario_asignado', type: 'integer', example: 2),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ],
+    type: 'object'
+)]
+#[OA\Schema(
+    schema: 'EdificioResource',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'direccion_completa', type: 'string', example: 'Calle Gran Capitan 10'),
+        new OA\Property(property: 'planta', type: 'string', nullable: true, example: '3'),
+        new OA\Property(property: 'puerta', type: 'string', nullable: true, example: 'A'),
+        new OA\Property(property: 'ubicacion', ref: '#/components/schemas/GeoPoint'),
+        new OA\Property(property: 'id_zona', type: 'integer', example: 1),
+        new OA\Property(property: 'tipo', type: 'string', example: 'residencial'),
+        new OA\Property(property: 'id_cliente', type: 'integer', nullable: true, example: 1),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ],
+    type: 'object'
+)]
+#[OA\Schema(
+    schema: 'UserResource',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'nombre', type: 'string', example: 'Alejandro'),
+        new OA\Property(property: 'apellidos', type: 'string', example: 'Garcia Martinez'),
+        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'ale.garcia@email.com'),
+        new OA\Property(property: 'rol', type: 'string', example: 'comercial'),
+        new OA\Property(property: 'id_responsable', type: 'integer', nullable: true, example: 1),
+        new OA\Property(property: 'id_zona', type: 'integer', nullable: true, example: 2),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ],
+    type: 'object'
+)]
+#[OA\Schema(
+    schema: 'VisitaResource',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'id_usuario', type: 'integer', example: 2),
+        new OA\Property(property: 'id_cliente', type: 'integer', example: 1),
+        new OA\Property(property: 'fecha_hora', type: 'string', format: 'date-time', example: '2026-03-15 10:30:00'),
+        new OA\Property(property: 'id_estado', type: 'integer', example: 1),
+        new OA\Property(property: 'observaciones', type: 'string', nullable: true, example: 'Primera visita al cliente'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ],
+    type: 'object'
+)]
+#[OA\Schema(
+    schema: 'ZonaResource',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'nombre_zona', type: 'string', example: 'Zona Norte'),
+        new OA\Property(property: 'esquina_noroeste', type: 'object', properties: [new OA\Property(property: 'lat', type: 'number', format: 'float', example: 37.90), new OA\Property(property: 'lng', type: 'number', format: 'float', example: -4.80)]),
+        new OA\Property(property: 'esquina_noreste',  type: 'object', properties: [new OA\Property(property: 'lat', type: 'number', format: 'float', example: 37.90), new OA\Property(property: 'lng', type: 'number', format: 'float', example: -4.75)]),
+        new OA\Property(property: 'esquina_suroeste', type: 'object', properties: [new OA\Property(property: 'lat', type: 'number', format: 'float', example: 37.87), new OA\Property(property: 'lng', type: 'number', format: 'float', example: -4.80)]),
+        new OA\Property(property: 'esquina_sureste',  type: 'object', properties: [new OA\Property(property: 'lat', type: 'number', format: 'float', example: 37.87), new OA\Property(property: 'lng', type: 'number', format: 'float', example: -4.75)]),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ],
+    type: 'object'
+)]
+class OpenApiSpec {}
