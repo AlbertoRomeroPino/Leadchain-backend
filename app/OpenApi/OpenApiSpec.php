@@ -8,7 +8,7 @@ use OpenApi\Attributes as OA;
     version: '1.0.0',
     title: 'LeadChain API',
     description: 'API REST de LeadChain para la gestión comercial de clientes, edificios y visitas. Autenticación mediante JWT (Bearer token). Incluye soporte para coordenadas geográficas PostGIS.',
-    contact: new OA\Contact(name: 'LeadChain Dev', email: 'dev@leadchain.local')
+    contact: new OA\Contact(name: 'Alberto Romero Pino', email: 'albertoromeropino2004@gmail.com')
 )]
 #[OA\Server(
     url: 'http://localhost:8000',
@@ -114,6 +114,4 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-class OpenApiSpec
-{
-}
+class OpenApiSpec {}

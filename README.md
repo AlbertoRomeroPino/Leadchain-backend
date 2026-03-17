@@ -1,5 +1,3 @@
-# //TODO Alberto esto es un boceto para modificar mas adelante
-
 # LeadChain API - Backend Córdoba
 
 LeadChain es una **API-Rest** diseñada para la gestión de clientes, edificios y visitas comerciales en la ciudad de Córdoba. Utiliza **PostgreSQL con PostGIS** para manejar ubicaciones geográficas exactas, permitiendo visualizar mapas y zonas de venta en tiempo real.

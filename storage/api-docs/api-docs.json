@@ -4,8 +4,8 @@
         "title": "LeadChain API",
         "description": "API REST de LeadChain para la gestión comercial de clientes, edificios y visitas. Autenticación mediante JWT (Bearer token). Incluye soporte para coordenadas geográficas PostGIS.",
         "contact": {
-            "name": "LeadChain Dev",
-            "email": "dev@leadchain.local"
+            "name": "Alberto Romero Pino",
+            "email": "albertoromeropino2004@gmail.com"
         },
         "version": "1.0.0"
     },
