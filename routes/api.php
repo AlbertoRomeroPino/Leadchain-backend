@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\EdificioController;
+use App\Http\Controllers\EstadoVisitaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitaController;
 use App\Http\Controllers\ZonaController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\ZonaController;
 | Rutas públicas
 |--------------------------------------------------------------------------
 */
+
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
 });
@@ -34,6 +36,7 @@ Route::middleware('auth:api')->group(function () {
     // Lectura compartida (admin y comercial)
     Route::apiResource('clientes',  ClienteController::class)->only(['index', 'show']);
     Route::apiResource('edificios', EdificioController::class)->only(['index', 'show']);
+    Route::apiResource('estados-visita', EstadoVisitaController::class)->only(['index', 'show']);
     Route::apiResource('visitas',   VisitaController::class)->only(['index', 'show']);
     Route::apiResource('zonas',     ZonaController::class)->only(['index', 'show']);
 

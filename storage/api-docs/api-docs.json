@@ -702,6 +702,118 @@
                 ]
             }
         },
+        "/api/estados-visita": {
+            "get": {
+                "tags": [
+                    "Estados de Visita"
+                ],
+                "summary": "Listar todos los estados de visita",
+                "operationId": "0bcbdecb9cc1350a5c4eb340b34715cb",
+                "responses": {
+                    "200": {
+                        "description": "Listado de estados de visita",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "etiqueta": {
+                                                "type": "string"
+                                            },
+                                            "color_hex": {
+                                                "type": "string"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/estados-visita/{estadoVisita}": {
+            "get": {
+                "tags": [
+                    "Estados de Visita"
+                ],
+                "summary": "Obtener un estado de visita por ID",
+                "operationId": "888cf8625e5ead8168a5db3c5a2745ec",
+                "parameters": [
+                    {
+                        "name": "estadoVisita",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estado de visita encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "etiqueta": {
+                                            "type": "string"
+                                        },
+                                        "color_hex": {
+                                            "type": "string"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Estado de visita no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/users": {
             "get": {
                 "tags": [
@@ -1799,6 +1911,10 @@
         {
             "name": "Edificios",
             "description": "Edificios"
+        },
+        {
+            "name": "Estados de Visita",
+            "description": "Estados de Visita"
         },
         {
             "name": "Usuarios",
