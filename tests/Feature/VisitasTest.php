@@ -18,8 +18,16 @@ class VisitasTest extends TestCase
         return $loginResponse->json('access_token');
     }
 
-    private function createVisita(string $token): int
+    private function comercialToken(): string
     {
+        $loginResponse = $this->postJson('/api/auth/login', LoginData::LOGIN_COMERCIAL);
+
+        return $loginResponse->json('access_token');
+    }
+
+    private function createVisita(): int
+    {
+        $token = $this->comercialToken();
         $visita = VisitasData::VISITA_POST;
         $visita['observaciones'] = 'Visita Base ' . uniqid();
 
@@ -78,7 +86,7 @@ class VisitasTest extends TestCase
 
     public function test_create_visita(): void
     {
-        $token = $this->adminToken();
+        $token = $this->comercialToken();
         $visita = VisitasData::VISITA_POST;
         $visita['observaciones'] = 'Creacion visita ' . time();
 
@@ -94,8 +102,8 @@ class VisitasTest extends TestCase
 
     public function test_update_visita_with_put(): void
     {
-        $token = $this->adminToken();
-        $visitaId = $this->createVisita($token);
+        $token = $this->comercialToken();
+        $visitaId = $this->createVisita();
 
         $visita = VisitasData::VISITA_PUT;
         $visita['observaciones'] = 'PUT visita ' . uniqid();
@@ -111,8 +119,8 @@ class VisitasTest extends TestCase
 
     public function test_update_visita_with_patch(): void
     {
-        $token = $this->adminToken();
-        $visitaId = $this->createVisita($token);
+        $token = $this->comercialToken();
+        $visitaId = $this->createVisita();
 
         $visita = VisitasData::VISITA_PUT;
         $visita['id_estado'] = 3;
@@ -129,8 +137,8 @@ class VisitasTest extends TestCase
 
     public function test_delete_visita(): void
     {
+        $visitaId = $this->createVisita();
         $token = $this->adminToken();
-        $visitaId = $this->createVisita($token);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
