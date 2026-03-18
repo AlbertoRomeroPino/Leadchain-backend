@@ -43,6 +43,14 @@ No necesitas instalar PHP, Composer ni PostgreSQL en tu maquina para usar este f
 docker compose up --build
 ```
 
+---
+
+Una vez descargado el --build ejecutamos para tener los seeders:
+
+```bash
+docker compose exec app php artisan db:seed --force
+```
+
 API disponible en:
 
 - http://localhost:8000
@@ -100,14 +108,14 @@ Recursos principales del dominio:
 
 Matriz de permisos definida en el proyecto:
 
-| Recurso | Admin | Comercial |
-| :-- | :--: | :--: |
-| Clientes | CRUD | R |
-| Zonas | CRUD | R |
-| Usuarios | CRUD | - |
-| Edificios | CRUD | R |
-| Visitas | R, D | C, R, U |
-| EstadoVisita | U | U |
+| Recurso      | Admin | Comercial |
+| :----------- | :---: | :-------: |
+| Clientes     | CRUD |     R     |
+| Zonas        | CRUD |     R     |
+| Usuarios     | CRUD |     -     |
+| Edificios    | CRUD |     R     |
+| Visitas      | R, D |  C, R, U  |
+| EstadoVisita |   R   |     R     |
 
 ## Estructura Base del Proyecto
 
