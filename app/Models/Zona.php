@@ -18,50 +18,32 @@ class Zona extends Model
     ];
 
     protected $appends = [
-        'esquina_noroeste',
-        'esquina_noreste',
-        'esquina_suroeste',
-        'esquina_sureste',
-    ];
-
-    protected $hidden = [
-        'esquina_noroeste_raw',
-        'esquina_noreste_raw',
-        'esquina_suroeste_raw',
-        'esquina_sureste_raw',
+        'area',
     ];
 
     /**
-     * Parsear geometry Point a array [lat, lng]
+     * Parsear geometry Polygon a array de puntos [{lat, lng}, ...]
      */
-    private function parsePoint(?string $column): ?array
+    public function getAreaAttribute(): ?array
     {
-        if (!$this->id) return null;
-        $result = DB::selectOne(
-            "SELECT ST_Y({$column}) as lat, ST_X({$column}) as lng FROM zonas WHERE id = ?",
-            [$this->id]
-        );
-        return $result ? ['lat' => (float) $result->lat, 'lng' => (float) $result->lng] : null;
-    }
+        if (!$this->id) {
+            return null;
+        }
 
-    public function getEsquinaNoroesteAttribute(): ?array
-    {
-        return $this->parsePoint('esquina_noroeste');
-    }
+        $result = DB::selectOne('SELECT ST_AsGeoJSON(area) as area_geojson FROM zonas WHERE id = ?', [$this->id]);
 
-    public function getEsquinaNoresteAttribute(): ?array
-    {
-        return $this->parsePoint('esquina_noreste');
-    }
+        if (!$result || !$result->area_geojson) {
+            return null;
+        }
 
-    public function getEsquinaSuroesteAttribute(): ?array
-    {
-        return $this->parsePoint('esquina_suroeste');
-    }
+        $geojson = json_decode($result->area_geojson, true);
+        $coordinates = $geojson['coordinates'][0] ?? [];
 
-    public function getEsquinaSuresteAttribute(): ?array
-    {
-        return $this->parsePoint('esquina_sureste');
+        if (count($coordinates) > 1 && $coordinates[0] === $coordinates[count($coordinates) - 1]) {
+            array_pop($coordinates);
+        }
+
+        return array_map(fn($point) => ['lat' => (float) $point[1], 'lng' => (float) $point[0]], $coordinates);
     }
 
     /**

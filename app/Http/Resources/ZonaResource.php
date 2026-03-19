@@ -17,10 +17,7 @@ class ZonaResource extends JsonResource
         return [
             'id' => $this->id,
             'nombre_zona' => $this->nombre_zona,
-            'esquina_noroeste' => $this->esquina_noroeste,
-            'esquina_noreste' => $this->esquina_noreste,
-            'esquina_suroeste' => $this->esquina_suroeste,
-            'esquina_sureste' => $this->esquina_sureste,
+            'area' => $this->area,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

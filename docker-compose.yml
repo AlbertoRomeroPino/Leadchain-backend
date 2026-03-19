@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      - app_source:/var/www/html
+      - ./:/var/www/html
     environment:
       APP_ENV: ${APP_ENV:-local}
       APP_DEBUG: ${APP_DEBUG:-true}
@@ -26,12 +26,7 @@ services:
       db:
         condition: service_healthy
     command: >
-      sh -c "if [ ! -f /var/www/html/artisan ]; then
-      git clone https://github.com/AlbertoRomeroPino/Leadchain-backend.git /tmp/leadchain
-      && cp -a /tmp/leadchain/. /var/www/html
-      && rm -rf /tmp/leadchain;
-      fi
-      && composer install --no-interaction --prefer-dist
+      sh -c "composer install --no-interaction --prefer-dist
       && until pg_isready -h \"$$DB_HOST\" -p \"$$DB_PORT\" -U \"$$DB_USERNAME\" -d \"$$DB_DATABASE\"; do echo 'Esperando la base de datos...'; sleep 2; done
       && php artisan migrate --force
       && php artisan serve --host=0.0.0.0 --port=8000"
@@ -55,5 +50,4 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  app_source:
   postgres_data:

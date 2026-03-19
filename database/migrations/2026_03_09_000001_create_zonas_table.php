@@ -21,11 +21,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Añadir columnas geometry para las 4 esquinas de la zona (cuadrícula)
-        DB::statement('ALTER TABLE zonas ADD COLUMN esquina_noroeste geometry(Point, 4326)');
-        DB::statement('ALTER TABLE zonas ADD COLUMN esquina_noreste geometry(Point, 4326)');
-        DB::statement('ALTER TABLE zonas ADD COLUMN esquina_suroeste geometry(Point, 4326)');
-        DB::statement('ALTER TABLE zonas ADD COLUMN esquina_sureste geometry(Point, 4326)');
+        // Añadir columna geometry para el área de la zona
+        DB::statement('ALTER TABLE zonas ADD COLUMN area geometry(Polygon, 4326)');
     }
 
     /**

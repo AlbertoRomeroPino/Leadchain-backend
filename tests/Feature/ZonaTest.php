@@ -8,12 +8,21 @@ require_once __DIR__ . '/../Fixture/ZonaData.php';
 use tests\Fixture\LoginData;
 use tests\Fixture\ZonaData;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Database\Seeders\DatabaseSeeder;
 
 class ZonaTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected bool $seed = true;
+
+    protected string $seeder = DatabaseSeeder::class;
+
     private function adminToken(): string
     {
         $loginResponse = $this->postJson('/api/auth/login', LoginData::LOGIN_ADMIN);
+        $loginResponse->assertStatus(200);
 
         return $loginResponse->json('access_token');
     }
@@ -45,10 +54,7 @@ class ZonaTest extends TestCase
                 '*' => [
                     'id',
                     'nombre_zona',
-                    'esquina_noroeste' => ['lat', 'lng'],
-                    'esquina_noreste' => ['lat', 'lng'],
-                    'esquina_suroeste' => ['lat', 'lng'],
-                    'esquina_sureste' => ['lat', 'lng'],
+                    'area' => [['lat', 'lng']],
                     'created_at',
                     'updated_at',
                 ],
@@ -67,10 +73,7 @@ class ZonaTest extends TestCase
             ->assertJsonStructure([
                 'id',
                 'nombre_zona',
-                'esquina_noroeste' => ['lat', 'lng'],
-                'esquina_noreste' => ['lat', 'lng'],
-                'esquina_suroeste' => ['lat', 'lng'],
-                'esquina_sureste' => ['lat', 'lng'],
+                'area' => [['lat', 'lng']],
                 'created_at',
                 'updated_at',
             ]);

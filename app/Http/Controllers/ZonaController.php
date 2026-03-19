@@ -66,25 +66,16 @@ class ZonaController extends Controller
             DB::beginTransaction();
 
             $zona = Zona::create(['nombre_zona' => $request['nombre_zona']]);
+            $polygonWkt = $this->buildPolygonWkt($request['area']);
 
             DB::statement(
                 "
             UPDATE zonas SET
-                esquina_noroeste = ST_SetSRID(ST_MakePoint(?, ?), 4326),
-                esquina_noreste  = ST_SetSRID(ST_MakePoint(?, ?), 4326),
-                esquina_suroeste = ST_SetSRID(ST_MakePoint(?, ?), 4326),
-                esquina_sureste  = ST_SetSRID(ST_MakePoint(?, ?), 4326)
+                area = ST_GeomFromText(?, 4326)
             WHERE id = ?
         ",
                 [
-                    $request['esquina_noroeste']['lng'],
-                    $request['esquina_noroeste']['lat'],
-                    $request['esquina_noreste']['lng'],
-                    $request['esquina_noreste']['lat'],
-                    $request['esquina_suroeste']['lng'],
-                    $request['esquina_suroeste']['lat'],
-                    $request['esquina_sureste']['lng'],
-                    $request['esquina_sureste']['lat'],
+                    $polygonWkt,
                     $zona->id,
                 ]
             );
@@ -132,17 +123,44 @@ class ZonaController extends Controller
             $zona->update(['nombre_zona' => $request['nombre_zona']]);
         }
 
-        $esquinas = ['esquina_noroeste', 'esquina_noreste', 'esquina_suroeste', 'esquina_sureste'];
-        foreach ($esquinas as $esquina) {
-            if (isset($request[$esquina])) {
-                DB::statement(
-                    "UPDATE zonas SET {$esquina} = ST_SetSRID(ST_MakePoint(?, ?), 4326) WHERE id = ?",
-                    [$request[$esquina]['lng'], $request[$esquina]['lat'], $zona->id]
-                );
-            }
+        if (isset($request['area'])) {
+            DB::statement(
+                'UPDATE zonas SET area = ST_GeomFromText(?, 4326) WHERE id = ?',
+                [$this->buildPolygonWkt($request['area']), $zona->id]
+            );
         }
 
         return response()->json(new ZonaResource($zona->fresh()));
+    }
+
+    /**
+     * Convierte un array de puntos [{lat, lng}, ...] en WKT POLYGON.
+     */
+    private function buildPolygonWkt(array $points): string
+    {
+        if (count($points) < 4) {
+            throw new \InvalidArgumentException('El polígono debe contener al menos 4 puntos.');
+        }
+
+        $first = $points[0];
+        $last = $points[count($points) - 1];
+
+        if (!$this->isSamePoint($first, $last)) {
+            $points[] = $first;
+        }
+
+        $coordinates = array_map(
+            fn($point) => sprintf('%s %s', (float) $point['lng'], (float) $point['lat']),
+            $points
+        );
+
+        return 'POLYGON((' . implode(', ', $coordinates) . '))';
+    }
+
+    private function isSamePoint(array $pointA, array $pointB): bool
+    {
+        return (float) $pointA['lat'] === (float) $pointB['lat']
+            && (float) $pointA['lng'] === (float) $pointB['lng'];
     }
 
     #[OA\Delete(

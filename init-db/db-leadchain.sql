@@ -26,15 +26,12 @@ DROP TABLE IF EXISTS zonas CASCADE;
 -- =============================================
 -- TABLA: ZONAS (migración 000001)
 -- Define cuadrículas/zonas donde los usuarios no-admin se mueven
--- Cada zona tiene 4 esquinas usando geometry(Point, 4326)
+-- Cada zona guarda su área con geometry(Polygon, 4326)
 -- =============================================
 CREATE TABLE zonas (
     id BIGSERIAL PRIMARY KEY,
     nombre_zona VARCHAR(100) NOT NULL,
-    esquina_noroeste GEOMETRY(Point, 4326),
-    esquina_noreste GEOMETRY(Point, 4326),
-    esquina_suroeste GEOMETRY(Point, 4326),
-    esquina_sureste GEOMETRY(Point, 4326),
+    area GEOMETRY(Polygon, 4326),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -247,28 +244,16 @@ CREATE INDEX idx_personal_access_tokens_expires_at ON personal_access_tokens(exp
 -- =============================================
 
 -- Zonas de Córdoba (ZonaSeeder)
--- Cada zona es una cuadrícula definida por 4 esquinas geometry
-INSERT INTO zonas (nombre_zona, esquina_noroeste, esquina_noreste, esquina_suroeste, esquina_sureste) VALUES
+-- Cada zona es una cuadrícula definida por un polígono
+INSERT INTO zonas (nombre_zona, area) VALUES
     ('Centro',
-        ST_SetSRID(ST_MakePoint(-4.7850, 37.8920), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7740, 37.8920), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7850, 37.8850), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7740, 37.8850), 4326)),
+        ST_GeomFromText('POLYGON((-4.7850 37.8920, -4.7740 37.8920, -4.7740 37.8850, -4.7850 37.8850, -4.7850 37.8920))', 4326)),
     ('La Judería',
-        ST_SetSRID(ST_MakePoint(-4.7870, 37.8830), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7780, 37.8830), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7870, 37.8760), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7780, 37.8760), 4326)),
+        ST_GeomFromText('POLYGON((-4.7870 37.8830, -4.7780 37.8830, -4.7780 37.8760, -4.7870 37.8760, -4.7870 37.8830))', 4326)),
     ('San Basilio',
-        ST_SetSRID(ST_MakePoint(-4.7900, 37.8790), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7810, 37.8790), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7900, 37.8720), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7810, 37.8720), 4326)),
+        ST_GeomFromText('POLYGON((-4.7900 37.8790, -4.7810 37.8790, -4.7810 37.8720, -4.7900 37.8720, -4.7900 37.8790))', 4326)),
     ('La Ribera',
-        ST_SetSRID(ST_MakePoint(-4.7780, 37.8900), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7680, 37.8900), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7780, 37.8820), 4326),
-        ST_SetSRID(ST_MakePoint(-4.7680, 37.8820), 4326));
+        ST_GeomFromText('POLYGON((-4.7780 37.8900, -4.7680 37.8900, -4.7680 37.8820, -4.7780 37.8820, -4.7780 37.8900))', 4326));
 
 -- Estados de visita (EstadoVisitaSeeder)
 INSERT INTO estados_visita (etiqueta, color_hex) VALUES

@@ -7,6 +7,24 @@ use Illuminate\Support\Facades\DB;
 
 class ZonaSeeder extends Seeder
 {
+    private function buildPolygonWkt(array $zona): string
+    {
+        $points = [
+            $zona['noroeste'],
+            $zona['noreste'],
+            $zona['sureste'],
+            $zona['suroeste'],
+            $zona['noroeste'],
+        ];
+
+        $coordinates = array_map(
+            fn($point) => sprintf('%s %s', (float) $point['lng'], (float) $point['lat']),
+            $points
+        );
+
+        return 'POLYGON((' . implode(', ', $coordinates) . '))';
+    }
+
     public function run(): void
     {
         // Zonas de Córdoba como cuadrículas con 4 esquinas (geometry points)
@@ -43,22 +61,16 @@ class ZonaSeeder extends Seeder
 
         foreach ($zonas as $zona) {
             DB::statement("
-                INSERT INTO zonas (nombre_zona, esquina_noroeste, esquina_noreste, esquina_suroeste, esquina_sureste, created_at, updated_at)
+                INSERT INTO zonas (nombre_zona, area, created_at, updated_at)
                 VALUES (
                     ?,
-                    ST_SetSRID(ST_MakePoint(?, ?), 4326),
-                    ST_SetSRID(ST_MakePoint(?, ?), 4326),
-                    ST_SetSRID(ST_MakePoint(?, ?), 4326),
-                    ST_SetSRID(ST_MakePoint(?, ?), 4326),
+                    ST_GeomFromText(?, 4326),
                     NOW(),
                     NOW()
                 )
             ", [
                 $zona['nombre_zona'],
-                $zona['noroeste']['lng'], $zona['noroeste']['lat'],
-                $zona['noreste']['lng'], $zona['noreste']['lat'],
-                $zona['suroeste']['lng'], $zona['suroeste']['lat'],
-                $zona['sureste']['lng'], $zona['sureste']['lat'],
+                $this->buildPolygonWkt($zona),
             ]);
         }
     }
