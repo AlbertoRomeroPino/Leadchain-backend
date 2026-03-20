@@ -41,15 +41,15 @@ Este método es el más limpio, ya que Docker se encarga de configurar PostGIS y
    docker compose up --build -d
 
    ```
-3. **Carga de datos de prueba:**
-   Para que la API no esté vacía, inyectamos datos realistas de Córdoba (usuarios, zonas y clientes):
+3. **Carga de datos de prueba (opcional):**
+   Si quieres entorno con datos iniciales, inyecta seeders (usuarios, zonas, clientes, etc.):
 
    ```
    docker compose exec app php artisan db:seed --force
 
    ```
 
-   *📍 Acceso: La API estará lista en `http://localhost:8000`.*
+   *📍 Acceso recomendado: `http://localhost:8000/api/documentation` (Swagger).*
 
 ### 💻 Opción B: Pasos para Instalación Local (Nativa)
 
@@ -61,31 +61,11 @@ Sigue estos pasos si prefieres ejecutar la aplicación Laravel de forma nativa m
    git clone [https://github.com/AlbertoRomeroPino/Leadchain-backend.git](https://github.com/AlbertoRomeroPino/Leadchain-backend.git)
    cd leadchain-backend
    ```
-2. **Configurar Docker para Base de Datos:**
-   Para este modo, debes modificar tu archivo `docker-compose.yml` para que  **solo dockerice PostgreSQL y PostGIS** . Sustituye el contenido de tu archivo por el siguiente bloque:
+2. **Levantar solo la base de datos en Docker (sin tocar el compose):**
 
-   ```
-   services:
-     db:
-       image: postgis/postgis:15-3.3 # Postgres 15 con PostGIS 3.3
-       container_name: postgres_leadchain
-       restart: always
-       environment:
-         POSTGRES_USER: root
-         POSTGRES_PASSWORD: root
-         POSTGRES_DB: leadchain
-       ports:
-         - "5432:5432"
-       # volumes:
-         # PostgreSQL ejecuta automáticamente los .sql en /docker-entrypoint-initdb.d/
-         # - ./init-db/db-leadchain.sql:/docker-entrypoint-initdb.d/db-leadchain.sql
-         # - postgres_data:/var/lib/postgresql/data
-
-   volumes:
-     postgres_data:
-   ```
-
-   *Levanta la base de datos con:* `docker compose up -d db`
+    ```
+    docker compose up -d db
+    ```
 3. **Instalar dependencias y Configurar Entorno:**
 
    ```
@@ -99,8 +79,15 @@ Sigue estos pasos si prefieres ejecutar la aplicación Laravel de forma nativa m
    php artisan key:generate
    php artisan jwt:secret
    ```
-4. **Configurar Base de Datos:**
-   Edita el archivo `.env` asegurándote de que el `DB_HOST` sea `127.0.0.1`. Luego, crea las tablas y carga los datos:
+4. **Configurar Base de Datos y sesión en `.env`:**
+   Asegúrate de tener:
+
+   ```env
+   DB_HOST=127.0.0.1
+   SESSION_DRIVER=file
+   ```
+
+   Luego crea tablas y carga datos:
 
    ```
    php artisan migrate --seed
@@ -112,6 +99,8 @@ Sigue estos pasos si prefieres ejecutar la aplicación Laravel de forma nativa m
    php artisan serve
 
    ```
+
+   *📍 Acceso recomendado: `http://127.0.0.1:8000/api/documentation` (Swagger).*
 
 ## 🔐 Modelo de Accesos y Permisos
 

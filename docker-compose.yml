@@ -18,6 +18,7 @@ services:
       DB_DATABASE: ${DB_DATABASE:-leadchain}
       DB_USERNAME: ${DB_USERNAME:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root}
+      SESSION_DRIVER: ${SESSION_DRIVER:-file}
       JWT_ALGO: ${JWT_ALGO:-HS256}
       JWT_SECRET: ${JWT_SECRET:-abPjIWHtPNVc1M7R4Lbb68ESf8N5f9sqWByU4k3x1Lx0YZmazYlnwCnugIyVOdZy}
     ports:
