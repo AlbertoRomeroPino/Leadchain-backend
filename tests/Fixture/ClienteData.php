@@ -8,16 +8,14 @@ class ClienteData
         "nombre" => "Antonio",
         "apellidos" => "Pérez García",
         "telefono" => "612345678",
-        "email" => "antonio@ejemplo.com",
-        "id_usuario_asignado" => 2
+        "email" => "antonio@ejemplo.com"
     ];
 
     const CLIENTE_PUT = [
         "nombre" => "Maria",
         "apellidos" => "Castillo García",
         "telefono" => "612345678",
-        "email" => "antonio@ejemplo.com",
-        "id_usuario_asignado" => 2
+        "email" => "antonio@ejemplo.com"
     ];
 
     const CLIENTE_PATCH = [

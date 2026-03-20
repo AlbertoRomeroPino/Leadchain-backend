@@ -22,7 +22,7 @@ class ClienteController extends Controller
     )]
     public function index(): JsonResponse
     {
-        return response()->json(ClienteResource::collection(Cliente::with('usuarioAsignado')->get()));
+        return response()->json(ClienteResource::collection(Cliente::all()));
     }
 
     #[OA\Get(
@@ -39,7 +39,7 @@ class ClienteController extends Controller
     )]
     public function show(Cliente $cliente): JsonResponse
     {
-        return response()->json(new ClienteResource($cliente->load(['usuarioAsignado', 'edificios', 'visitas'])));
+        return response()->json(new ClienteResource($cliente->load(['edificios', 'visitas'])));
     }
 
     #[OA\Post(
@@ -55,7 +55,6 @@ class ClienteController extends Controller
                     new OA\Property(property: 'apellidos', type: 'string', example: 'Perez Garcia'),
                     new OA\Property(property: 'email', type: 'string', format: 'email', example: 'antonio@ejemplo.com'),
                     new OA\Property(property: 'telefono', type: 'string', example: '612345678'),
-                    new OA\Property(property: 'id_usuario_asignado', type: 'integer', example: 2),
                 ]
             )
         ),

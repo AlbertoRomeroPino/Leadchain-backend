@@ -169,13 +169,9 @@ CREATE TABLE clientes (
     apellidos VARCHAR(150) NOT NULL,
     telefono VARCHAR(20),
     email VARCHAR(255),
-    id_usuario_asignado BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_cliente_usuario FOREIGN KEY (id_usuario_asignado) REFERENCES users(id) ON DELETE RESTRICT
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE INDEX idx_clientes_usuario ON clientes(id_usuario_asignado);
 
 -- =============================================
 -- TABLA: EDIFICIOS (migración 000007)
@@ -275,11 +271,11 @@ INSERT INTO users (nombre, apellidos, email, password, rol, id_responsable, id_z
     ('Pedro', 'Martínez Sánchez', 'pedro.martinez@leadchain.com', '$2y$12$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'comercial', 1, 3);
 
 -- Clientes (ClienteSeeder)
-INSERT INTO clientes (nombre, apellidos, telefono, email, id_usuario_asignado) VALUES
-    ('Antonio', 'López Moreno', '657123456', 'antonio.lopez@email.com', 2),
-    ('Carmen', 'Rodríguez Pérez', '658234567', 'carmen.rodriguez@email.com', 2),
-    ('Francisco', 'Jiménez Torres', '659345678', 'francisco.jimenez@email.com', 3),
-    ('Isabel', 'Navarro Delgado', '660456789', 'isabel.navarro@email.com', 4);
+INSERT INTO clientes (nombre, apellidos, telefono, email) VALUES
+    ('Antonio', 'López Moreno', '657123456', 'antonio.lopez@email.com'),
+    ('Carmen', 'Rodríguez Pérez', '658234567', 'carmen.rodriguez@email.com'),
+    ('Francisco', 'Jiménez Torres', '659345678', 'francisco.jimenez@email.com'),
+    ('Isabel', 'Navarro Delgado', '660456789', 'isabel.navarro@email.com');
 
 -- Edificios (EdificioSeeder)
 INSERT INTO edificios (direccion_completa, planta, puerta, ubicacion, id_zona, tipo, id_cliente) VALUES

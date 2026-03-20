@@ -6,9 +6,9 @@ services:
     container_name: laravel_leadchain
     restart: unless-stopped
     working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
     environment:
+      BACKEND_REPO: ${BACKEND_REPO:-https://github.com/AlbertoRomeroPino/Leadchain-backend.git}
+      BACKEND_BRANCH: ${BACKEND_BRANCH:-docker}
       APP_ENV: ${APP_ENV:-local}
       APP_DEBUG: ${APP_DEBUG:-true}
       APP_KEY: ${APP_KEY:-base64:KlAZySTfmFdzK4yr8509iuigPTcXZlFSo/yumu/JQ7A=}
@@ -26,10 +26,17 @@ services:
       db:
         condition: service_healthy
     command: >
-      sh -c "composer install --no-interaction --prefer-dist
-      && until pg_isready -h \"$$DB_HOST\" -p \"$$DB_PORT\" -U \"$$DB_USERNAME\" -d \"$$DB_DATABASE\"; do echo 'Esperando la base de datos...'; sleep 2; done
-      && php artisan migrate --force
-      && php artisan serve --host=0.0.0.0 --port=8000"
+      sh -c "set -e;
+      if [ -d /var/www/html/.git ]; then
+        git -C /var/www/html fetch origin && git -C /var/www/html checkout \"$$BACKEND_BRANCH\" && git -C /var/www/html reset --hard \"origin/$$BACKEND_BRANCH\";
+      else
+        rm -rf /var/www/html/* && git clone --branch \"$$BACKEND_BRANCH\" --single-branch \"$$BACKEND_REPO\" /var/www/html;
+      fi;
+      composer install --no-interaction --prefer-dist;
+      php artisan optimize:clear;
+      until pg_isready -h \"$$DB_HOST\" -p \"$$DB_PORT\" -U \"$$DB_USERNAME\" -d \"$$DB_DATABASE\"; do echo 'Esperando la base de datos...'; sleep 2; done;
+      php artisan migrate --force;
+      php artisan serve --host=0.0.0.0 --port=8000"
 
   db:
     image: postgis/postgis:15-3.3

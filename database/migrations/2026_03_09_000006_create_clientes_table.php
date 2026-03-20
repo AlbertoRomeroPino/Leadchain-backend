@@ -17,10 +17,7 @@ return new class extends Migration
             $table->string('apellidos', 150);
             $table->string('telefono', 20)->nullable();
             $table->string('email', 255)->nullable();
-            $table->foreignId('id_usuario_asignado')->constrained('users')->restrictOnDelete();
             $table->timestamps();
-
-            $table->index('id_usuario_asignado', 'idx_clientes_usuario');
         });
     }
 

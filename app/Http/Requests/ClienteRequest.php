@@ -34,7 +34,6 @@ class ClienteRequest extends FormRequest
                 Rule::unique('clientes', 'email')->ignore($clienteId)
             ],
             'telefono' => 'sometimes|string|max:20',
-            'id_usuario_asignado' => 'sometimes|exists:users,id',
         ];
     }
 }

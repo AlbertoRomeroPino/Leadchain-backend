@@ -51,7 +51,6 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'apellidos', type: 'string', example: 'Perez Garcia'),
         new OA\Property(property: 'telefono', type: 'string', example: '612345678'),
         new OA\Property(property: 'email', type: 'string', format: 'email', example: 'antonio@ejemplo.com'),
-        new OA\Property(property: 'id_usuario_asignado', type: 'integer', example: 2),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ],

@@ -48,7 +48,6 @@ class ClienteTest extends TestCase
                     'apellidos',
                     'telefono',
                     'email',
-                    'id_usuario_asignado',
                     'created_at',
                     'updated_at',
                 ],
@@ -70,7 +69,6 @@ class ClienteTest extends TestCase
                 'apellidos',
                 'telefono',
                 'email',
-                'id_usuario_asignado',
                 'created_at',
                 'updated_at',
             ]);
@@ -95,7 +93,6 @@ class ClienteTest extends TestCase
                 'apellidos',
                 'telefono',
                 'email',
-                'id_usuario_asignado',
                 'created_at',
                 'updated_at',
             ]);
