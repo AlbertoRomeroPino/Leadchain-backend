@@ -119,6 +119,9 @@ La seguridad se gestiona mediante  **JWT (JSON Web Tokens)** . El sistema implem
 
 * **Mapa de Arquitectura (`php artisan api:tree`):** Visualización simplificada de la estructura.
 * **Garantía de Calidad (`php artisan retest`):** Limpia la base de datos, ejecuta seeders y lanza los tests unitarios.
+* **Arranque Híbrido (`php artisan start:hybrid`):** Levanta solo la BD en Docker, migra y arranca Laravel local.
+* **Arranque Híbrido con seed (`php artisan start:hybrid --seed`):** Igual que el anterior, incluyendo seeders.
+* **Arranque Completo (`php artisan start:complete`):** Levanta app + BD en Docker con build.
 
 ## 📂 Estructura del Sistema
 
