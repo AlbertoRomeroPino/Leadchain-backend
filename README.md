@@ -1,154 +1,144 @@
-# LeadChain API - Backend Córdoba
 
-LeadChain es una **API-Rest** diseñada para la gestión de clientes, edificios y visitas comerciales en la ciudad de Córdoba. Utiliza **PostgreSQL con PostGIS** para manejar ubicaciones geográficas exactas, permitiendo visualizar mapas y zonas de venta en tiempo real.
+# LeadChain API - Backend Córdoba 🏢📍
 
----
+**LeadChain** es una solución backend RESTful de alto rendimiento diseñada específicamente para la gestión inteligente de carteras de clientes, edificios y visitas comerciales en la ciudad de Córdoba.
 
-## Tecnologías utilizadas
+Lo que hace única a esta API es su integración profunda con  **PostgreSQL y la extensión PostGIS** . Esta arquitectura permite que LeadChain no solo almacene datos, sino que comprenda la ubicación espacial: puede validar si un comercial está dentro de su zona asignada, ubicar edificios en un mapa con precisión milimétrica y optimizar rutas de venta basadas en coordenadas geográficas reales.
 
-* **Lenguaje:** PHP 8.x (Laravel Framework)
-* **Base de Datos:** PostgreSQL 15 + PostGIS (Extensión espacial)
-* **Contenedores:** Docker & Docker Compose
-* **Gestión de BD:** DBeaver (Recomendado)
+## 🚀 Guía de Despliegue (Deployment)
 
----
+Para poner en marcha el proyecto, primero revisa los componentes necesarios según el método que elijas.
 
-## Instalación y Despliegue
+### 📋 1. Requisitos e Información Técnica
 
-Sigue estos pasos para tener el entorno funcionando en menos de 5 minutos:
+Antes de comenzar, asegúrate de contar con las herramientas necesarias según tu preferencia de ejecución:
 
-### 1. Requisitos Previos
+#### **Para la Opción A (Docker - Recomendado)**
 
-Asegúrate de tener instalados:
+* [**Docker Desktop**](https://www.docker.com/products/docker-desktop/ "null")**:** Esencial para la "contenerización". Docker permite que la API y la base de datos corran en un entorno idéntico al de producción, evitando conflictos de versiones de PHP o librerías de sistema.
+* [**Git**](https://git-scm.com/ "null")**:** Para la clonación y gestión del código fuente.
 
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* [Git](https://git-scm.com/)
-* [Composer](https://getcomposer.org/)
+#### **Para la Opción B (Instalación Local / Nativa)**
 
-Comprueba que php.ini tenga descomentado las lineas:
+* **PHP 8.2 o superior:** El motor del lenguaje. Es vital que en tu archivo `php.ini` estén activas las extensiones `extension=sodium` (para el cifrado de tokens) y `extension=pdo_pgsql` (para la comunicación con PostgreSQL).
+* [**Composer**](https://getcomposer.org/ "null")**:** El gestor de dependencias de PHP que descargará Laravel y todas las librerías necesarias.
+* **PostgreSQL 15+ con PostGIS:** La base de datos debe tener instalada la extensión PostGIS. Sin ella, las columnas de tipo `GEOMETRY` (donde se guardan las ubicaciones de los edificios) no funcionarán.
 
-- `extension=sodium`
-- `extension=pdo_pgsql`
+### 🐳 Opción A: Pasos para Instalar con Docker (Recomendado)
 
-> ⚠️ Descomentado significa sin el `;` delante
+Este método es el más limpio, ya que Docker se encarga de configurar PostGIS y PHP por ti de forma totalmente aislada.
 
-### 2. Clonar y Preparar el Proyecto
+1. **Clonar el repositorio:**
 
-```bash
-# Clonar el repositorio
-git clone https://github.com/AlbertoRomeroPino/Leadchain-backend.git
-cd leadchain-backend
+   ```
+   git clone https://github.com/AlbertoRomeroPino/Leadchain-backend.git
+   cd leadchain-backend
+   ```
+2. **Levantar los contenedores:**
+   Este comando descarga las imágenes, instala dependencias y configura la red interna.
 
-# Instalar dependencias de PHP
-composer install
+   ```
+   docker compose up --build -d
+
+   ```
+3. **Carga de datos de prueba (opcional):**
+   Si quieres entorno con datos iniciales, inyecta seeders (usuarios, zonas, clientes, etc.):
+
+   ```
+   docker compose exec app php artisan db:seed --force
+
+   ```
+
+   *📍 Acceso recomendado: `http://localhost:8000/api/documentation` (Swagger).*
+
+### 💻 Opción B: Pasos para Instalación Local (Nativa)
+
+Sigue estos pasos si prefieres ejecutar la aplicación Laravel de forma nativa mientras usas Docker únicamente para la base de datos (Modo Híbrido).
+
+1. **Preparar el código:**
+
+   ```
+   git clone [https://github.com/AlbertoRomeroPino/Leadchain-backend.git](https://github.com/AlbertoRomeroPino/Leadchain-backend.git)
+   cd leadchain-backend
+   ```
+2. **Levantar solo la base de datos en Docker (sin tocar el compose):**
+
+   ```
+   docker compose up -d db
+   ```
+3. **Instalar dependencias y Configurar Entorno:**
+
+   ```
+   # Instalar librerías de Laravel
+   composer install
+
+   # Configurar archivo de entorno
+   cp .env.example .env
+
+   # Generar claves de seguridad únicas para tu instancia
+   php artisan key:generate
+   php artisan jwt:secret
+   ```
+4. **Configurar Base de Datos y sesión en `.env`:**
+   Asegúrate de tener:
+
+   ```env
+   DB_HOST=127.0.0.1
+   SESSION_DRIVER=file
+   ```
+
+   Luego crea tablas y carga datos:
+
+   ```
+   php artisan migrate --seed
+
+   ```
+5. **Lanzar el Servidor:**
+
+   ```
+   php artisan serve
+
+   ```
+
+   *📍 Acceso recomendado: `http://127.0.0.1:8000/api/documentation` (Swagger).*
+
+## 🔐 Modelo de Accesos y Permisos
+
+La seguridad se gestiona mediante  **JWT (JSON Web Tokens)** . El sistema implementa una lógica de roles estricta:
+
+| Recurso                 | Administrador | Comercial   | Notas de Privacidad                                        |
+| ----------------------- | ------------- | ----------- | ---------------------------------------------------------- |
+| **Clientes**      | CRUD          | R (Lectura) | Los comerciales ven sus clientes pero no pueden borrarlos. |
+| **Zonas**         | CRUD          | R (Lectura) | Gestión geográfica reservada a gerencia.                 |
+| **Usuarios**      | CRUD          | -           | Datos de empleados privados.                               |
+| **Edificios**     | CRUD          | R (Lectura) | Catálogo de puntos de interés comercial.                 |
+| **Visitas**       | R / D         | C / R / U   | Gestión diaria de actividad comercial.                    |
+| **Estado Visita** | R / U         | R / U       | Flujo de estados (Pendiente, Éxito, etc).                 |
+
+## 🛠️ Comandos de Utilidad Personalizados
+
+* **Mapa de Arquitectura (`php artisan api:tree`):** Visualización simplificada de la estructura.
+* **Garantía de Calidad (`php artisan retest`):** Limpia la base de datos, ejecuta seeders y lanza los tests unitarios.
+* **Arranque Híbrido (`php artisan start:hybrid`):** Levanta solo la BD en Docker, migra y arranca Laravel local.
+* **Arranque Híbrido con seed (`php artisan start:hybrid --seed`):** Igual que el anterior, incluyendo seeders.
+* **Arranque Completo (`php artisan start:complete`):** Levanta app + BD en Docker con build.
+
+## 📂 Estructura del Sistema
+
 ```
-
-### 3. Configurar Entorno y Seguridad
-
-Copia el archivo de `.env.example`, modificalo a `.env` y genera las claves necesarias:
-
-```bash
-cp .env.example .env
-
-# Generar clave de la aplicación y el secreto para JWT
-php artisan key:generate
-php artisan jwt:secret
-```
-
-**Verificación en el `.env`:**
-Asegúrate de que las variables de la base de datos coincidan con el entorno Docker y que el algoritmo JWT sea el correcto:
-
-**Fragmento de código de ejemplo**
-
-```
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=leadchain
-DB_USERNAME=root
-DB_PASSWORD=root
-
-JWT_ALGO=HS256
-```
-
-### 4. Levantar la infraestructura (Docker)
-
-Este comando levanta el contenedor de **PostgreSQL/PostGIS** necesario para el almacenamiento de datos geográficos.
-
-**Bash**
-
-```
-docker-compose up -d
-```
-
-> **Nota sobre persistencia:** Si decides descomentar la sección de `volumes` en tu `docker-compose.yml`, los datos se mantendrán aunque borres el contenedor. Si usas el script de inicialización automático (`init-db`), es posible que no necesites el siguiente paso.
-
-### 5 Lanzar migraciones, seeder y test
-
-Esto no es un comando nativo pero lo e creado para lanzarlo. Esto realiza las 3 acciones al mismo tiempo y te muestra si los test a finalizado correctamente.
-
-```bash
-php artisan retest
-```
-
-### 6. Ejecutar la API
-
-Una vez que la base de datos está lista y las dependencias instaladas, puedes poner en marcha el servidor de desarrollo:
-
-**Bash**
-
-```
-php artisan serve
-```
-
-La API estará disponible en: `http://127.0.0.1:8000`
-
-> (👉ﾟヮﾟ)👉Si pulsas CTRL + CLIC  en http://127.0.0.1:8000 te mostrara los endpoints👈(ﾟヮﾟ👈)
-
----
-
-## Comando creado
-
-Creado para poder hacer una estrutura de proyecto personalizada para mostrar los apartados que yo queria y quitar los inecesario.
-
-```bash
-php artisan api:tree
-```
-
-Comando que resetea la base de datos, ejecuta Seeders y lanza los tests
-
-```bash
-php artisan retest
-```
-
----
-
-## Permisos de usuario
-
-CRUD = Create, Read, Update, Delete
-
-|   Recurso   |  Admin  | Comercial |
-| :----------: | :-----: | :-------: |
-|   Clientes   |  CRUD  |  - R - -  |
-|    Zonas    |  CRUD  |  - R - -  |
-|   Usuarios   |  CRUD  |  - - - -  |
-|  Edificios  |  CRUD  |  - R - -  |
-|   Visitas   | - R - D |  C-R-U -  |
-| EstadoVisita | - - U - |  - - U -  |
-
----
-
-## Estructura del Proyecto
-
-```bash
 Estructura del proyecto (filtrada):
+├── .dockerignore
 ├── .env
 ├── .env.example
+├── NUL
+├── README-PROFESIONAL.md
 ├── README.md
+├── Recordatorio.md
 ├── app
 │   ├── Console
 │   │   └── Commands
-│   │       └── EstructuraProyecto.php
+│   │       ├── EstructuraProyecto.php
+│   │       └── ResetAndTest.php
 │   ├── Http
 │   │   ├── Controllers
 │   │   │   ├── Api
@@ -167,7 +157,6 @@ Estructura del proyecto (filtrada):
 │   │   │   ├── AuthRequest.php
 │   │   │   ├── ClienteRequest.php
 │   │   │   ├── EdificioRequest.php
-│   │   │   ├── EstadoVisitaRequest.php
 │   │   │   ├── UserRequest.php
 │   │   │   ├── UserUpdateRequest.php
 │   │   │   ├── VisitaRequest.php
@@ -179,16 +168,20 @@ Estructura del proyecto (filtrada):
 │   │       ├── UserResource.php
 │   │       ├── VisitaResource.php
 │   │       └── ZonaResource.php
-│   └── Models
-│       ├── Cliente.php
-│       ├── Edificio.php
-│       ├── EstadoVisita.php
-│       ├── User.php
-│       ├── Visita.php
-│       └── Zona.php
+│   ├── Models
+│   │   ├── Cliente.php
+│   │   ├── Edificio.php
+│   │   ├── EstadoVisita.php
+│   │   ├── User.php
+│   │   ├── Visita.php
+│   │   └── Zona.php
+│   └── OpenApi
+│       └── OpenApiSpec.php
 ├── config
 │   ├── auth.php
-│   └── jwt.php
+│   ├── cors.php
+│   ├── jwt.php
+│   └── l5-swagger.php
 ├── database
 │   ├── migrations
 │   │   ├── 2026_03_09_000001_create_zonas_table.php
@@ -196,7 +189,8 @@ Estructura del proyecto (filtrada):
 │   │   ├── 2026_03_09_000003_create_users_table.php
 │   │   ├── 2026_03_09_000006_create_clientes_table.php
 │   │   ├── 2026_03_09_000007_create_edificios_table.php
-│   │   └── 2026_03_09_000008_create_visitas_table.php
+│   │   ├── 2026_03_09_000008_create_visitas_table.php
+│   │   └── 2026_03_19_000010_convert_zonas_points_to_polygon.php
 │   └── seeders
 │       ├── ClienteSeeder.php
 │       ├── DatabaseSeeder.php
@@ -206,25 +200,32 @@ Estructura del proyecto (filtrada):
 │       ├── VisitaSeeder.php
 │       └── ZonaSeeder.php
 ├── docker-compose.yml
+├── dockerfile
 ├── init-db
 │   └── db-leadchain.sql
 ├── package.json
-└── routes
-    ├── api.php
-    ├── console.php
-    └── web.php
+├── routes
+│   ├── api.php
+│   ├── console.php
+│   └── web.php
+└── tests
+    ├── Feature
+    │   ├── ClienteTest.php
+    │   ├── EdificioTest.php
+    │   ├── LoginTest.php
+    │   ├── UserTest.php
+    │   ├── VisitasTest.php
+    │   └── ZonaTest.php
+    ├── Fixture
+    │   ├── ClienteData.php
+    │   ├── EdificioData.php
+    │   ├── LoginData.php
+    │   ├── UserData.php
+    │   ├── VisitasData.php
+    │   └── ZonaData.php
+    ├── TestCase.php
+    └── Unit
+        └── ExampleTest.php
 ```
 
-## Test Realizado
-
-Antes de hacerlo hay que comprobar que phpunit.xml tenga los datos referentes a tu base de datos. sino considerara que estas usando sqlite y daria fallo al estar usando posgre.
-Estos campos hay que modificar:
-
-```xml
-<env name="DB_CONNECTION" value="pgsql"/>
-<env name="DB_HOST" value="127.0.0.1"/>
-<env name="DB_PORT" value="5432"/>
-<env name="DB_DATABASE" value="leadchain"/>
-<env name="DB_USERNAME" value="root"/>
-<env name="DB_PASSWORD" value="root"/>
-```
+**Desarrollado por:** Alberto Romero Pino - [GitHub](https://github.com/AlbertoRomeroPino "null")
