@@ -34,9 +34,6 @@ services:
         rm -rf /var/www/html/* && git clone --branch \"$$BACKEND_BRANCH\" --single-branch \"$$BACKEND_REPO\" /var/www/html;
       fi;
       composer install --no-interaction --prefer-dist;
-      php artisan optimize:clear;
-      until pg_isready -h \"$$DB_HOST\" -p \"$$DB_PORT\" -U \"$$DB_USERNAME\" -d \"$$DB_DATABASE\"; do echo 'Esperando la base de datos...'; sleep 2; done;
-      php artisan migrate --force;
       php artisan serve --host=0.0.0.0 --port=8000"
 
   db:

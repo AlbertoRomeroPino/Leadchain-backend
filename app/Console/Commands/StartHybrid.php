@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class StartHybrid extends Command
 {
-    protected $signature = 'start:hybrid {--seed : Ejecuta seeders tras migrar}';
+    protected $signature = 'start:hybrid';
 
     protected $description = 'Arranca en modo híbrido: Docker DB + Laravel local';
 
@@ -19,18 +19,25 @@ class StartHybrid extends Command
             return self::FAILURE;
         }
 
-        if (!$this->runStep('Limpiando cachés de Laravel...', 'php artisan optimize:clear')) {
+        if (!$this->waitForDbReady()) {
             return self::FAILURE;
         }
 
-        if (!$this->runStep('Ejecutando migraciones...', 'php artisan migrate --force')) {
+        $localDbEnv = [
+            'DB_HOST' => '127.0.0.1',
+            'DB_PORT' => '5432',
+        ];
+
+        if (!$this->runStep('Ejecutando migraciones...', 'php artisan migrate --force', $localDbEnv, 6, 2)) {
             return self::FAILURE;
         }
 
-        if ($this->option('seed')) {
-            if (!$this->runStep('Ejecutando seeders...', 'php artisan db:seed --force')) {
-                return self::FAILURE;
-            }
+        if (!$this->runStep('Ejecutando seeders...', 'php artisan db:seed --force', $localDbEnv, 3, 2)) {
+            return self::FAILURE;
+        }
+
+        if (!$this->runStep('Limpiando cachés de Laravel...', 'php artisan optimize:clear', $localDbEnv)) {
+            return self::FAILURE;
         }
 
         $this->newLine();
@@ -44,22 +51,60 @@ class StartHybrid extends Command
         ]);
     }
 
-    private function runStep(string $title, string $command): bool
+    private function waitForDbReady(int $maxAttempts = 30, int $sleepSeconds = 2): bool
     {
-        $this->info($title);
+        $this->info('Esperando que PostgreSQL esté listo...');
 
-        $process = Process::fromShellCommandline($command, base_path());
-        $process->setTimeout(null);
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            $process = Process::fromShellCommandline(
+                'docker compose exec -T db sh -lc "pg_isready -U root -d leadchain && psql -U root -d leadchain -c \"select 1\" >/dev/null"',
+                base_path()
+            );
+            $process->setTimeout(null);
+            $process->run();
 
-        $process->run(function (string $type, string $buffer): void {
-            $this->output->write($buffer);
-        });
+            if ($process->isSuccessful()) {
+                return true;
+            }
 
-        if (!$process->isSuccessful()) {
-            $this->error("Error ejecutando: {$command}");
-            return false;
+            $this->line("Esperando DB... intento {$attempt}/{$maxAttempts}");
+            sleep($sleepSeconds);
         }
 
-        return true;
+        $this->error('Timeout esperando disponibilidad de PostgreSQL en Docker.');
+        return false;
+    }
+
+    private function runStep(
+        string $title,
+        string $command,
+        array $env = [],
+        int $maxAttempts = 1,
+        int $sleepSeconds = 0
+    ): bool
+    {
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            $suffix = $maxAttempts > 1 ? " (intento {$attempt}/{$maxAttempts})" : '';
+            $this->info($title . $suffix);
+
+            $process = Process::fromShellCommandline($command, base_path(), $env);
+            $process->setTimeout(null);
+
+            $process->run(function (string $type, string $buffer): void {
+                $this->output->write($buffer);
+            });
+
+            if ($process->isSuccessful()) {
+                return true;
+            }
+
+            if ($attempt < $maxAttempts && $sleepSeconds > 0) {
+                $this->warn('Fallo transitorio. Reintentando...');
+                sleep($sleepSeconds);
+            }
+        }
+
+        $this->error("Error ejecutando: {$command}");
+        return false;
     }
 }
