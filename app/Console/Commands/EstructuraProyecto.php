@@ -35,6 +35,8 @@ class EstructuraProyecto extends Command
         '.git',
         'Providers',
         'factories',
+        'Unit',
+        'init-db'
     ];
     private $excludeFiles = [
         '.editorconfig',
@@ -62,6 +64,7 @@ class EstructuraProyecto extends Command
         '2026_03_09_000005_create_jobs_table.php',
         '2026_03_09_000009_create_personal_access_tokens_table.php',
         '.gitignore',
+        'TestCase.php',
     ];
 
     public function handle()
