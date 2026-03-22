@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cliente extends Model
@@ -18,16 +17,7 @@ class Cliente extends Model
         'apellidos',
         'telefono',
         'email',
-        'id_usuario_asignado',
     ];
-
-    /**
-     * Usuario comercial asignado al cliente
-     */
-    public function usuarioAsignado(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'id_usuario_asignado');
-    }
 
     /**
      * Edificios del cliente

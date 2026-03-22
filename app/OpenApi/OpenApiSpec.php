@@ -31,13 +31,15 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Schema(
     schema: 'ZonaInput',
-    required: ['nombre_zona', 'esquina_noroeste', 'esquina_noreste', 'esquina_suroeste', 'esquina_sureste'],
+    required: ['nombre_zona', 'area'],
     properties: [
         new OA\Property(property: 'nombre_zona', type: 'string', example: 'Zona Norte'),
-        new OA\Property(property: 'esquina_noroeste', ref: '#/components/schemas/GeoPoint'),
-        new OA\Property(property: 'esquina_noreste', ref: '#/components/schemas/GeoPoint'),
-        new OA\Property(property: 'esquina_suroeste', ref: '#/components/schemas/GeoPoint'),
-        new OA\Property(property: 'esquina_sureste', ref: '#/components/schemas/GeoPoint'),
+        new OA\Property(
+            property: 'area',
+            type: 'array',
+            minItems: 4,
+            items: new OA\Items(ref: '#/components/schemas/GeoPoint')
+        ),
     ],
     type: 'object'
 )]
@@ -49,7 +51,6 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'apellidos', type: 'string', example: 'Perez Garcia'),
         new OA\Property(property: 'telefono', type: 'string', example: '612345678'),
         new OA\Property(property: 'email', type: 'string', format: 'email', example: 'antonio@ejemplo.com'),
-        new OA\Property(property: 'id_usuario_asignado', type: 'integer', example: 2),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ],
@@ -105,10 +106,7 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 1),
         new OA\Property(property: 'nombre_zona', type: 'string', example: 'Zona Norte'),
-        new OA\Property(property: 'esquina_noroeste', type: 'object', properties: [new OA\Property(property: 'lat', type: 'number', format: 'float', example: 37.90), new OA\Property(property: 'lng', type: 'number', format: 'float', example: -4.80)]),
-        new OA\Property(property: 'esquina_noreste',  type: 'object', properties: [new OA\Property(property: 'lat', type: 'number', format: 'float', example: 37.90), new OA\Property(property: 'lng', type: 'number', format: 'float', example: -4.75)]),
-        new OA\Property(property: 'esquina_suroeste', type: 'object', properties: [new OA\Property(property: 'lat', type: 'number', format: 'float', example: 37.87), new OA\Property(property: 'lng', type: 'number', format: 'float', example: -4.80)]),
-        new OA\Property(property: 'esquina_sureste',  type: 'object', properties: [new OA\Property(property: 'lat', type: 'number', format: 'float', example: 37.87), new OA\Property(property: 'lng', type: 'number', format: 'float', example: -4.75)]),
+        new OA\Property(property: 'area', type: 'array', items: new OA\Items(ref: '#/components/schemas/GeoPoint')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ],

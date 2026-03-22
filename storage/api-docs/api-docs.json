@@ -223,10 +223,6 @@
                                     "telefono": {
                                         "type": "string",
                                         "example": "612345678"
-                                    },
-                                    "id_usuario_asignado": {
-                                        "type": "integer",
-                                        "example": 2
                                     }
                                 },
                                 "type": "object"
@@ -1616,27 +1612,19 @@
             "ZonaInput": {
                 "required": [
                     "nombre_zona",
-                    "esquina_noroeste",
-                    "esquina_noreste",
-                    "esquina_suroeste",
-                    "esquina_sureste"
+                    "area"
                 ],
                 "properties": {
                     "nombre_zona": {
                         "type": "string",
                         "example": "Zona Norte"
                     },
-                    "esquina_noroeste": {
-                        "$ref": "#/components/schemas/GeoPoint"
-                    },
-                    "esquina_noreste": {
-                        "$ref": "#/components/schemas/GeoPoint"
-                    },
-                    "esquina_suroeste": {
-                        "$ref": "#/components/schemas/GeoPoint"
-                    },
-                    "esquina_sureste": {
-                        "$ref": "#/components/schemas/GeoPoint"
+                    "area": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/GeoPoint"
+                        },
+                        "minItems": 4
                     }
                 },
                 "type": "object"
@@ -1663,10 +1651,6 @@
                         "type": "string",
                         "format": "email",
                         "example": "antonio@ejemplo.com"
-                    },
-                    "id_usuario_asignado": {
-                        "type": "integer",
-                        "example": 2
                     },
                     "created_at": {
                         "type": "string",
@@ -1819,65 +1803,11 @@
                         "type": "string",
                         "example": "Zona Norte"
                     },
-                    "esquina_noroeste": {
-                        "properties": {
-                            "lat": {
-                                "type": "number",
-                                "format": "float",
-                                "example": 37.9
-                            },
-                            "lng": {
-                                "type": "number",
-                                "format": "float",
-                                "example": -4.8
-                            }
-                        },
-                        "type": "object"
-                    },
-                    "esquina_noreste": {
-                        "properties": {
-                            "lat": {
-                                "type": "number",
-                                "format": "float",
-                                "example": 37.9
-                            },
-                            "lng": {
-                                "type": "number",
-                                "format": "float",
-                                "example": -4.75
-                            }
-                        },
-                        "type": "object"
-                    },
-                    "esquina_suroeste": {
-                        "properties": {
-                            "lat": {
-                                "type": "number",
-                                "format": "float",
-                                "example": 37.87
-                            },
-                            "lng": {
-                                "type": "number",
-                                "format": "float",
-                                "example": -4.8
-                            }
-                        },
-                        "type": "object"
-                    },
-                    "esquina_sureste": {
-                        "properties": {
-                            "lat": {
-                                "type": "number",
-                                "format": "float",
-                                "example": 37.87
-                            },
-                            "lng": {
-                                "type": "number",
-                                "format": "float",
-                                "example": -4.75
-                            }
-                        },
-                        "type": "object"
+                    "area": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/GeoPoint"
+                        }
                     },
                     "created_at": {
                         "type": "string",

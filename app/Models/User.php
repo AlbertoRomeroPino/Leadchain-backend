@@ -78,14 +78,6 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-     * Clientes asignados al usuario
-     */
-    public function clientes(): HasMany
-    {
-        return $this->hasMany(Cliente::class, 'id_usuario_asignado');
-    }
-
-    /**
      * Visitas del usuario
      */
     public function visitas(): HasMany

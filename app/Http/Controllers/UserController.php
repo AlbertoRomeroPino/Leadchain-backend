@@ -43,7 +43,7 @@ class UserController extends Controller
     )]
     public function show(User $user): JsonResponse
     {
-        return response()->json(new UserResource($user->load(['zona', 'responsable', 'subordinados', 'clientes'])));
+        return response()->json(new UserResource($user->load(['zona', 'responsable', 'subordinados'])));
     }
 
     #[OA\Post(

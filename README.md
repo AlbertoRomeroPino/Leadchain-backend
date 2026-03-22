@@ -103,7 +103,7 @@ php artisan serve
 
 La API estará disponible en: `http://127.0.0.1:8000`
 
-> (👉ﾟヮﾟ)👉Si pulsas CTRL + CLIC  en http://127.0.0.1:8000 te mostrara los endpoints 👈(ﾟヮﾟ👈)
+> (👉ﾟヮﾟ)👉Si pulsas CTRL + CLIC  en http://127.0.0.1:8000 te mostrara los endpoints👈(ﾟヮﾟ👈)
 
 ---
 

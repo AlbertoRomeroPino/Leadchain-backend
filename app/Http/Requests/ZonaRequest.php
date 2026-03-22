@@ -23,18 +23,10 @@ class ZonaRequest extends FormRequest
     {
         return [
             'nombre_zona' => 'required|string|max:100',
-            'esquina_noroeste' => 'required|array',
-            'esquina_noroeste.lat' => 'required|numeric|between:-90,90',
-            'esquina_noroeste.lng' => 'required|numeric|between:-180,180',
-            'esquina_noreste' => 'required|array',
-            'esquina_noreste.lat' => 'required|numeric|between:-90,90',
-            'esquina_noreste.lng' => 'required|numeric|between:-180,180',
-            'esquina_suroeste' => 'required|array',
-            'esquina_suroeste.lat' => 'required|numeric|between:-90,90',
-            'esquina_suroeste.lng' => 'required|numeric|between:-180,180',
-            'esquina_sureste' => 'required|array',
-            'esquina_sureste.lat' => 'required|numeric|between:-90,90',
-            'esquina_sureste.lng' => 'required|numeric|between:-180,180',
+            'area' => 'required|array|min:4',
+            'area.*' => 'required|array',
+            'area.*.lat' => 'required|numeric|between:-90,90',
+            'area.*.lng' => 'required|numeric|between:-180,180',
         ];
     }
 }
