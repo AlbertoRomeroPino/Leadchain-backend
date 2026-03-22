@@ -41,9 +41,9 @@ Este método es el más limpio, ya que Docker se encarga de configurar PostGIS y
 
 ### Requisitos para Opción B
 
-- **PHP 8.2 o superior**: Motor del lenguaje. En `php.ini` deben estar activas las extensiones `extension=sodium` (para cifrado de tokens) y `extension=pdo_pgsql` (comunicación con PostgreSQL).
+- **PHP 8.2 o superior**: Motor del lenguaje. Asegúrate de que en tu `php.ini` estén activas las extensiones `extension=sodium` (cifrado de tokens) y `extension=pdo_pgsql` (comunicación con PostgreSQL dockerizado).
 - [Composer](https://getcomposer.org/): Gestor de dependencias de PHP.
-- **PostgreSQL 15+ con PostGIS**: La extensión PostGIS es obligatoria para que las columnas de tipo `GEOMETRY` (ubicaciones de edificios) funcionen.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/): Solo para dockerizar la BD (PostgreSQL + PostGIS). Laravel corre local.
 
 ### Pasos de Instalación Local
 
@@ -68,19 +68,7 @@ Sigue estos pasos si prefieres ejecutar Laravel de forma nativa mientras usas Do
    php artisan key:generate
    php artisan jwt:secret
    ```
-3. **Configurar Base de Datos en `.env`:**
-
-   Asegúrate de tener:
-
-   ```env
-   DB_HOST=127.0.0.1
-   DB_PORT=5432
-   DB_DATABASE=leadchain
-   DB_USERNAME=root
-   DB_PASSWORD=root
-   SESSION_DRIVER=file
-   ```
-4. **Iniciar desarrollo con un comando:**
+3. **Iniciar desarrollo con un comando:**
 
    ```bash
    php artisan start:hybrid
@@ -268,7 +256,7 @@ Estructura del proyecto (filtrada):
 ├── docker-compose.yml
 ├── dockerfile
 ├── init-db
-│   └── db-leadchain.sql
+│   └── db-leadchain.sql    (Ejemplo de base de datos y como se ven todos los componentes)
 ├── routes
 │   ├── api.php
 │   ├── console.php
