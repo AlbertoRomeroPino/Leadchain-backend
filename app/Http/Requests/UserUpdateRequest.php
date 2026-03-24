@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UserUpdateRequest extends FormRequest
 {
@@ -41,5 +42,18 @@ class UserUpdateRequest extends FormRequest
             'id_responsable' => 'nullable|exists:users,id',
             'id_zona' => 'nullable|exists:zonas,id',
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $user = $this->route('user');
+            $effectiveRole = $this->input('rol', $user?->rol);
+            $effectiveZona = $this->has('id_zona') ? $this->input('id_zona') : $user?->id_zona;
+
+            if ($effectiveRole !== 'admin' && empty($effectiveZona)) {
+                $validator->errors()->add('id_zona', 'La zona es obligatoria para usuarios que no sean administradores.');
+            }
+        });
     }
 }

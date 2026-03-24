@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UserRequest extends FormRequest
 {
@@ -28,7 +29,11 @@ class UserRequest extends FormRequest
             'password' => 'required|string|min:8',
             'rol' => 'required|string|max:50',
             'id_responsable' => 'nullable|exists:users,id',
-            'id_zona' => 'nullable|exists:zonas,id',
+            'id_zona' => [
+                Rule::requiredIf($this->input('rol') !== 'admin'),
+                'nullable',
+                'exists:zonas,id',
+            ],
         ];
     }
 }

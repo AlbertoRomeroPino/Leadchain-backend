@@ -119,6 +119,47 @@ class UserTest extends TestCase
     }
 
     /**
+     * Test: Crear un administrador sin zona (usuario de oficina)
+     */
+    public function test_create_admin_without_zone(): void
+    {
+        $token = $this->adminToken();
+
+        $usuario = UserData::USER_POST;
+        $usuario['email'] = 'admin.office.' . uniqid() . '@email.com';
+        $usuario['rol'] = 'admin';
+        $usuario['id_zona'] = null;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->postJson('/api/users', $usuario);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('rol', 'admin')
+            ->assertJsonPath('id_zona', null);
+    }
+
+    /**
+     * Test: No permitir usuario no admin sin zona
+     */
+    public function test_create_non_admin_without_zone_fails(): void
+    {
+        $token = $this->adminToken();
+
+        $usuario = UserData::USER_POST;
+        $usuario['email'] = 'comercial.nozona.' . uniqid() . '@email.com';
+        $usuario['rol'] = 'comercial';
+        $usuario['id_zona'] = null;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->postJson('/api/users', $usuario);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['id_zona']);
+    }
+
+    /**
      * Test: Actualizar un usuario existente
      */
     public function test_update_user(): void
@@ -168,6 +209,44 @@ class UserTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('nombre', $usuario['nombre'])
             ->assertJsonPath('email', $usuario['email']);
+    }
+
+    /**
+     * Test: Permitir dejar sin zona cuando se actualiza a admin
+     */
+    public function test_patch_user_to_admin_without_zone(): void
+    {
+        $token = $this->adminToken();
+        $userId = $this->createUser($token);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->patchJson('/api/users/' . $userId, [
+            'rol' => 'admin',
+            'id_zona' => null,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('rol', 'admin')
+            ->assertJsonPath('id_zona', null);
+    }
+
+    /**
+     * Test: Bloquear quitar zona a usuario no admin
+     */
+    public function test_patch_non_admin_without_zone_fails(): void
+    {
+        $token = $this->adminToken();
+        $userId = $this->createUser($token);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token
+        ])->patchJson('/api/users/' . $userId, [
+            'id_zona' => null,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['id_zona']);
     }
 
     /**

@@ -10,7 +10,7 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Usuario admin (root / root)
+        // Usuario admin de oficina (root / root) sin zona asignada
         $admin = User::updateOrCreate(
             ['email' => 'root@leadchain.com'],
             [
@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
                 'apellidos' => 'Root',
                 'password' => Hash::make('12345678'),
                 'rol' => 'admin',
-                'id_zona' => 1,
+                'id_zona' => null,
             ]
         );
 
