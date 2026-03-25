@@ -21,6 +21,20 @@ class VisitaResource extends JsonResource
             'fecha_hora' => $this->fecha_hora,
             'id_estado' => $this->id_estado,
             'observaciones' => $this->observaciones,
+            'usuario' => $this->whenLoaded('usuario', function () {
+                return [
+                    'id' => $this->usuario?->id,
+                    'nombre' => $this->usuario?->nombre,
+                    'apellidos' => $this->usuario?->apellidos,
+                ];
+            }),
+            'estado' => $this->whenLoaded('estado', function () {
+                return [
+                    'id' => $this->estado?->id,
+                    'etiqueta' => $this->estado?->etiqueta,
+                    'color_hex' => $this->estado?->color_hex,
+                ];
+            }),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

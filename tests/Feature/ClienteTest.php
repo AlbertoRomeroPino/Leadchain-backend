@@ -54,6 +54,16 @@ class ClienteTest extends TestCase
             ]);
     }
 
+    private function comercialToken(): string
+    {
+        $loginResponse = $this->postJson('/api/auth/login', [
+            'email' => 'juan.garcia@leadchain.com',
+            'password' => '12345678',
+        ]);
+
+        return $loginResponse->json('access_token');
+    }
+
     public function test_get_cliente_by_id(): void
     {
         $token = $this->adminToken();
@@ -72,6 +82,36 @@ class ClienteTest extends TestCase
                 'created_at',
                 'updated_at',
             ]);
+    }
+
+    public function test_admin_sees_clientes_of_subordinated_zones(): void
+    {
+        $token = $this->adminToken();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->getJson('/api/clientes');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(4)
+            ->assertJsonFragment(['id' => 1])
+            ->assertJsonFragment(['id' => 2])
+            ->assertJsonFragment(['id' => 3])
+            ->assertJsonFragment(['id' => 4]);
+    }
+
+    public function test_comercial_sees_only_clientes_in_own_zone(): void
+    {
+        $token = $this->comercialToken();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->getJson('/api/clientes');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2)
+            ->assertJsonFragment(['id' => 1])
+            ->assertJsonFragment(['id' => 4]);
     }
 
     public function test_create_cliente(): void

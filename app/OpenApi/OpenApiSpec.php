@@ -112,4 +112,84 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
+#[OA\Schema(
+    schema: 'ClienteDetalleResource',
+    properties: [
+        new OA\Property(
+            property: 'cliente',
+            properties: [
+                new OA\Property(property: 'id', type: 'integer', example: 1),
+                new OA\Property(property: 'nombre', type: 'string', example: 'Antonio'),
+                new OA\Property(property: 'apellidos', type: 'string', example: 'Perez Garcia'),
+                new OA\Property(property: 'telefono', type: 'string', nullable: true, example: '612345678'),
+                new OA\Property(property: 'email', type: 'string', nullable: true, format: 'email', example: 'antonio@ejemplo.com'),
+            ],
+            type: 'object'
+        ),
+        new OA\Property(
+            property: 'edificio',
+            nullable: true,
+            properties: [
+                new OA\Property(property: 'id', type: 'integer', example: 10),
+                new OA\Property(property: 'direccion_completa', type: 'string', example: 'Calle Cruz Conde 15, Córdoba'),
+                new OA\Property(property: 'planta', type: 'string', nullable: true, example: '2'),
+                new OA\Property(property: 'puerta', type: 'string', nullable: true, example: 'B'),
+                new OA\Property(property: 'ubicacion', ref: '#/components/schemas/GeoPoint', nullable: true),
+                new OA\Property(property: 'tipo', type: 'string', example: 'residencial'),
+                new OA\Property(property: 'id_zona', type: 'integer', example: 3),
+                new OA\Property(
+                    property: 'zona',
+                    nullable: true,
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 3),
+                        new OA\Property(property: 'nombre_zona', type: 'string', example: 'Centro'),
+                    ],
+                    type: 'object'
+                ),
+            ],
+            type: 'object'
+        ),
+        new OA\Property(
+            property: 'visitas',
+            properties: [
+                new OA\Property(property: 'total', type: 'integer', example: 12),
+                new OA\Property(
+                    property: 'ultima',
+                    nullable: true,
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 44),
+                        new OA\Property(property: 'id_usuario', type: 'integer', example: 5),
+                        new OA\Property(property: 'id_cliente', type: 'integer', example: 1),
+                        new OA\Property(property: 'id_estado', type: 'integer', example: 2),
+                        new OA\Property(property: 'fecha_hora', type: 'string', format: 'date-time', example: '2026-03-20 09:30:00'),
+                        new OA\Property(property: 'observaciones', type: 'string', nullable: true, example: 'Cliente no disponible, volver la próxima semana'),
+                        new OA\Property(
+                            property: 'estado',
+                            nullable: true,
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 2),
+                                new OA\Property(property: 'etiqueta', type: 'string', example: 'Pendiente'),
+                                new OA\Property(property: 'color_hex', type: 'string', example: '#f59e0b'),
+                            ],
+                            type: 'object'
+                        ),
+                        new OA\Property(
+                            property: 'usuario',
+                            nullable: true,
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 5),
+                                new OA\Property(property: 'nombre', type: 'string', example: 'Juan'),
+                                new OA\Property(property: 'apellidos', type: 'string', example: 'García López'),
+                            ],
+                            type: 'object'
+                        ),
+                    ],
+                    type: 'object'
+                ),
+            ],
+            type: 'object'
+        ),
+    ],
+    type: 'object'
+)]
 class OpenApiSpec {}

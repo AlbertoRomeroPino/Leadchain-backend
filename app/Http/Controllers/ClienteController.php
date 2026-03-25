@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClienteRequest;
+use App\Http\Resources\ClienteDetalleResource;
 use App\Http\Resources\ClienteResource;
 use App\Models\Cliente;
 use Illuminate\Http\JsonResponse;
@@ -22,7 +23,48 @@ class ClienteController extends Controller
     )]
     public function index(): JsonResponse
     {
-        return response()->json(ClienteResource::collection(Cliente::all()));
+        $user = request()->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
+
+        if ($user->rol === 'comercial') {
+            $clientes = Cliente::whereHas('edificios', function ($query) use ($user) {
+                if ($user->id_zona) {
+                    $query->where('id_zona', $user->id_zona);
+                }
+            })
+                ->with('edificios')
+                ->distinct()
+                ->get();
+        } elseif ($user->rol === 'admin') {
+            $zoneIds = $user->subordinados()->pluck('id_zona')->filter()->toArray();
+
+            if ($user->id_zona) {
+                $zoneIds[] = $user->id_zona;
+            }
+
+            $zoneIds = array_values(array_unique($zoneIds));
+
+            if (empty($zoneIds)) {
+                $clientes = Cliente::all();
+            } else {
+                $clientes = Cliente::whereHas('edificios', function ($query) use ($zoneIds) {
+                    $query->whereIn('id_zona', $zoneIds);
+                })
+                    ->with('edificios')
+                    ->distinct()
+                    ->get();
+            }
+        } else {
+            $clientes = Cliente::whereHas('edificios')
+                ->with('edificios')
+                ->distinct()
+                ->get();
+        }
+
+        return response()->json(ClienteResource::collection($clientes));
     }
 
     #[OA\Get(
@@ -40,6 +82,47 @@ class ClienteController extends Controller
     public function show(Cliente $cliente): JsonResponse
     {
         return response()->json(new ClienteResource($cliente->load(['edificios', 'visitas'])));
+    }
+
+    #[OA\Get(
+        path: '/api/clientes/{cliente}/detalle',
+        tags: ['Clientes'],
+        summary: 'Obtener detalle completo de cliente para vista unificada',
+        security: [['bearerAuth' => []]],
+        parameters: [new OA\Parameter(name: 'cliente', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Detalle completo del cliente', content: new OA\JsonContent(ref: '#/components/schemas/ClienteDetalleResource')),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 404, description: 'Cliente no encontrado'),
+        ]
+    )]
+    public function detalle(Cliente $cliente): JsonResponse
+    {
+        $cliente->load([
+            'edificios.zona',
+            'visitas.usuario',
+            'visitas.estado',
+        ]);
+
+        return response()->json(new ClienteDetalleResource($cliente));
+    }
+
+    #[OA\Get(
+        path: '/api/clientes/sin-edificio',
+        tags: ['Clientes'],
+        summary: 'Listar clientes sin edificio asignado',
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Listado de clientes sin edificio', content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/ClienteResource'))),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado por rol'),
+        ]
+    )]
+    public function sinEdificio(): JsonResponse
+    {
+        $clientes = Cliente::doesntHave('edificios')->get();
+
+        return response()->json(ClienteResource::collection($clientes));
     }
 
     #[OA\Post(
@@ -125,4 +208,6 @@ class ClienteController extends Controller
 
         return response()->json(null, 204);
     }
+
+    
 }

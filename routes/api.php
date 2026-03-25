@@ -34,7 +34,8 @@ Route::middleware('auth:api')->group(function () {
     });
 
     // Lectura compartida (admin y comercial)
-    Route::apiResource('clientes',  ClienteController::class)->only(['index', 'show']);
+    Route::get('clientes/{cliente}/detalle', [ClienteController::class, 'detalle'])->whereNumber('cliente');
+    Route::apiResource('clientes',  ClienteController::class)->only(['index', 'show'])->whereNumber('cliente');
     Route::apiResource('edificios', EdificioController::class)->only(['index', 'show']);
     Route::apiResource('estados-visita', EstadoVisitaController::class)->only(['index', 'show']);
     Route::apiResource('visitas',   VisitaController::class)->only(['index', 'show']);
@@ -55,7 +56,8 @@ Route::middleware('auth:api')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware('role:admin')->group(function () {
-        Route::apiResource('clientes',  ClienteController::class)->only(['store', 'update', 'destroy']);
+        Route::get('clientes/sin-edificio', [ClienteController::class, 'sinEdificio']);
+        Route::apiResource('clientes',  ClienteController::class)->only(['store', 'update', 'destroy'])->whereNumber('cliente');
         Route::apiResource('edificios', EdificioController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('visitas',   VisitaController::class)->only(['destroy']);
         Route::apiResource('zonas',     ZonaController::class)->only(['store', 'update', 'destroy']);

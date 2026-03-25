@@ -439,6 +439,48 @@
                 ]
             }
         },
+        "/api/clientes/{cliente}/detalle": {
+            "get": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Obtener detalle completo de cliente para vista unificada",
+                "operationId": "eac857f80b15a98a1c74598a018f2bb5",
+                "parameters": [
+                    {
+                        "name": "cliente",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalle completo del cliente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClienteDetalleResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Cliente no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/edificios": {
             "get": {
                 "tags": [
@@ -1816,6 +1858,170 @@
                     "updated_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ClienteDetalleResource": {
+                "properties": {
+                    "cliente": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "nombre": {
+                                "type": "string",
+                                "example": "Antonio"
+                            },
+                            "apellidos": {
+                                "type": "string",
+                                "example": "Perez Garcia"
+                            },
+                            "telefono": {
+                                "type": "string",
+                                "example": "612345678",
+                                "nullable": true
+                            },
+                            "email": {
+                                "type": "string",
+                                "format": "email",
+                                "example": "antonio@ejemplo.com",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "edificio": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 10
+                            },
+                            "direccion_completa": {
+                                "type": "string",
+                                "example": "Calle Cruz Conde 15, Córdoba"
+                            },
+                            "planta": {
+                                "type": "string",
+                                "example": "2",
+                                "nullable": true
+                            },
+                            "puerta": {
+                                "type": "string",
+                                "example": "B",
+                                "nullable": true
+                            },
+                            "ubicacion": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/GeoPoint"
+                                    }
+                                ],
+                                "nullable": true
+                            },
+                            "tipo": {
+                                "type": "string",
+                                "example": "residencial"
+                            },
+                            "id_zona": {
+                                "type": "integer",
+                                "example": 3
+                            },
+                            "zona": {
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "nombre_zona": {
+                                        "type": "string",
+                                        "example": "Centro"
+                                    }
+                                },
+                                "type": "object",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "visitas": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 12
+                            },
+                            "ultima": {
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "example": 44
+                                    },
+                                    "id_usuario": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "id_cliente": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "id_estado": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "fecha_hora": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-03-20 09:30:00"
+                                    },
+                                    "observaciones": {
+                                        "type": "string",
+                                        "example": "Cliente no disponible, volver la próxima semana",
+                                        "nullable": true
+                                    },
+                                    "estado": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "etiqueta": {
+                                                "type": "string",
+                                                "example": "Pendiente"
+                                            },
+                                            "color_hex": {
+                                                "type": "string",
+                                                "example": "#f59e0b"
+                                            }
+                                        },
+                                        "type": "object",
+                                        "nullable": true
+                                    },
+                                    "usuario": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "nombre": {
+                                                "type": "string",
+                                                "example": "Juan"
+                                            },
+                                            "apellidos": {
+                                                "type": "string",
+                                                "example": "García López"
+                                            }
+                                        },
+                                        "type": "object",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
