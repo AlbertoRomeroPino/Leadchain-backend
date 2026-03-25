@@ -439,13 +439,13 @@
                 ]
             }
         },
-        "/api/clientes/{cliente}/detalle": {
+        "/api/cliente/detalles/{cliente}": {
             "get": {
                 "tags": [
                     "Clientes"
                 ],
                 "summary": "Obtener detalle completo de cliente para vista unificada",
-                "operationId": "eac857f80b15a98a1c74598a018f2bb5",
+                "operationId": "14e1b0717dc61d68abd98ec759e0e996",
                 "parameters": [
                     {
                         "name": "cliente",
@@ -472,6 +472,41 @@
                     },
                     "404": {
                         "description": "Cliente no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/clientes/sin-edificio": {
+            "get": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Listar clientes sin edificio asignado",
+                "operationId": "75b2cf5488c5d4ff41ab3d3fe3f1b150",
+                "responses": {
+                    "200": {
+                        "description": "Listado de clientes sin edificio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ClienteResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado por rol"
                     }
                 },
                 "security": [

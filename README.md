@@ -26,9 +26,18 @@ Este método es el más limpio, ya que Docker se encarga de configurar PostGIS y
    cd leadchain-backend
    ```
 2. **Levantar los contenedores con un comando:**
+   Aqui puedes hacer 2 opciones:
 
    ```bash
+   composer install
    php artisan start:complete
+
+   -------------------------------------------------------------------
+
+   docker compose up -d --build
+   # para las migraciones tienes que pararte un poco tras ejecutar el --build o te dara fallo
+   docker compose exec -T app php artisan migrate --force
+   docker compose exec -T app php artisan db:seed --force
    ```
 
    Este comando se encarga de todo: construye imágenes, levanta contenedores, ejecuta migraciones y carga datos iniciales.

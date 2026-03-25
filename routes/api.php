@@ -34,7 +34,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     // Lectura compartida (admin y comercial)
-    Route::get('clientes/{cliente}/detalle', [ClienteController::class, 'detalle'])->whereNumber('cliente');
+    Route::get('cliente/detalles/{cliente}', [ClienteController::class, 'detalle'])->whereNumber('cliente');
     Route::apiResource('clientes',  ClienteController::class)->only(['index', 'show'])->whereNumber('cliente');
     Route::apiResource('edificios', EdificioController::class)->only(['index', 'show']);
     Route::apiResource('estados-visita', EstadoVisitaController::class)->only(['index', 'show']);

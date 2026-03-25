@@ -85,7 +85,7 @@ class ClienteController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/clientes/{cliente}/detalle',
+        path: '/api/cliente/detalles/{cliente}',
         tags: ['Clientes'],
         summary: 'Obtener detalle completo de cliente para vista unificada',
         security: [['bearerAuth' => []]],
