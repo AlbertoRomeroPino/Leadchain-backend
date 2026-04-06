@@ -287,4 +287,21 @@ Estructura del proyecto (filtrada):
         └── ZonaData.php
 ```
 
+# Soluciones a problemas
+
+1º Windows estaba sobreponiendose al puerto de postman y no me dejaba hacer un start:complete. Lo que se realiza aqui es para el servicio que ocupa el puerto tirar la base de datos y luego activar el que habia parado para que cambie de puerto
+
+```powershell
+# 1. Detener el servicio que gestiona el NAT y las reservas de puertos
+net stop winnat
+
+# 2. Levanta tu contenedor de Docker (ahora debería dejarte usar el puerto 5432)
+# docker-compose up -d (o el comando que uses)
+
+# 3. Volver a iniciar el servicio
+net start winnat
+```
+
+
+
 **Desarrollado por:** Alberto Romero Pino - [GitHub](https://github.com/AlbertoRomeroPino "null")
