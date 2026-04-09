@@ -45,12 +45,11 @@ class EdificioTest extends TestCase
                 '*' => [
                     'id',
                     'direccion_completa',
-                    'planta',
-                    'puerta',
                     'ubicacion',
                     'id_zona',
                     'tipo',
                     'id_cliente',
+                    'clientes',
                     'created_at',
                     'updated_at',
                 ],
@@ -69,12 +68,11 @@ class EdificioTest extends TestCase
             ->assertJsonStructure([
                 'id',
                 'direccion_completa',
-                'planta',
-                'puerta',
                 'ubicacion',
                 'id_zona',
                 'tipo',
                 'id_cliente',
+                'clientes',
                 'created_at',
                 'updated_at',
             ]);
@@ -110,8 +108,8 @@ class EdificioTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonPath('direccion_completa', $edificio['direccion_completa'])
-            ->assertJsonPath('planta', $edificio['planta'])
-            ->assertJsonPath('puerta', $edificio['puerta']);
+            ->assertJsonPath('id_zona', $edificio['id_zona'])
+            ->assertJsonPath('tipo', $edificio['tipo']);
     }
 
     public function test_update_edificio_with_patch(): void
@@ -126,8 +124,8 @@ class EdificioTest extends TestCase
         ])->patchJson('/api/edificios/' . $edificioId, $edificioPatch);
 
         $response->assertStatus(200)
-            ->assertJsonPath('planta', $edificioPatch['planta'])
-            ->assertJsonPath('puerta', $edificioPatch['puerta']);
+            ->assertJsonPath('id_zona', $edificioPatch['id_zona'])
+            ->assertJsonPath('tipo', $edificioPatch['tipo']);
     }
 
     public function test_delete_edificio(): void

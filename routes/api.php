@@ -59,6 +59,11 @@ Route::middleware('auth:api')->group(function () {
         Route::get('clientes/sin-edificio', [ClienteController::class, 'sinEdificio']);
         Route::apiResource('clientes',  ClienteController::class)->only(['store', 'update', 'destroy'])->whereNumber('cliente');
         Route::apiResource('edificios', EdificioController::class)->only(['store', 'update', 'destroy']);
+        
+        // Gestión de clientes en edificios
+        Route::post('edificios/{edificio}/clientes/{clienteId}', [EdificioController::class, 'attachCliente'])->whereNumber(['edificio', 'clienteId']);
+        Route::delete('edificios/{edificio}/clientes/{clienteId}', [EdificioController::class, 'detachCliente'])->whereNumber(['edificio', 'clienteId']);
+        
         Route::apiResource('visitas',   VisitaController::class)->only(['destroy']);
         Route::apiResource('zonas',     ZonaController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('users',     UserController::class);

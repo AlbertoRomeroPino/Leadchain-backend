@@ -6,6 +6,7 @@ use App\Http\Requests\VisitaRequest;
 use App\Http\Resources\VisitaResource;
 use App\Models\Visita;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes as OA;
 
 class VisitaController extends Controller
@@ -22,7 +23,23 @@ class VisitaController extends Controller
     )]
     public function index(): JsonResponse
     {
-        return response()->json(VisitaResource::collection(Visita::with(['usuario', 'cliente', 'estado'])->get()));
+        $user = Auth::user();
+        $query = Visita::with(['usuario', 'cliente.edificios', 'estado']);
+
+        if ($user && $user->rol === 'comercial') {
+            $query = $query->where('id_usuario', $user->id);
+        } elseif ($user && $user->rol === 'admin') {
+            $query = $query->where(function ($query) use ($user) {
+                $query->where('id_usuario', $user->id)
+                    ->orWhereHas('usuario', function ($query) use ($user) {
+                        $query->where('id_responsable', $user->id);
+                    });
+            });
+        } else {
+            $query = $query->where('id_usuario', $user?->id ?? 0);
+        }
+
+        return response()->json(VisitaResource::collection($query->get()));
     }
 
     #[OA\Get(

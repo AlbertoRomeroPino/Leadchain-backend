@@ -31,8 +31,8 @@ class ClienteDetalleResource extends JsonResource
             'edificio' => $edificio ? [
                 'id' => $edificio->id,
                 'direccion_completa' => $edificio->direccion_completa,
-                'planta' => $edificio->planta,
-                'puerta' => $edificio->puerta,
+                'planta' => $edificio->pivot ? $edificio->pivot->planta : null,
+                'puerta' => $edificio->pivot ? $edificio->pivot->puerta : null,
                 'ubicacion' => $edificio->ubicacion,
                 'tipo' => $edificio->tipo,
                 'id_zona' => $edificio->id_zona,

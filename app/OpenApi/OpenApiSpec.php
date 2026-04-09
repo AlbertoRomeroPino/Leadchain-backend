@@ -61,8 +61,6 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 1),
         new OA\Property(property: 'direccion_completa', type: 'string', example: 'Calle Gran Capitan 10'),
-        new OA\Property(property: 'planta', type: 'string', nullable: true, example: '3'),
-        new OA\Property(property: 'puerta', type: 'string', nullable: true, example: 'A'),
         new OA\Property(property: 'ubicacion', ref: '#/components/schemas/GeoPoint'),
         new OA\Property(property: 'id_zona', type: 'integer', example: 1),
         new OA\Property(property: 'tipo', type: 'string', example: 'residencial'),
@@ -132,8 +130,6 @@ use OpenApi\Attributes as OA;
             properties: [
                 new OA\Property(property: 'id', type: 'integer', example: 10),
                 new OA\Property(property: 'direccion_completa', type: 'string', example: 'Calle Cruz Conde 15, Córdoba'),
-                new OA\Property(property: 'planta', type: 'string', nullable: true, example: '2'),
-                new OA\Property(property: 'puerta', type: 'string', nullable: true, example: 'B'),
                 new OA\Property(property: 'ubicacion', ref: '#/components/schemas/GeoPoint', nullable: true),
                 new OA\Property(property: 'tipo', type: 'string', example: 'residencial'),
                 new OA\Property(property: 'id_zona', type: 'integer', example: 3),

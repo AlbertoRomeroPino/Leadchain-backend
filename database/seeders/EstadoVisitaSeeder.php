@@ -10,16 +10,14 @@ class EstadoVisitaSeeder extends Seeder
     public function run(): void
     {
         $estados = [
-            ['etiqueta' => 'Pendiente', 'color_hex' => '#9E9E9E'],       // Gris: Aún no se ha realizado
-            ['etiqueta' => 'En Camino', 'color_hex' => '#2196F3'],       // Azul: El técnico/comercial va hacia allá
-            ['etiqueta' => 'En Proceso', 'color_hex' => '#FFC107'],      // Ámbar: Se está realizando la visita
-            ['etiqueta' => 'Vendido', 'color_hex' => '#4CAF50'],         // Verde: Éxito total
-            ['etiqueta' => 'Ausente', 'color_hex' => '#FF9800'],         // Naranja: El cliente no estaba
-            ['etiqueta' => 'No Interesado', 'color_hex' => '#F44336'],   // Rojo: El cliente rechazó la oferta
-            ['etiqueta' => 'Volver luego', 'color_hex' => '#673AB7'],    // Púrpura: No pudo atender, pidió otra hora
-            ['etiqueta' => 'Local Cerrado', 'color_hex' => '#795548'],   // Marrón: Negocio fuera de horario o cerrado
-            ['etiqueta' => 'Presupuestado', 'color_hex' => '#00BCD4'],   // Cian: Se dejó propuesta para decidir
-            ['etiqueta' => 'Cancelada', 'color_hex' => '#212121'],       // Negro/Gris oscuro: Anulada previamente
+            ['etiqueta' => 'Vendido', 'color_hex' => '#2ECC71'],        // Verde: Éxito / Meta cumplida
+            ['etiqueta' => 'En Camino', 'color_hex' => '#F1C40F'],      // Amarillo: Acción inmediata
+            ['etiqueta' => 'Pendiente', 'color_hex' => '#BDC3C7'],      // Gris claro: Neutral / En espera
+            ['etiqueta' => 'Volver luego', 'color_hex' => '#E67E22'],   // Naranja: Precaución / Seguimiento
+            ['etiqueta' => 'Ausente', 'color_hex' => '#9B59B6'],        // Púrpura: Re-programar visita
+            ['etiqueta' => 'Local Cerrado', 'color_hex' => '#A67C52'],  // Marrón: Obstáculo logístico
+            ['etiqueta' => 'No Interesado', 'color_hex' => '#7F8C8D'],  // Gris oscuro: Cierre de oportunidad
+            ['etiqueta' => 'Cancelada', 'color_hex' => '#212121'],      // Negro: Pérdida / Alerta
         ];
 
         foreach ($estados as $estado) {

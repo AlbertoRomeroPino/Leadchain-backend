@@ -23,7 +23,7 @@ class EdificioController extends Controller
     )]
     public function index(): JsonResponse
     {
-        return response()->json(EdificioResource::collection(Edificio::with(['zona', 'cliente'])->get()));
+        return response()->json(EdificioResource::collection(Edificio::with(['zona', 'cliente', 'clientes'])->get()));
     }
 
     #[OA\Get(
@@ -40,7 +40,7 @@ class EdificioController extends Controller
     )]
     public function show(Edificio $edificio): JsonResponse
     {
-        return response()->json(new EdificioResource($edificio->load(['zona', 'cliente'])));
+        return response()->json(new EdificioResource($edificio->load(['zona', 'cliente', 'clientes'])));
     }
 
     #[OA\Post(
@@ -66,13 +66,11 @@ class EdificioController extends Controller
             DB::beginTransaction();
 
             $inserted = DB::selectOne(
-                'INSERT INTO edificios (direccion_completa, planta, puerta, id_zona, tipo, id_cliente, ubicacion, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), NOW(), NOW())
+                'INSERT INTO edificios (direccion_completa, id_zona, tipo, id_cliente, ubicacion, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), NOW(), NOW())
                  RETURNING id',
                 [
                     $data['direccion_completa'],
-                    $data['planta'] ?? null,
-                    $data['puerta'] ?? null,
                     $data['id_zona'],
                     $data['tipo'],
                     $data['id_cliente'] ?? null,
@@ -129,8 +127,6 @@ class EdificioController extends Controller
 
             $updatable = $request->only([
                 'direccion_completa',
-                'planta',
-                'puerta',
                 'id_zona',
                 'tipo',
                 'id_cliente',
@@ -173,5 +169,67 @@ class EdificioController extends Controller
         $edificio->delete();
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * Adjuntar un cliente a un edificio
+     */
+    public function attachCliente(Edificio $edificio, int $clienteId): JsonResponse
+    {
+        try {
+            // Verificar que el cliente existe
+            $cliente = \App\Models\Cliente::findOrFail($clienteId);
+            
+            // Obtener datos de piso y puerta del request
+            $planta = request()->input('planta');
+            $puerta = request()->input('puerta');
+            
+            // Adjuntar el cliente al edificio con datos pivot
+            $pivotData = [];
+            if ($planta) {
+                $pivotData['planta'] = $planta;
+            }
+            if ($puerta) {
+                $pivotData['puerta'] = $puerta;
+            }
+            
+            $edificio->clientes()->syncWithoutDetaching([$clienteId => $pivotData]);
+
+            return response()->json(
+                new EdificioResource($edificio->load(['zona', 'cliente', 'clientes'])),
+                200
+            );
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(
+                ['error' => 'Cliente no encontrado'],
+                404
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                ['error' => $e->getMessage()],
+                500
+            );
+        }
+    }
+
+    /**
+     * Desadjuntar un cliente de un edificio
+     */
+    public function detachCliente(Edificio $edificio, int $clienteId): JsonResponse
+    {
+        try {
+            // Desadjuntar el cliente del edificio
+            $edificio->clientes()->detach($clienteId);
+
+            return response()->json(
+                new EdificioResource($edificio->load(['zona', 'cliente', 'clientes'])),
+                200
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                ['error' => $e->getMessage()],
+                500
+            );
+        }
     }
 }

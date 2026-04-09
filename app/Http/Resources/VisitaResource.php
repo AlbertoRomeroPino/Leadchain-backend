@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\ClienteResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -27,6 +28,9 @@ class VisitaResource extends JsonResource
                     'nombre' => $this->usuario?->nombre,
                     'apellidos' => $this->usuario?->apellidos,
                 ];
+            }),
+            'cliente' => $this->whenLoaded('cliente', function () {
+                return ClienteResource::make($this->cliente);
             }),
             'estado' => $this->whenLoaded('estado', function () {
                 return [

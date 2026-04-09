@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ClienteSeeder::class,
             EdificioSeeder::class,
+            ClienteEdificioSeeder::class,
             VisitaSeeder::class,
         ]);
     }

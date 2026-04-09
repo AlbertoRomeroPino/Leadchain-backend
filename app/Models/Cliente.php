@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Cliente extends Model
 {
@@ -20,11 +21,11 @@ class Cliente extends Model
     ];
 
     /**
-     * Edificios del cliente
+     * Edificios del cliente (relación many-to-many)
      */
-    public function edificios(): HasMany
+    public function edificios(): BelongsToMany
     {
-        return $this->hasMany(Edificio::class, 'id_cliente');
+        return $this->belongsToMany(Edificio::class, 'cliente_edificio', 'cliente_id', 'edificio_id');
     }
 
     /**

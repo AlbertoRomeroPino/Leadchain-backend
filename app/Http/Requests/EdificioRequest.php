@@ -24,8 +24,6 @@ class EdificioRequest extends FormRequest
         if ($this->isMethod('post')) {
             return [
                 'direccion_completa' => 'required|string|max:255',
-                'planta' => 'nullable|string|max:20',
-                'puerta' => 'nullable|string|max:10',
                 'ubicacion' => 'required|array',
                 'ubicacion.lat' => 'required|numeric|between:-90,90',
                 'ubicacion.lng' => 'required|numeric|between:-180,180',
@@ -37,8 +35,6 @@ class EdificioRequest extends FormRequest
 
         return [
             'direccion_completa' => 'sometimes|string|max:255',
-            'planta' => 'sometimes|nullable|string|max:20',
-            'puerta' => 'sometimes|nullable|string|max:10',
             'ubicacion' => 'sometimes|array',
             'ubicacion.lat' => 'required_with:ubicacion,ubicacion.lng|numeric|between:-90,90',
             'ubicacion.lng' => 'required_with:ubicacion,ubicacion.lat|numeric|between:-180,180',

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\DB;
 
 class Edificio extends Model
@@ -15,8 +16,6 @@ class Edificio extends Model
 
     protected $fillable = [
         'direccion_completa',
-        'planta',
-        'puerta',
         'id_zona',
         'tipo',
         'id_cliente',
@@ -48,7 +47,7 @@ class Edificio extends Model
     }
 
     /**
-     * Cliente propietario del edificio
+     * Cliente propietario del edificio (relación antigua, mantener para compatibilidad)
      */
     public function cliente(): BelongsTo
     {
@@ -56,17 +55,31 @@ class Edificio extends Model
     }
 
     /**
-     * Dirección completa con planta y puerta
+     * Clientes residentes en el edificio (relación many-to-many)
+     */
+    public function clientes(): BelongsToMany
+    {
+        return $this->belongsToMany(Cliente::class, 'cliente_edificio', 'edificio_id', 'cliente_id');
+    }
+
+    /**
+     * Dirección completa con planta y puerta (del primer cliente)
      */
     public function getDireccionCompletaConPisoAttribute(): string
     {
         $direccion = $this->direccion_completa;
-        if ($this->planta) {
-            $direccion .= ", {$this->planta}";
-            if ($this->puerta) {
-                $direccion .= "º{$this->puerta}";
+        
+        // Obtener datos del primer cliente en la relación
+        if ($this->relationLoaded('clientes') && $this->clientes->isNotEmpty()) {
+            $primerCliente = $this->clientes->first();
+            if ($primerCliente->pivot->planta) {
+                $direccion .= ", {$primerCliente->pivot->planta}";
+                if ($primerCliente->pivot->puerta) {
+                    $direccion .= "º{$primerCliente->pivot->puerta}";
+                }
             }
         }
+        
         return $direccion;
     }
 }
