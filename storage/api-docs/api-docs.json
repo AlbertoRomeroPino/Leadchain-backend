@@ -1750,16 +1750,6 @@
                         "type": "string",
                         "example": "Calle Gran Capitan 10"
                     },
-                    "planta": {
-                        "type": "string",
-                        "example": "3",
-                        "nullable": true
-                    },
-                    "puerta": {
-                        "type": "string",
-                        "example": "A",
-                        "nullable": true
-                    },
                     "ubicacion": {
                         "$ref": "#/components/schemas/GeoPoint"
                     },
@@ -1936,16 +1926,6 @@
                             "direccion_completa": {
                                 "type": "string",
                                 "example": "Calle Cruz Conde 15, Córdoba"
-                            },
-                            "planta": {
-                                "type": "string",
-                                "example": "2",
-                                "nullable": true
-                            },
-                            "puerta": {
-                                "type": "string",
-                                "example": "B",
-                                "nullable": true
                             },
                             "ubicacion": {
                                 "oneOf": [

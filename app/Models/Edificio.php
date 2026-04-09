@@ -59,7 +59,8 @@ class Edificio extends Model
      */
     public function clientes(): BelongsToMany
     {
-        return $this->belongsToMany(Cliente::class, 'cliente_edificio', 'edificio_id', 'cliente_id');
+        return $this->belongsToMany(Cliente::class, 'cliente_edificio', 'edificio_id', 'cliente_id')
+            ->withPivot('planta', 'puerta');
     }
 
     /**

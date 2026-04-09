@@ -13,8 +13,10 @@ class ClienteEdificioSeeder extends Seeder
         // Obtener datos de planta/puerta del cache (guardado por EdificioSeeder)
         $plantaPuertaData = \Illuminate\Support\Facades\Cache::get('edificios_planta_puerta', []);
 
-        // Primero, insertar todas las relaciones base desde edificios.id_cliente con planta/puerta
-        $edificios = Edificio::whereNotNull('id_cliente')->get();
+        // Insertar todas las relaciones desde edificios.id_cliente con planta/puerta
+        $edificios = Edificio::whereNotNull('id_cliente')
+            ->where('id_cliente', '<=', 16) // Solo clientes 1-16
+            ->get();
 
         foreach ($edificios as $edificio) {
             $exists = DB::table('cliente_edificio')
@@ -36,38 +38,5 @@ class ClienteEdificioSeeder extends Seeder
                 ]);
             }
         }
-
-        // Luego, insertar relaciones adicionales para que algunos clientes estén en múltiples edificios
-        $relacionesAdicionales = [
-            ['cliente_id' => 2, 'edificio_id' => 8, 'planta' => '2', 'puerta' => 'F'],   // Carmen también en Blanco Belmonte
-            ['cliente_id' => 3, 'edificio_id' => 14, 'planta' => '2', 'puerta' => 'I'],  // Francisco también en Calle Orfila
-            ['cliente_id' => 5, 'edificio_id' => 10, 'planta' => '4', 'puerta' => 'J'],  // Javier también en Calle Herrera
-            ['cliente_id' => 6, 'edificio_id' => 7, 'planta' => '1', 'puerta' => 'B'],   // Elena también en Calle Judería
-            ['cliente_id' => 7, 'edificio_id' => 8, 'planta' => '3', 'puerta' => 'G'],   // Roberto también en Blanco Belmonte
-            ['cliente_id' => 13, 'edificio_id' => 3, 'planta' => '1', 'puerta' => null], // Andrés también en Plaza Tendillas
-            ['cliente_id' => 14, 'edificio_id' => 2, 'planta' => 'Bajo', 'puerta' => null], // Violeta también en Gran Capitán
-        ];
-
-        // Insertar solo relaciones que no existan ya
-        foreach ($relacionesAdicionales as $relacion) {
-            $exists = DB::table('cliente_edificio')
-                ->where('cliente_id', $relacion['cliente_id'])
-                ->where('edificio_id', $relacion['edificio_id'])
-                ->exists();
-
-            if (!$exists) {
-                DB::table('cliente_edificio')->insert([
-                    'cliente_id' => $relacion['cliente_id'],
-                    'edificio_id' => $relacion['edificio_id'],
-                    'planta' => $relacion['planta'],
-                    'puerta' => $relacion['puerta'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-        }
     }
 }
-
-
-
