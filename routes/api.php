@@ -45,6 +45,10 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('edificios', EdificioController::class)->only(['index', 'show']);
     Route::get('edificios/{edificio}/detalle', [EdificioController::class, 'detalle'])->whereNumber('edificio');
     Route::apiResource('estados-visita', EstadoVisitaController::class)->only(['index', 'show']);
+    
+    // Endpoint consolidado para página de Visitas (una sola consulta en lugar de 3)
+    Route::get('visitas/pagina/datos-consolidados', [VisitaController::class, 'paraVisitasPage']);
+    
     Route::apiResource('visitas',   VisitaController::class)->only(['index', 'show']);
     Route::get('zonas/mapa', [ZonaController::class, 'mapa']);
     Route::apiResource('zonas',     ZonaController::class)->only(['index', 'show']);

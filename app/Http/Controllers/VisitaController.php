@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\VisitaRequest;
 use App\Http\Resources\VisitaResource;
+use App\Http\Resources\VisitasPaginaResource;
 use App\Models\Visita;
+use App\Models\Cliente;
+use App\Models\EstadoVisita;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes as OA;
@@ -131,5 +134,77 @@ class VisitaController extends Controller
         $visita->delete();
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * Get consolidated data for visitas page
+     * Returns: visitas, clientes, and estados in a single optimized query
+     * This reduces 3 API calls to 1
+     */
+    #[OA\Get(
+        path: '/api/visitas/pagina/datos-consolidados',
+        tags: ['Visitas'],
+        summary: 'Obtener datos consolidados para página de visitas (una sola consulta)',
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Visitas, clientes y estados consolidados',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'visitas', type: 'array', items: new OA\Items(ref: '#/components/schemas/VisitasPaginaResource')),
+                        new OA\Property(property: 'clientes', type: 'array', items: new OA\Items(type: 'object')),
+                        new OA\Property(property: 'estados', type: 'array', items: new OA\Items(type: 'object')),
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado'),
+        ]
+    )]
+    public function paraVisitasPage(): JsonResponse
+    {
+        $user = Auth::user();
+
+        // Obtener visitas con relaciones eager loaded
+        $visitasQuery = Visita::with(['usuario', 'cliente.edificios', 'estado']);
+
+        if ($user && $user->rol === 'comercial') {
+            $visitasQuery = $visitasQuery->where('id_usuario', $user->id);
+        } elseif ($user && $user->rol === 'admin') {
+            $visitasQuery = $visitasQuery->where(function ($q) use ($user) {
+                $q->where('id_usuario', $user->id)
+                    ->orWhereHas('usuario', function ($q) use ($user) {
+                        $q->where('id_responsable', $user->id);
+                    });
+            });
+        }
+
+        $visitas = $visitasQuery->get();
+
+        // Obtener TODOS los clientes (necesarios para el formulario)
+        $clientes = Cliente::with('edificios')->get();
+
+        // Obtener TODOS los estados
+        $estados = EstadoVisita::all();
+
+        return response()->json([
+            'visitas' => VisitasPaginaResource::collection($visitas),
+            'clientes' => $clientes->map(fn($c) => [
+                'id' => $c->id,
+                'nombre' => $c->nombre,
+                'apellidos' => $c->apellidos,
+                'telefono' => $c->telefono,
+                'email' => $c->email,
+                'edificios' => $c->edificios ? $c->edificios->map(fn($e) => [
+                    'id' => $e->id,
+                    'direccion_completa' => $e->direccion_completa,
+                ])->toArray() : [],
+            ])->toArray(),
+            'estados' => $estados->map(fn($e) => [
+                'id' => $e->id,
+                'etiqueta' => $e->etiqueta,
+                'color_hex' => $e->color_hex,
+            ])->toArray(),
+        ]);
     }
 }
