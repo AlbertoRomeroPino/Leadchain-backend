@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ZonaRequest;
+use App\Http\Resources\MapaInicioResource;
 use App\Http\Resources\ZonaResource;
 use App\Models\Zona;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
 
@@ -179,5 +181,88 @@ class ZonaController extends Controller
     {
         $zona->delete();
         return response()->json(null, 204);
+    }
+
+    /**
+     * Get consolidated data for map view
+     * Returns: zonas with nested edificios and clientes in a single optimized query
+     */
+    #[OA\Get(
+        path: '/api/zonas/mapa',
+        tags: ['Zonas'],
+        summary: 'Obtener zonas, edificios y clientes para vista de mapa (una sola consulta optimizada)',
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Zonas con edificios y clientes anidados. Optimizado en una única query.',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'zonas', type: 'array', items: new OA\Items(ref: '#/components/schemas/ZonaResource')),
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado'),
+        ]
+    )]
+    public function mapa(): JsonResponse
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
+
+        // Obtener zonas con edificios y clientes
+        // Usar query raw para obtener coordenadas geospatiales en una sola consulta
+        if ($user->rol === 'comercial' && $user->id_zona) {
+            $zonas = Zona::where('id', $user->id_zona)
+                ->with(['edificios.clientes'])
+                ->get();
+        } else {
+            $zonas = Zona::with(['edificios.clientes'])->get();
+        }
+
+        // Obtener coordenadas para todos los edificios en una sola query
+        $edificiosCoordenadas = DB::table('edificios')
+            ->select('id', DB::raw('ST_Y(ubicacion) as lat'), DB::raw('ST_X(ubicacion) as lng'))
+            ->get()
+            ->keyBy('id');
+
+        // Transformar directamente sin usar Resource
+        $zonasTransformadas = $zonas->map(function ($zona) use ($edificiosCoordenadas) {
+            return [
+                'id' => $zona->id,
+                'nombre_zona' => $zona->nombre_zona,
+                'area' => $zona->area,
+                'edificios' => $zona->edificios->map(function ($edificio) use ($edificiosCoordenadas) {
+                    $coordenadas = $edificiosCoordenadas->get($edificio->id);
+                    $ubicacion = $coordenadas ? [
+                        'lat' => (float) $coordenadas->lat,
+                        'lng' => (float) $coordenadas->lng,
+                    ] : null;
+
+                    return [
+                        'id' => $edificio->id,
+                        'nombre' => $edificio->nombre,
+                        'direccion_completa' => $edificio->direccion_completa,
+                        'tipo' => $edificio->tipo,
+                        'ubicacion' => $ubicacion,
+                        'id_zona' => $edificio->id_zona,
+                        'clientes' => $edificio->clientes ? $edificio->clientes->map(fn($c) => [
+                            'id' => $c->id,
+                            'nombre' => $c->nombre,
+                            'apellidos' => $c->apellidos,
+                            'telefono' => $c->telefono,
+                            'email' => $c->email,
+                        ])->toArray() : [],
+                    ];
+                })->toArray(),
+            ];
+        });
+
+        return response()->json([
+            'zonas' => $zonasTransformadas,
+        ]);
     }
 }

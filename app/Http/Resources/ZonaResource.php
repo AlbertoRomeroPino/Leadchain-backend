@@ -20,6 +20,10 @@ class ZonaResource extends JsonResource
             'area' => $this->area,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'usuarios' => $this->whenLoaded('usuarios', function () {
+                return $this->usuarios;
+            }),
+            'edificios' => EdificioResource::collection($this->whenLoaded('edificios', $this->edificios)),
         ];
     }
 }

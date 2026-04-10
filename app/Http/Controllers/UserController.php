@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\ComercialesAMiCargoResource;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\ZonaResource;
 use App\Models\User;
+use App\Models\Zona;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use OpenApi\Attributes as OA;
 
@@ -125,4 +129,57 @@ class UserController extends Controller
 
         return response()->json(null, 204);
     }
-}
+
+    /**
+     * Obtener comerciales del usuario actual con sus visitas, clientes y zonas
+     * Consolida en una sola petición toda la información necesaria para ComercialesPage
+     */
+    #[OA\Get(
+        path: '/api/users/comerciales-a-cargo',
+        tags: ['Usuarios'],
+        summary: 'Obtener comerciales a cargo del usuario actual con visitas consolidadas',
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Comerciales con visitas, clientes y zonas consolidados',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'comerciales', type: 'array', items: new OA\Items(ref: '#/components/schemas/UserResource')),
+                        new OA\Property(property: 'visitas', type: 'array', items: new OA\Items(ref: '#/components/schemas/VisitaResource')),
+                        new OA\Property(property: 'clientes', type: 'array', items: new OA\Items(ref: '#/components/schemas/ClienteResource')),
+                        new OA\Property(property: 'zonas', type: 'array', items: new OA\Items(ref: '#/components/schemas/ZonaResource')),
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado (solo admin)'),
+        ]
+    )]
+    public function comercialesAMiCargo(): JsonResponse
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
+
+        // Solo admin puede ver sus comerciales
+        if ($user->rol !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
+        // Obtener comerciales del usuario actual (con sus subordinados)
+        $comerciales = User::where('rol', 'comercial')
+            ->where('id_responsable', $user->id)
+            ->with(['visitas.cliente', 'visitas.estado'])
+            ->get();
+
+        // Obtener todas las zonas
+        $zonas = Zona::get(['id', 'nombre_zona']);
+
+        return response()->json([
+            'comerciales' => ComercialesAMiCargoResource::collection($comerciales),
+            'zonas' => ZonaResource::collection($zonas),
+        ]);
+    }}
