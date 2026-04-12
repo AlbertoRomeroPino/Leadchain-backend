@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ZonaRequest;
 use App\Http\Resources\MapaInicioResource;
 use App\Http\Resources\ZonaResource;
+use App\Http\Resources\ZonaPageResource;
 use App\Models\Zona;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -26,6 +27,23 @@ class ZonaController extends Controller
     public function index(): JsonResponse
     {
         return response()->json(ZonaResource::collection(Zona::all()));
+    }
+
+    #[OA\Get(
+        path: '/api/zonas/page/data',
+        tags: ['Zonas'],
+        summary: 'Obtener datos optimizados para la página de zonas',
+        description: 'Retorna todas las zonas con sus edificios y clientes en una única consulta, optimizado para la visualización en la página',
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Datos de zonas para la página', content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/ZonaPageResource'))),
+            new OA\Response(response: 401, description: 'No autenticado'),
+        ]
+    )]
+    public function pageData(): JsonResponse
+    {
+        $zonas = Zona::with(['edificios.clientes'])->get();
+        return response()->json(ZonaPageResource::collection($zonas));
     }
 
     #[OA\Get(

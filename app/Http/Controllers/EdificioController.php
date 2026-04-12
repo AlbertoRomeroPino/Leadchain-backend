@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EdificioRequest;
 use App\Http\Resources\EdificioResource;
+use App\Http\Resources\EdificioDetailResource;
 use App\Http\Resources\ZonaResource;
 use App\Models\Edificio;
+use App\Models\Zona;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -43,6 +45,44 @@ class EdificioController extends Controller
     public function show(Edificio $edificio): JsonResponse
     {
         return response()->json(new EdificioResource($edificio->load(['zona', 'cliente', 'clientes'])));
+    }
+
+    #[OA\Get(
+        path: '/api/edificios/{edificio}/detalle',
+        tags: ['Edificios'],
+        summary: 'Obtener detalles completos de un edificio',
+        description: 'Retorna todo lo necesario para la vista de detalles en una sola consulta: edificio, zona, otros edificios del bloque y todas las zonas',
+        security: [['bearerAuth' => []]],
+        parameters: [new OA\Parameter(name: 'edificio', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Detalles del edificio', content: new OA\JsonContent(ref: '#/components/schemas/EdificioDetailResource')),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 404, description: 'Edificio no encontrado'),
+        ]
+    )]
+    public function detalle(Edificio $edificio): JsonResponse
+    {
+        // Obtener el edificio con sus clientes
+        $edificio->load(['clientes']);
+
+        // Obtener otros edificios del mismo bloque (misma dirección)
+        $bloqueEdificios = Edificio::where('direccion_completa', $edificio->direccion_completa)
+            ->where('id', '!=', $edificio->id)
+            ->with(['clientes'])
+            ->get();
+
+        // Obtener la zona del edificio
+        $zona = Zona::find($edificio->id_zona);
+
+        // Obtener todas las zonas
+        $todasLasZonas = Zona::all();
+
+        // Asignar los datos al modelo para que el resource los encuentre
+        $edificio->setRelation('zona', $zona);
+        $edificio->setRelation('bloqueEdificios', $bloqueEdificios);
+        $edificio->setRelation('todasLasZonas', $todasLasZonas);
+
+        return response()->json(new EdificioDetailResource($edificio));
     }
 
     #[OA\Post(
@@ -234,46 +274,5 @@ class EdificioController extends Controller
             );
         }
     }
-
-    /**
-     * Obtener detalle completo de un edificio con zona y clientes
-     * Una sola consulta optimizada con eager loading
-     */
-    #[OA\Get(
-        path: '/api/edificios/{edificio}/detalle',
-        tags: ['Edificios'],
-        summary: 'Obtener detalle de edificio con zona y clientes (una sola consulta optimizada)',
-        security: [['bearerAuth' => []]],
-        parameters: [new OA\Parameter(name: 'edificio', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Edificio con zona y clientes anidados.',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'edificio', type: 'object', ref: '#/components/schemas/EdificioResource'),
-                        new OA\Property(property: 'zona', type: 'object', ref: '#/components/schemas/ZonaResource'),
-                    ]
-                )
-            ),
-            new OA\Response(response: 401, description: 'No autenticado'),
-            new OA\Response(response: 404, description: 'Edificio no encontrado'),
-        ]
-    )]
-    public function detalle(Edificio $edificio): JsonResponse
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            return response()->json(['message' => 'No autenticado'], 401);
-        }
-
-        // Cargar zona y clientes del edificio en una sola consulta
-        $edificio->load(['zona', 'clientes']);
-
-        return response()->json([
-            'edificio' => new EdificioResource($edificio),
-            'zona' => new ZonaResource($edificio->zona),
-        ]);
-    }
 }
+

@@ -50,6 +50,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('visitas/pagina/datos-consolidados', [VisitaController::class, 'paraVisitasPage']);
     
     Route::apiResource('visitas',   VisitaController::class)->only(['index', 'show']);
+    
+    // Endpoint consolidado para página de Zonas (una sola consulta con edificios y clientes)
+    Route::get('zonas/pagina/datos', [ZonaController::class, 'pageData']);
+    
     Route::get('zonas/mapa', [ZonaController::class, 'mapa']);
     Route::apiResource('zonas',     ZonaController::class)->only(['index', 'show']);
 
