@@ -25,14 +25,15 @@ Route::prefix('auth')->group(function () {
 | Rutas protegidas (requieren autenticación JWT)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:api')->group(function () {
 
-    // Sesión
-    Route::prefix('auth')->group(function () {
-        Route::post('logout',  [AuthController::class, 'logout']);
-        Route::post('refresh', [AuthController::class, 'refresh']);
-        Route::get('me',       [AuthController::class, 'me']);
-    });
+// Rutas de sesión - refresh necesita permitir tokens expirados
+Route::prefix('auth')->group(function () {
+    Route::post('logout',  [AuthController::class, 'logout'])->middleware('auth:api');
+    Route::post('refresh', [AuthController::class, 'refresh'])->middleware('allow_expired_token');
+    Route::get('me',       [AuthController::class, 'me'])->middleware('auth:api');
+});
+
+Route::middleware('auth:api')->group(function () {
 
     // Lectura compartida (admin y comercial)
     Route::get('cliente/detalles/{cliente}', [ClienteController::class, 'detalle'])->whereNumber('cliente');
@@ -40,6 +41,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::apiResource('edificios', EdificioController::class)->only(['index', 'show']);
     Route::get('edificios/{edificio}/detalle', [EdificioController::class, 'detalle'])->whereNumber('edificio');
+    Route::get('edificios/{edificio}/panel', [EdificioController::class, 'panel'])->whereNumber('edificio');
     
     Route::apiResource('estados-visita', EstadoVisitaController::class)->only(['index', 'show']);
 
@@ -83,10 +85,12 @@ Route::middleware('auth:api')->group(function () {
 
         Route::apiResource('visitas',   VisitaController::class)->only(['destroy']);
         Route::apiResource('zonas',     ZonaController::class)->only(['store', 'update', 'destroy']);
-        Route::apiResource('users',     UserController::class);
-
-        // Endpoint para obtener comerciales a cargo del admin
+        
+        // Endpoint para obtener comerciales a cargo del admin (DEBE IR ANTES del apiResource de users)
         Route::get('users/comerciales-a-cargo', [UserController::class, 'comercialesAMiCargo']);
+        
+        Route::apiResource('users',     UserController::class);
+        
         // Endpoint para datos de inicio del admin
         Route::get('inicio/admin', [InicioController::class, 'admin']);
     });

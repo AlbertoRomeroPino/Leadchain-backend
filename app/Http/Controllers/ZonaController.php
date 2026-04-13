@@ -30,7 +30,7 @@ class ZonaController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/zonas/page/data',
+        path: '/api/zonas/pagina/datos',
         tags: ['Zonas'],
         summary: 'Obtener datos optimizados para la página de zonas',
         description: 'Retorna todas las zonas con sus edificios y clientes en una única consulta, optimizado para la visualización en la página',

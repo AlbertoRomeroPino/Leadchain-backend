@@ -96,7 +96,16 @@ class AuthController extends Controller
     )]
     public function refresh()
     {
-        return $this->respondWithToken($this->guard()->refresh());
+        try {
+            // Intentar refrescar el token (funciona incluso con tokens expirados)
+            $newToken = $this->guard()->refresh();
+            return $this->respondWithToken($newToken);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al refrescar token: ' . $e->getMessage(),
+            ], 401);
+        }
     }
 
     #[OA\Get(
@@ -129,7 +138,28 @@ class AuthController extends Controller
 
     protected function respondWithToken($token)
     {
+        // Intentar obtener el usuario normalmente
         $user = $this->guard()->user();
+
+        // Si falla, intenta extraer del token (para tokens recién refrescados)
+        if (!$user) {
+            try {
+                // Decodificar el nuevo token para obtener datos del usuario
+                \PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth::setToken($token);
+                $decoded = \PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth::getPayload();
+                $userId = $decoded->get('sub'); // 'sub' es el user_id en JWT
+                
+                $user = \App\Models\User::find($userId);
+                if (!$user) {
+                    throw new \Exception('Usuario no encontrado');
+                }
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error obteniendo datos del usuario: ' . $e->getMessage(),
+                ], 401);
+            }
+        }
 
         return response()->json([
             'success' => true,

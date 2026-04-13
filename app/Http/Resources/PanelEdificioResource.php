@@ -5,11 +5,11 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class EdificioDetailResource extends JsonResource
+class PanelEdificioResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     * Optimized for EdificioInfo component - includes all needed info in one request
+     * Lightweight version for MapaEdificioPanel - only zona and clientes
      *
      * @return array<string, mixed>
      */
@@ -18,13 +18,12 @@ class EdificioDetailResource extends JsonResource
         return [
             'id' => $this->id,
             'direccion_completa' => $this->direccion_completa,
+            'tipo' => $this->tipo,
             'ubicacion' => $this->ubicacion,
             'id_zona' => $this->id_zona,
-            'tipo' => $this->tipo,
-            'id_cliente' => $this->id_cliente,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            // Relación con clientes (many-to-many con pivot)
+            // Zona del edificio
+            'zona' => $this->whenLoaded('zona', new ZonaLiteResource($this->zona)),
+            // Clientes con planta y puerta del pivot
             'clientes' => $this->whenLoaded('clientes', function () {
                 return $this->clientes->map(function ($cliente) {
                     return [
@@ -38,12 +37,6 @@ class EdificioDetailResource extends JsonResource
                     ];
                 });
             }),
-            // Zona del edificio
-            'zona' => $this->whenLoaded('zona', new ZonaLiteResource($this->zona)),
-            // Otros edificios del mismo bloque (misma dirección)
-            'bloqueEdificios' => $this->whenLoaded('bloqueEdificios', EdificioDetailResource::collection($this->bloqueEdificios)),
-            // Todas las zonas disponibles (lightweight - sin edificios anidados)
-            'todasLasZonas' => $this->whenLoaded('todasLasZonas', ZonaLiteResource::collection($this->todasLasZonas)),
         ];
     }
 }

@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'admin' => \App\Http\Middleware\LoginAdmin::class,
+            'allow_expired_token' => \App\Http\Middleware\AllowExpiredToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

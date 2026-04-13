@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\EdificioRequest;
 use App\Http\Resources\EdificioResource;
 use App\Http\Resources\EdificioDetailResource;
+use App\Http\Resources\PanelEdificioResource;
 use App\Http\Resources\ZonaResource;
 use App\Models\Edificio;
 use App\Models\Zona;
@@ -83,6 +84,32 @@ class EdificioController extends Controller
         $edificio->setRelation('todasLasZonas', $todasLasZonas);
 
         return response()->json(new EdificioDetailResource($edificio));
+    }
+
+    /**
+     * Obtener datos ligeros del edificio para panel de mapa
+     * Retorna solo: id, dirección, tipo, ubicación, zona y clientes
+     * Optimizado para MapaEdificioPanel
+     */
+    #[OA\Get(
+        path: '/api/edificios/{edificio}/panel',
+        tags: ['Edificios'],
+        summary: 'Obtener datos ligeros de edificio para panel de mapa',
+        description: 'Retorna solo la información necesaria para el panel del mapa: dirección, tipo, zona y clientes',
+        security: [['bearerAuth' => []]],
+        parameters: [new OA\Parameter(name: 'edificio', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Panel del edificio', content: new OA\JsonContent(ref: '#/components/schemas/PanelEdificioResource')),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 404, description: 'Edificio no encontrado'),
+        ]
+    )]
+    public function panel(Edificio $edificio): JsonResponse
+    {
+        // Cargar solo lo necesario: zona y clientes
+        $edificio->load(['zona', 'clientes']);
+
+        return response()->json(new PanelEdificioResource($edificio));
     }
 
     #[OA\Post(

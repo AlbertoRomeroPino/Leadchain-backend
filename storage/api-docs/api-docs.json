@@ -775,6 +775,92 @@
                 ]
             }
         },
+        "/api/edificios/{edificio}/detalle": {
+            "get": {
+                "tags": [
+                    "Edificios"
+                ],
+                "summary": "Obtener detalles completos de un edificio",
+                "description": "Retorna todo lo necesario para la vista de detalles en una sola consulta: edificio, zona, otros edificios del bloque y todas las zonas",
+                "operationId": "f61c6ccb71ddab274fbe336b57fa0d68",
+                "parameters": [
+                    {
+                        "name": "edificio",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalles del edificio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EdificioDetailResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Edificio no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/edificios/{edificio}/panel": {
+            "get": {
+                "tags": [
+                    "Edificios"
+                ],
+                "summary": "Obtener datos ligeros de edificio para panel de mapa",
+                "description": "Retorna solo la información necesaria para el panel del mapa: dirección, tipo, zona y clientes",
+                "operationId": "b766a3be15ac3a841e5bc7a8a9b10e76",
+                "parameters": [
+                    {
+                        "name": "edificio",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Panel del edificio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PanelEdificioResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Edificio no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/estados-visita": {
             "get": {
                 "tags": [
@@ -878,6 +964,130 @@
                     },
                     "404": {
                         "description": "Estado de visita no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/inicio/comercial": {
+            "get": {
+                "tags": [
+                    "Inicio"
+                ],
+                "summary": "Obtener datos consolidados para inicio comercial",
+                "description": "Get consolidated data for commercial dashboard\nReturns: edificios, clientes, visitas y estados de visita",
+                "operationId": "42cbcac503521a0a95687d2786f4b598",
+                "responses": {
+                    "200": {
+                        "description": "Datos consolidados del inicio comercial",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "edificios": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/EdificioResource"
+                                            }
+                                        },
+                                        "clientes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ClienteResource"
+                                            }
+                                        },
+                                        "visitas": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/VisitaResource"
+                                            }
+                                        },
+                                        "estados_visita": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/EstadoVisitaResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/inicio/admin": {
+            "get": {
+                "tags": [
+                    "Inicio"
+                ],
+                "summary": "Obtener datos consolidados para inicio admin",
+                "description": "Get consolidated data for admin dashboard\nReturns: usuarios comerciales, visitas, clientes y tipos de edificios",
+                "operationId": "ba220ea0709d4fd77aba90cbc12eb1fd",
+                "responses": {
+                    "200": {
+                        "description": "Datos consolidados del inicio admin",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "usuarios_comerciales": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/UserResource"
+                                            }
+                                        },
+                                        "visitas": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/VisitaResource"
+                                            }
+                                        },
+                                        "clientes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ClienteResource"
+                                            }
+                                        },
+                                        "edificios": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/EdificioResource"
+                                            }
+                                        },
+                                        "estados_visita": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/EstadoVisitaResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
                     }
                 },
                 "security": [
@@ -1149,6 +1359,65 @@
                 ]
             }
         },
+        "/api/users/comerciales-a-cargo": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Obtener comerciales a cargo del usuario actual con visitas consolidadas",
+                "description": "Obtener comerciales del usuario actual con sus visitas, clientes y zonas\nConsolida en una sola petición toda la información necesaria para ComercialesPage",
+                "operationId": "c2e73cabcc0e75e88a5f35fb50974b26",
+                "responses": {
+                    "200": {
+                        "description": "Comerciales con visitas, clientes y zonas consolidados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "comerciales": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/UserResource"
+                                            }
+                                        },
+                                        "visitas": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/VisitaResource"
+                                            }
+                                        },
+                                        "clientes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ClienteResource"
+                                            }
+                                        },
+                                        "zonas": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ZonaResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado (solo admin)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/visitas": {
             "get": {
                 "tags": [
@@ -1405,6 +1674,56 @@
                 ]
             }
         },
+        "/api/visitas/pagina/datos-consolidados": {
+            "get": {
+                "tags": [
+                    "Visitas"
+                ],
+                "summary": "Obtener datos consolidados para página de visitas (una sola consulta)",
+                "description": "Get consolidated data for visitas page\nReturns: visitas, clientes, and estados in a single optimized query\nThis reduces 3 API calls to 1",
+                "operationId": "72df56ac02fd39bc0ee097d2aace1d3d",
+                "responses": {
+                    "200": {
+                        "description": "Visitas, clientes y estados consolidados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "visitas": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/VisitasPaginaResource"
+                                            }
+                                        },
+                                        "clientes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "estados": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/zonas": {
             "get": {
                 "tags": [
@@ -1474,6 +1793,39 @@
                     },
                     "500": {
                         "description": "Error al crear la zona"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/zonas/pagina/datos": {
+            "get": {
+                "tags": [
+                    "Zonas"
+                ],
+                "summary": "Obtener datos optimizados para la página de zonas",
+                "description": "Retorna todas las zonas con sus edificios y clientes en una única consulta, optimizado para la visualización en la página",
+                "operationId": "ede3ad4e2c9b5240740becf17d876c1a",
+                "responses": {
+                    "200": {
+                        "description": "Datos de zonas para la página",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ZonaPageResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
                     }
                 },
                 "security": [
@@ -1655,6 +2007,44 @@
                     },
                     "422": {
                         "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/zonas/mapa": {
+            "get": {
+                "tags": [
+                    "Zonas"
+                ],
+                "summary": "Obtener zonas, edificios y clientes para vista de mapa (una sola consulta optimizada)",
+                "description": "Get consolidated data for map view\nReturns: zonas with nested edificios and clientes in a single optimized query",
+                "operationId": "962b120dbfc39feb7c04ed2318492861",
+                "responses": {
+                    "200": {
+                        "description": "Zonas con edificios y clientes anidados. Optimizado en una única query.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "zonas": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ZonaResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
                     }
                 },
                 "security": [
@@ -2040,6 +2430,234 @@
                     }
                 },
                 "type": "object"
+            },
+            "EstadoVisitaResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "etiqueta": {
+                        "type": "string",
+                        "example": "Completada"
+                    },
+                    "color_hex": {
+                        "type": "string",
+                        "example": "#10b981"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "EdificioDetailResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "direccion_completa": {
+                        "type": "string",
+                        "example": "Calle Gran Capitan 10"
+                    },
+                    "ubicacion": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/GeoPoint"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "id_zona": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "tipo": {
+                        "type": "string",
+                        "example": "residencial"
+                    },
+                    "id_cliente": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "clientes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ClienteResource"
+                        }
+                    },
+                    "zona": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ZonaResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "bloqueEdificios": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EdificioDetailResource"
+                        }
+                    },
+                    "todasLasZonas": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ZonaResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "VisitasPaginaResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "id_usuario": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "id_cliente": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "fecha_hora": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-03-15 10:30:00"
+                    },
+                    "id_estado": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "observaciones": {
+                        "type": "string",
+                        "example": "Primera visita al cliente",
+                        "nullable": true
+                    },
+                    "estado": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/EstadoVisitaResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "usuario": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "cliente": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ClienteResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ZonaPageResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nombre_zona": {
+                        "type": "string",
+                        "example": "Zona Norte"
+                    },
+                    "area": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/GeoPoint"
+                        }
+                    },
+                    "edificios": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PanelEdificioResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "direccion_completa": {
+                        "type": "string",
+                        "example": "Calle Cruz Conde 15, Córdoba"
+                    },
+                    "tipo": {
+                        "type": "string",
+                        "example": "residencial"
+                    },
+                    "ubicacion": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/GeoPoint"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "id_zona": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "zona": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ZonaResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "clientes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ClienteResource"
+                        }
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -2066,6 +2684,10 @@
         {
             "name": "Estados de Visita",
             "description": "Estados de Visita"
+        },
+        {
+            "name": "Inicio",
+            "description": "Inicio"
         },
         {
             "name": "Usuarios",
