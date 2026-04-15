@@ -273,6 +273,8 @@ class ZonaController extends Controller
                             'apellidos' => $c->apellidos,
                             'telefono' => $c->telefono,
                             'email' => $c->email,
+                            'planta' => $c->pivot?->planta,
+                            'puerta' => $c->pivot?->puerta,
                         ])->toArray() : [],
                     ];
                 })->toArray(),
