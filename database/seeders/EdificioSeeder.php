@@ -34,26 +34,36 @@ class EdificioSeeder extends Seeder
             ['direccion' => 'Calle Corregidor Luis de la Cerda 5, Córdoba', 'planta' => '2', 'puerta' => 'N', 'lng' => -4.7750, 'lat' => 37.8845, 'zona' => 4, 'tipo' => 'residencial', 'cliente' => 13],
             ['direccion' => 'Paseo de la Ribera 12, Córdoba', 'planta' => '3', 'puerta' => 'O', 'lng' => -4.7710, 'lat' => 37.8835, 'zona' => 4, 'tipo' => 'comercial', 'cliente' => 14],
             ['direccion' => 'Calle San Fernando 20, Córdoba', 'planta' => '4', 'puerta' => 'P', 'lng' => -4.7770, 'lat' => 37.8875, 'zona' => 4, 'tipo' => 'residencial', 'cliente' => 16],
+
+            // ZONA 5 - Encinarejo (polígono personalizado)
+            ['direccion' => 'Calle Encinarejo 10, Córdoba', 'planta' => '1', 'puerta' => 'Q', 'lng' => -4.9290, 'lat' => 37.8340, 'zona' => 5, 'tipo' => 'residencial', 'cliente' => [21]],
+            ['direccion' => 'Avenida Encinarejo 25, Córdoba', 'planta' => '2', 'puerta' => 'R', 'lng' => -4.9310, 'lat' => 37.8315, 'zona' => 5, 'tipo' => 'residencial', 'cliente' => [22]],
+            ['direccion' => 'Calle Principal Encinarejo 8, Córdoba', 'planta' => '1', 'puerta' => 'S', 'lng' => -4.9260, 'lat' => 37.8290, 'zona' => 5, 'tipo' => 'comercial', 'cliente' => [23, 24, 25]],
+            ['direccion' => 'Plaza de Encinarejo 2, Córdoba', 'planta' => '3', 'puerta' => 'T', 'lng' => -4.9340, 'lat' => 37.8370, 'zona' => 5, 'tipo' => 'residencial', 'cliente' => [26]],
         ];
 
-        // Almacenar datos de planta/puerta para ClienteEdificioSeeder
-        $plantaPuertaData = [];
+        // Almacenar datos de planta/puerta y cliente_ids para ClienteEdificioSeeder
+        $edificiosMetadata = [];
         foreach ($edificios as $index => $edificio) {
-            $plantaPuertaData[$index] = [
-                'cliente_id' => $edificio['cliente'],
+            $clienteArray = is_array($edificio['cliente']) ? $edificio['cliente'] : [$edificio['cliente']];
+            $edificiosMetadata[$index] = [
+                'cliente_ids' => $clienteArray,
                 'planta' => $edificio['planta'],
                 'puerta' => $edificio['puerta'],
             ];
         }
-        \Illuminate\Support\Facades\Cache::put('edificios_planta_puerta', $plantaPuertaData, now()->addHour());
+        \Illuminate\Support\Facades\Cache::put('edificios_metadata', $edificiosMetadata, now()->addHour());
 
         foreach ($edificios as $edificio) {
+            // Si 'cliente' es un array, usar el primer elemento como id_cliente
+            $idCliente = is_array($edificio['cliente']) ? $edificio['cliente'][0] : $edificio['cliente'];
+            
             DB::table('edificios')->insert([
                 'direccion_completa' => $edificio['direccion'],
                 'ubicacion' => DB::raw("ST_GeomFromText('POINT({$edificio['lng']} {$edificio['lat']})', 4326)"),
                 'id_zona' => $edificio['zona'],
                 'tipo' => $edificio['tipo'],
-                'id_cliente' => $edificio['cliente'],
+                'id_cliente' => $idCliente,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

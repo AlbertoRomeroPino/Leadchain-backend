@@ -10,32 +10,47 @@ class ClienteEdificioSeeder extends Seeder
 {
     public function run(): void
     {
-        // Obtener datos de planta/puerta del cache (guardado por EdificioSeeder)
-        $plantaPuertaData = \Illuminate\Support\Facades\Cache::get('edificios_planta_puerta', []);
+        // Obtener metadata de edificios (cliente_ids, planta, puerta)
+        $edificiosMetadata = \Illuminate\Support\Facades\Cache::get('edificios_metadata', []);
 
-        // Insertar todas las relaciones desde edificios.id_cliente con planta/puerta
-        $edificios = Edificio::whereNotNull('id_cliente')
-            ->where('id_cliente', '<=', 16) // Solo clientes 1-16
-            ->get();
+        // Insertar todas las relaciones desde edificios con cliente_ids
+        $edificios = Edificio::all();
 
         foreach ($edificios as $edificio) {
-            $exists = DB::table('cliente_edificio')
-                ->where('cliente_id', $edificio->id_cliente)
-                ->where('edificio_id', $edificio->id)
-                ->exists();
+            // Buscar los cliente_ids para este edificio
+            $metadata = collect($edificiosMetadata)->firstWhere('cliente_ids', function($clienteIds) use ($edificio) {
+                return in_array($edificio->id_cliente, $clienteIds);
+            });
 
-            if (!$exists) {
-                // Buscar los datos de planta/puerta
-                $plantaPuerta = collect($plantaPuertaData)->firstWhere('cliente_id', $edificio->id_cliente);
-                
-                DB::table('cliente_edificio')->insert([
-                    'cliente_id' => $edificio->id_cliente,
-                    'edificio_id' => $edificio->id,
-                    'planta' => $plantaPuerta['planta'] ?? null,
-                    'puerta' => $plantaPuerta['puerta'] ?? null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+            // Si no encontramos por id_cliente, buscar por índice en edificios
+            if (!$metadata) {
+                foreach ($edificiosMetadata as $meta) {
+                    if (in_array($edificio->id_cliente, $meta['cliente_ids'])) {
+                        $metadata = $meta;
+                        break;
+                    }
+                }
+            }
+
+            // Si tenemos metadata, insertar relaciones para todos los cliente_ids
+            if ($metadata) {
+                foreach ($metadata['cliente_ids'] as $clienteId) {
+                    $exists = DB::table('cliente_edificio')
+                        ->where('cliente_id', $clienteId)
+                        ->where('edificio_id', $edificio->id)
+                        ->exists();
+
+                    if (!$exists) {
+                        DB::table('cliente_edificio')->insert([
+                            'cliente_id' => $clienteId,
+                            'edificio_id' => $edificio->id,
+                            'planta' => $metadata['planta'] ?? null,
+                            'puerta' => $metadata['puerta'] ?? null,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
             }
         }
     }

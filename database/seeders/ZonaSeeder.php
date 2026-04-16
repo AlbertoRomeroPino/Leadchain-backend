@@ -9,13 +9,18 @@ class ZonaSeeder extends Seeder
 {
     private function buildPolygonWkt(array $zona): string
     {
-        $points = [
-            $zona['noroeste'],
-            $zona['noreste'],
-            $zona['sureste'],
-            $zona['suroeste'],
-            $zona['noroeste'],
-        ];
+        // Si tiene 'poligono' array, usarlo; si no, usar las 4 esquinas
+        if (isset($zona['poligono']) && is_array($zona['poligono'])) {
+            $points = $zona['poligono'];
+        } else {
+            $points = [
+                $zona['noroeste'],
+                $zona['noreste'],
+                $zona['sureste'],
+                $zona['suroeste'],
+                $zona['noroeste'],
+            ];
+        }
 
         $coordinates = array_map(
             fn($point) => sprintf('%s %s', (float) $point['lng'], (float) $point['lat']),
@@ -56,6 +61,23 @@ class ZonaSeeder extends Seeder
                 'noreste'  => ['lat' => 37.8900, 'lng' => -4.7680],
                 'suroeste' => ['lat' => 37.8820, 'lng' => -4.7780],
                 'sureste'  => ['lat' => 37.8820, 'lng' => -4.7680],
+            ],
+            [
+                'nombre_zona' => 'Encinarejo',
+                'poligono' => [
+                    ['lng' => -4.934541551, 'lat' => 37.825505895],
+                    ['lng' => -4.918957,    'lat' => 37.826623584],
+                    ['lng' => -4.923722524, 'lat' => 37.840271573],
+                    ['lng' => -4.928144587, 'lat' => 37.840440887],
+                    ['lng' => -4.929217903, 'lat' => 37.840373161],
+                    ['lng' => -4.930420017, 'lat' => 37.840407024],
+                    ['lng' => -4.931793862, 'lat' => 37.840373161],
+                    ['lng' => -4.932652515, 'lat' => 37.839831355],
+                    ['lng' => -4.933339437, 'lat' => 37.839628176],
+                    ['lng' => -4.93484208,  'lat' => 37.838781593],
+                    ['lng' => -4.936387655, 'lat' => 37.838612275],
+                    ['lng' => -4.934541551, 'lat' => 37.825505895], // Cierre del polígono
+                ],
             ],
         ];
 

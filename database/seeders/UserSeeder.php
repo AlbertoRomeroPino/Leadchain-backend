@@ -22,7 +22,6 @@ class UserSeeder extends Seeder
             ]
         );
 
-        // Usuarios comerciales - Se mantienen los 2 primeros
         User::updateOrCreate(
             ['email' => 'juan.garcia@leadchain.com'],
             [
@@ -56,7 +55,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('12345678'),
                 'rol' => 'comercial',
                 'id_responsable' => $admin->id,
-                'id_zona' => 1,
+                'id_zona' => 3,
             ]
         );
 
@@ -68,7 +67,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('12345678'),
                 'rol' => 'comercial',
                 'id_responsable' => $admin->id,
-                'id_zona' => 2,
+                'id_zona' => 4,
             ]
         );
 
@@ -80,7 +79,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('12345678'),
                 'rol' => 'comercial',
                 'id_responsable' => $admin->id,
-                'id_zona' => 3,
+                'id_zona' => 5,
             ]
         );
     }

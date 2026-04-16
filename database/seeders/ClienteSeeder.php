@@ -30,6 +30,14 @@ class ClienteSeeder extends Seeder
             ['nombre' => 'Rosalía', 'apellidos' => 'Romero Campos', 'telefono' => '674890123', 'email' => 'rosalia.romero@email.com'],
             ['nombre' => 'Sergio', 'apellidos' => 'vega Torres', 'telefono' => '675901234', 'email' => 'sergio.vega@email.com'],
             ['nombre' => 'Juana', 'apellidos' => 'Flores Martín', 'telefono' => '676012345', 'email' => 'juana.flores@email.com'],
+            
+            // Clientes zona 5 - Encinarejo
+            ['nombre' => 'Ramón', 'apellidos' => 'Encinas Barrera', 'telefono' => '677123456', 'email' => 'ramon.encinas@email.com'],
+            ['nombre' => 'Beatriz', 'apellidos' => 'Calvillo López', 'telefono' => '678234567', 'email' => 'beatriz.calvillo@email.com'],
+            ['nombre' => 'Fernando', 'apellidos' => 'Encinos García', 'telefono' => '679345678', 'email' => 'fernando.encinos@email.com'],
+            ['nombre' => 'Soledad', 'apellidos' => 'Prieto Ramos', 'telefono' => '680456789', 'email' => 'soledad.prieto@email.com'],
+            ['nombre' => 'Leopoldo', 'apellidos' => 'Hermoso Martín', 'telefono' => '681567890', 'email' => 'leopoldo.hermoso@email.com'],
+            ['nombre' => 'Dolores', 'apellidos' => 'Encinas Vera', 'telefono' => '682678901', 'email' => 'dolores.encinas@email.com'],
         ];
 
         foreach ($clientes as $cliente) {
