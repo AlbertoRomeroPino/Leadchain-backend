@@ -15,11 +15,8 @@ return new class extends Migration
         Schema::create('edificios', function (Blueprint $table) {
             $table->id();
             $table->string('direccion_completa', 255);
-            $table->string('planta', 20)->nullable();
-            $table->string('puerta', 10)->nullable();
             $table->foreignId('id_zona')->constrained('zonas')->restrictOnDelete();
             $table->string('tipo', 50);
-            $table->foreignId('id_cliente')->nullable()->constrained('clientes')->nullOnDelete();
             $table->timestamps();
 
             $table->index('id_zona', 'idx_edificios_zona');

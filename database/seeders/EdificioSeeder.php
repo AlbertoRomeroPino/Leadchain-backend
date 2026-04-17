@@ -55,15 +55,11 @@ class EdificioSeeder extends Seeder
         \Illuminate\Support\Facades\Cache::put('edificios_metadata', $edificiosMetadata, now()->addHour());
 
         foreach ($edificios as $edificio) {
-            // Si 'cliente' es un array, usar el primer elemento como id_cliente
-            $idCliente = is_array($edificio['cliente']) ? $edificio['cliente'][0] : $edificio['cliente'];
-            
             DB::table('edificios')->insert([
                 'direccion_completa' => $edificio['direccion'],
                 'ubicacion' => DB::raw("ST_GeomFromText('POINT({$edificio['lng']} {$edificio['lat']})', 4326)"),
                 'id_zona' => $edificio['zona'],
                 'tipo' => $edificio['tipo'],
-                'id_cliente' => $idCliente,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

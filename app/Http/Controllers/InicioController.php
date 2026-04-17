@@ -116,6 +116,7 @@ class InicioController extends Controller
                         new OA\Property(property: 'clientes', type: 'array', items: new OA\Items(ref: '#/components/schemas/ClienteResource')),
                         new OA\Property(property: 'edificios', type: 'array', items: new OA\Items(ref: '#/components/schemas/EdificioResource')),
                         new OA\Property(property: 'estados_visita', type: 'array', items: new OA\Items(ref: '#/components/schemas/EstadoVisitaResource')),
+                        new OA\Property(property: 'zonas', type: 'array', items: new OA\Items(ref: '#/components/schemas/ZonaResource')),
                     ]
                 )
             ),
@@ -148,6 +149,9 @@ class InicioController extends Controller
         // Obtener todos los estados de visita
         $estadosVisita = EstadoVisita::all();
 
+        // Obtener todas las zonas
+        $zonas = Zona::all();
+
         // Crear un objeto con toda la información
         $data = (object)[
             'usuarios_comerciales' => $usuariosComerciales,
@@ -155,6 +159,7 @@ class InicioController extends Controller
             'clientes' => $clientes,
             'edificios' => $edificios,
             'estados_visita' => $estadosVisita,
+            'zonas' => $zonas,
         ];
 
         return response()->json([
@@ -182,6 +187,7 @@ class InicioController extends Controller
                 'clientes' => $e->clientes ? $e->clientes->map(fn($c) => ['id' => $c->id, 'nombre' => $c->nombre]) : [],
             ]),
             'estados_visita' => $estadosVisita,
+            'zonas' => $zonas->map(fn($z) => ['id' => $z->id, 'nombre' => $z->nombre_zona]),
         ]);
     }
 }

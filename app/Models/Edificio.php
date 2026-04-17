@@ -18,7 +18,6 @@ class Edificio extends Model
         'direccion_completa',
         'id_zona',
         'tipo',
-        'id_cliente',
     ];
 
     /**
@@ -44,14 +43,6 @@ class Edificio extends Model
     public function zona(): BelongsTo
     {
         return $this->belongsTo(Zona::class, 'id_zona');
-    }
-
-    /**
-     * Cliente propietario del edificio (relación antigua, mantener para compatibilidad)
-     */
-    public function cliente(): BelongsTo
-    {
-        return $this->belongsTo(Cliente::class, 'id_cliente');
     }
 
     /**

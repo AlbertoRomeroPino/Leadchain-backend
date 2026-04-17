@@ -24,7 +24,6 @@ class ClienteResource extends JsonResource
                     'ubicacion' => $edificio->ubicacion,
                     'id_zona' => $edificio->id_zona,
                     'tipo' => $edificio->tipo,
-                    'id_cliente' => $edificio->id_cliente,
                     'created_at' => $edificio->created_at,
                     'updated_at' => $edificio->updated_at,
                 ];

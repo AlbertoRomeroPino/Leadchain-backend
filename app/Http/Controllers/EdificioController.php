@@ -28,7 +28,7 @@ class EdificioController extends Controller
     )]
     public function index(): JsonResponse
     {
-        return response()->json(EdificioResource::collection(Edificio::with(['zona', 'cliente', 'clientes'])->get()));
+        return response()->json(EdificioResource::collection(Edificio::with(['zona', 'clientes'])->get()));
     }
 
     #[OA\Get(
@@ -45,7 +45,7 @@ class EdificioController extends Controller
     )]
     public function show(Edificio $edificio): JsonResponse
     {
-        return response()->json(new EdificioResource($edificio->load(['zona', 'cliente', 'clientes'])));
+        return response()->json(new EdificioResource($edificio->load(['zona', 'clientes'])));
     }
 
     #[OA\Get(
@@ -135,14 +135,13 @@ class EdificioController extends Controller
             DB::beginTransaction();
 
             $inserted = DB::selectOne(
-                'INSERT INTO edificios (direccion_completa, id_zona, tipo, id_cliente, ubicacion, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), NOW(), NOW())
+                'INSERT INTO edificios (direccion_completa, id_zona, tipo, ubicacion, created_at, updated_at)
+                 VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), NOW(), NOW())
                  RETURNING id',
                 [
                     $data['direccion_completa'],
                     $data['id_zona'],
                     $data['tipo'],
-                    $data['id_cliente'] ?? null,
                     $ubicacion['lng'],
                     $ubicacion['lat'],
                 ]
@@ -156,7 +155,7 @@ class EdificioController extends Controller
             return response()->json(['error' => 'Error al crear el edificio', 'message' => $e->getMessage()], 500);
         }
 
-        return response()->json(new EdificioResource($edificio->fresh()->load(['zona', 'cliente'])), 201);
+        return response()->json(new EdificioResource($edificio->fresh()->load(['zona', 'clientes'])), 201);
     }
 
     #[OA\Put(
@@ -198,7 +197,6 @@ class EdificioController extends Controller
                 'direccion_completa',
                 'id_zona',
                 'tipo',
-                'id_cliente',
             ]);
 
             if (!empty($updatable)) {
@@ -218,7 +216,7 @@ class EdificioController extends Controller
             return response()->json(['error' => 'Error al actualizar el edificio', 'message' => $e->getMessage()], 500);
         }
 
-        return response()->json(new EdificioResource($edificio->fresh()->load(['zona', 'cliente'])));
+        return response()->json(new EdificioResource($edificio->fresh()->load(['zona', 'clientes'])));
     }
 
     #[OA\Delete(
@@ -265,7 +263,7 @@ class EdificioController extends Controller
             $edificio->clientes()->syncWithoutDetaching([$clienteId => $pivotData]);
 
             return response()->json(
-                new EdificioResource($edificio->load(['zona', 'cliente', 'clientes'])),
+                new EdificioResource($edificio->load(['zona', 'clientes'])),
                 200
             );
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -291,12 +289,80 @@ class EdificioController extends Controller
             $edificio->clientes()->detach($clienteId);
 
             return response()->json(
-                new EdificioResource($edificio->load(['zona', 'cliente', 'clientes'])),
+                new EdificioResource($edificio->load(['zona', 'clientes'])),
                 200
             );
         } catch (\Exception $e) {
             return response()->json(
                 ['error' => $e->getMessage()],
+                500
+            );
+        }
+    }
+
+    /**
+     * Adjuntar múltiples clientes a un edificio en una sola operación
+     */
+    public function attachMultipleClientes(Edificio $edificio): JsonResponse
+    {
+        try {
+            $clientes = request()->input('clientes', []);
+
+            if (empty($clientes)) {
+                return response()->json(
+                    ['error' => 'No se proporcionaron clientes'],
+                    400
+                );
+            }
+
+            // Usar transacción para garantizar integridad de datos
+            DB::beginTransaction();
+
+            $syncData = [];
+
+            foreach ($clientes as $cliente) {
+                $mode = $cliente['mode'] ?? null;
+                $planta = $cliente['planta'] ?? null;
+                $puerta = $cliente['puerta'] ?? null;
+
+                $pivotData = [];
+                if ($planta) {
+                    $pivotData['planta'] = $planta;
+                }
+                if ($puerta) {
+                    $pivotData['puerta'] = $puerta;
+                }
+
+                if ($mode === 'crear') {
+                    // Crear nuevo cliente
+                    $nuevoCliente = \App\Models\Cliente::create([
+                        'nombre' => $cliente['nombre'] ?? '',
+                        'apellidos' => $cliente['apellidos'] ?? '',
+                        'email' => $cliente['email'] ?? null,
+                        'telefono' => $cliente['telefono'] ?? null,
+                    ]);
+                    $syncData[$nuevoCliente->id] = $pivotData;
+                } elseif ($mode === 'seleccionar' && isset($cliente['clienteId'])) {
+                    // Usar cliente existente
+                    $syncData[$cliente['clienteId']] = $pivotData;
+                }
+            }
+
+            // Adjuntar todos los clientes sin eliminar los existentes
+            if (!empty($syncData)) {
+                $edificio->clientes()->syncWithoutDetaching($syncData);
+            }
+
+            DB::commit();
+
+            return response()->json(
+                new EdificioResource($edificio->load(['zona', 'clientes'])),
+                200
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(
+                ['error' => 'Error al adjuntar clientes: ' . $e->getMessage()],
                 500
             );
         }

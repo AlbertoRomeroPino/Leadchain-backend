@@ -80,6 +80,7 @@ Route::middleware('auth:api')->group(function () {
         Route::apiResource('edificios', EdificioController::class)->only(['store', 'update', 'destroy']);
 
         // Gestión de clientes en edificios
+        Route::post('edificios/{edificio}/clientes/attach-bulk', [EdificioController::class, 'attachMultipleClientes'])->whereNumber('edificio');
         Route::post('edificios/{edificio}/clientes/{clienteId}', [EdificioController::class, 'attachCliente'])->whereNumber(['edificio', 'clienteId']);
         Route::delete('edificios/{edificio}/clientes/{clienteId}', [EdificioController::class, 'detachCliente'])->whereNumber(['edificio', 'clienteId']);
 

@@ -20,8 +20,6 @@ class EdificioResource extends JsonResource
             'ubicacion' => $this->ubicacion,
             'id_zona' => $this->id_zona,
             'tipo' => $this->tipo,
-            'id_cliente' => $this->id_cliente,
-            'cliente' => $this->whenLoaded('cliente'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

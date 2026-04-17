@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -16,19 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
             $table->foreignId('edificio_id')->constrained('edificios')->onDelete('cascade');
+            $table->string('planta', 20)->nullable();
+            $table->string('puerta', 10)->nullable();
             $table->timestamps();
             
             // Evitar duplicados
             $table->unique(['cliente_id', 'edificio_id']);
         });
-
-        // Migrar datos existentes desde id_cliente en edificios
-        DB::statement('
-            INSERT INTO cliente_edificio (cliente_id, edificio_id, created_at, updated_at)
-            SELECT id_cliente, id, NOW(), NOW()
-            FROM edificios
-            WHERE id_cliente IS NOT NULL
-        ');
     }
 
     /**

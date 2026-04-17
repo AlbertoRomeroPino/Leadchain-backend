@@ -13,27 +13,15 @@ class ClienteEdificioSeeder extends Seeder
         // Obtener metadata de edificios (cliente_ids, planta, puerta)
         $edificiosMetadata = \Illuminate\Support\Facades\Cache::get('edificios_metadata', []);
 
-        // Insertar todas las relaciones desde edificios con cliente_ids
-        $edificios = Edificio::all();
+        // Obtener todos los edificios en el mismo orden de CrearEdificioSeeder
+        $edificios = Edificio::orderBy('created_at')->get();
 
+        $index = 0;
         foreach ($edificios as $edificio) {
-            // Buscar los cliente_ids para este edificio
-            $metadata = collect($edificiosMetadata)->firstWhere('cliente_ids', function($clienteIds) use ($edificio) {
-                return in_array($edificio->id_cliente, $clienteIds);
-            });
+            if (isset($edificiosMetadata[$index])) {
+                $metadata = $edificiosMetadata[$index];
 
-            // Si no encontramos por id_cliente, buscar por índice en edificios
-            if (!$metadata) {
-                foreach ($edificiosMetadata as $meta) {
-                    if (in_array($edificio->id_cliente, $meta['cliente_ids'])) {
-                        $metadata = $meta;
-                        break;
-                    }
-                }
-            }
-
-            // Si tenemos metadata, insertar relaciones para todos los cliente_ids
-            if ($metadata) {
+                // Insertar relaciones para todos los cliente_ids de este edificio
                 foreach ($metadata['cliente_ids'] as $clienteId) {
                     $exists = DB::table('cliente_edificio')
                         ->where('cliente_id', $clienteId)
@@ -52,6 +40,7 @@ class ClienteEdificioSeeder extends Seeder
                     }
                 }
             }
+            $index++;
         }
     }
 }
