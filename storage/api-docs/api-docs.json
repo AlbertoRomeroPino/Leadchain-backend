@@ -1076,6 +1076,12 @@
                                             "items": {
                                                 "$ref": "#/components/schemas/EstadoVisitaResource"
                                             }
+                                        },
+                                        "zonas": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ZonaResource"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -2151,11 +2157,6 @@
                         "type": "string",
                         "example": "residencial"
                     },
-                    "id_cliente": {
-                        "type": "integer",
-                        "example": 1,
-                        "nullable": true
-                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time"
@@ -2481,11 +2482,6 @@
                     "tipo": {
                         "type": "string",
                         "example": "residencial"
-                    },
-                    "id_cliente": {
-                        "type": "integer",
-                        "example": 1,
-                        "nullable": true
                     },
                     "created_at": {
                         "type": "string",
