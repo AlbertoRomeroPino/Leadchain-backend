@@ -13,7 +13,7 @@ class TestingSeeder extends Seeder
         $this->call(EstadoVisitaSeeder::class);
 
         User::updateOrCreate(
-            ['email' => 'root@leadchain.local'],
+            ['email' => 'root@leadchain.com'],
             [
                 'nombre' => 'Admin',
                 'apellidos' => 'Testing 1',
@@ -25,7 +25,7 @@ class TestingSeeder extends Seeder
         );
 
         User::updateOrCreate(
-            ['email' => 'root2@leadchain.local'],
+            ['email' => 'root2@leadchain.com'],
             [
                 'nombre' => 'Admin',
                 'apellidos' => 'Testing 2',
