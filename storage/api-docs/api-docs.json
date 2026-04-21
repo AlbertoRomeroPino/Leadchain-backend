@@ -2084,11 +2084,11 @@
             },
             "ZonaInput": {
                 "required": [
-                    "nombre_zona",
+                    "nombre",
                     "area"
                 ],
                 "properties": {
-                    "nombre_zona": {
+                    "nombre": {
                         "type": "string",
                         "example": "Zona Norte"
                     },
@@ -2257,7 +2257,7 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "nombre_zona": {
+                    "nombre": {
                         "type": "string",
                         "example": "Zona Norte"
                     },
@@ -2340,7 +2340,7 @@
                                         "type": "integer",
                                         "example": 3
                                     },
-                                    "nombre_zona": {
+                                    "nombre": {
                                         "type": "string",
                                         "example": "Centro"
                                     }
@@ -2585,7 +2585,7 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "nombre_zona": {
+                    "nombre": {
                         "type": "string",
                         "example": "Zona Norte"
                     },

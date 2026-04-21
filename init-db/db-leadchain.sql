@@ -30,7 +30,7 @@ DROP TABLE IF EXISTS zonas CASCADE;
 -- =============================================
 CREATE TABLE zonas (
     id BIGSERIAL PRIMARY KEY,
-    nombre_zona VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
     area GEOMETRY(Polygon, 4326),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -241,7 +241,7 @@ CREATE INDEX idx_personal_access_tokens_expires_at ON personal_access_tokens(exp
 
 -- Zonas de Córdoba (ZonaSeeder)
 -- Cada zona es una cuadrícula definida por un polígono
-INSERT INTO zonas (nombre_zona, area) VALUES
+INSERT INTO zonas (nombre, area) VALUES
     ('Centro',
         ST_GeomFromText('POLYGON((-4.7850 37.8920, -4.7740 37.8920, -4.7740 37.8850, -4.7850 37.8850, -4.7850 37.8920))', 4326)),
     ('La Judería',

@@ -85,7 +85,7 @@ class ZonaController extends Controller
         try {
             DB::beginTransaction();
 
-            $zona = Zona::create(['nombre_zona' => $request['nombre_zona']]);
+            $zona = Zona::create(['nombre' => $request['nombre']]);
             $polygonWkt = $this->buildPolygonWkt($request['area']);
 
             DB::statement(
@@ -139,8 +139,8 @@ class ZonaController extends Controller
     )]
     public function update(ZonaRequest $request, Zona $zona): JsonResponse
     {
-        if (isset($request['nombre_zona'])) {
-            $zona->update(['nombre_zona' => $request['nombre_zona']]);
+        if (isset($request['nombre'])) {
+            $zona->update(['nombre' => $request['nombre']]);
         }
 
         if (isset($request['area'])) {
@@ -251,7 +251,7 @@ class ZonaController extends Controller
         $zonasTransformadas = $zonas->map(function ($zona) use ($edificiosCoordenadas) {
             return [
                 'id' => $zona->id,
-                'nombre_zona' => $zona->nombre_zona,
+                'nombre' => $zona->nombre,
                 'area' => $zona->area,
                 'edificios' => $zona->edificios->map(function ($edificio) use ($edificiosCoordenadas) {
                     $coordenadas = $edificiosCoordenadas->get($edificio->id);

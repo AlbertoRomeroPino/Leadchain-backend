@@ -16,7 +16,7 @@ class MapaInicioResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nombre_zona' => $this->nombre_zona,
+            'nombre' => $this->nombre,
             'area' => $this->area,
             'edificios' => $this->whenLoaded('edificios', function () {
                 return $this->edificios->map(function ($edificio) {

@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Zona;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use OpenApi\Attributes as OA;
 
@@ -125,7 +126,10 @@ class UserController extends Controller
     )]
     public function destroy(User $user): JsonResponse
     {
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            $user->visitas()->delete();
+            $user->delete();
+        });
 
         return response()->json(null, 204);
     }
@@ -176,7 +180,7 @@ class UserController extends Controller
             ->get();
 
         // Obtener todas las zonas
-        $zonas = Zona::get(['id', 'nombre_zona']);
+        $zonas = Zona::get(['id', 'nombre']);
 
         return response()->json([
             'comerciales' => ComercialesAMiCargoResource::collection($comerciales),

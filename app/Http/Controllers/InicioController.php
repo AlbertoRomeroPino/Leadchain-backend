@@ -187,7 +187,7 @@ class InicioController extends Controller
                 'clientes' => $e->clientes ? $e->clientes->map(fn($c) => ['id' => $c->id, 'nombre' => $c->nombre]) : [],
             ]),
             'estados_visita' => $estadosVisita,
-            'zonas' => $zonas->map(fn($z) => ['id' => $z->id, 'nombre' => $z->nombre_zona]),
+            'zonas' => $zonas->map(fn($z) => ['id' => $z->id, 'nombre' => $z->nombre]),
         ]);
     }
 }

@@ -31,9 +31,9 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Schema(
     schema: 'ZonaInput',
-    required: ['nombre_zona', 'area'],
+    required: ['nombre', 'area'],
     properties: [
-        new OA\Property(property: 'nombre_zona', type: 'string', example: 'Zona Norte'),
+        new OA\Property(property: 'nombre', type: 'string', example: 'Zona Norte'),
         new OA\Property(
             property: 'area',
             type: 'array',
@@ -102,7 +102,7 @@ use OpenApi\Attributes as OA;
     schema: 'ZonaResource',
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 1),
-        new OA\Property(property: 'nombre_zona', type: 'string', example: 'Zona Norte'),
+        new OA\Property(property: 'nombre', type: 'string', example: 'Zona Norte'),
         new OA\Property(property: 'area', type: 'array', items: new OA\Items(ref: '#/components/schemas/GeoPoint')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
@@ -137,7 +137,7 @@ use OpenApi\Attributes as OA;
                     nullable: true,
                     properties: [
                         new OA\Property(property: 'id', type: 'integer', example: 3),
-                        new OA\Property(property: 'nombre_zona', type: 'string', example: 'Centro'),
+                        new OA\Property(property: 'nombre', type: 'string', example: 'Centro'),
                     ],
                     type: 'object'
                 ),
@@ -236,7 +236,7 @@ use OpenApi\Attributes as OA;
     schema: 'ZonaPageResource',
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 1),
-        new OA\Property(property: 'nombre_zona', type: 'string', example: 'Zona Norte'),
+        new OA\Property(property: 'nombre', type: 'string', example: 'Zona Norte'),
         new OA\Property(property: 'area', type: 'array', items: new OA\Items(ref: '#/components/schemas/GeoPoint')),
         new OA\Property(property: 'edificios', type: 'array', items: new OA\Items(type: 'object')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),

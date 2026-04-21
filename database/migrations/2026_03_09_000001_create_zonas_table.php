@@ -17,7 +17,7 @@ return new class extends Migration
 
         Schema::create('zonas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre_zona', 100);
+            $table->string('nombre', 100);
             $table->timestamps();
         });
 

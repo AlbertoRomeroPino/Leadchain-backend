@@ -5,7 +5,7 @@ namespace tests\Fixture;
 class ZonaData
 {
     const ZONA_POST = [
-        "nombre_zona" => "Cordoba-rellena",
+        "nombre" => "Cordoba-rellena",
         "area" => [
             ["lat" => 37.90, "lng" => -4.80],
             ["lat" => 37.90, "lng" => -4.75],
@@ -15,7 +15,7 @@ class ZonaData
     ];
 
     const ZONA_PUT = [
-        "nombre_zona" => "Cordoba",
+        "nombre" => "Cordoba",
         "area" => [
             ["lat" => 37.90, "lng" => -4.81],
             ["lat" => 37.90, "lng" => -4.76],

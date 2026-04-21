@@ -150,7 +150,11 @@ class ClienteController extends Controller
     )]
     public function store(ClienteRequest $request): JsonResponse
     {
-        $cliente = Cliente::create($request->validated());
+        $data = $request->validated();
+        $apellidos = trim($data['apellidos'] ?? '');
+        $data['apellidos'] = $apellidos === '' ? 'Sin apellidos' : $apellidos;
+
+        $cliente = Cliente::create($data);
 
         return response()->json(new ClienteResource($cliente), 201);
     }
@@ -185,7 +189,14 @@ class ClienteController extends Controller
     )]
     public function update(ClienteRequest $request, Cliente $cliente): JsonResponse
     {
-        $cliente->update($request->validated());
+        $data = $request->validated();
+
+        if (array_key_exists('apellidos', $data)) {
+            $apellidos = trim($data['apellidos'] ?? '');
+            $data['apellidos'] = $apellidos === '' ? 'Sin apellidos' : $apellidos;
+        }
+
+        $cliente->update($data);
 
         return response()->json(new ClienteResource($cliente));
     }
@@ -204,6 +215,7 @@ class ClienteController extends Controller
     )]
     public function destroy(Cliente $cliente): JsonResponse
     {
+        $cliente->visitas()->delete();
         $cliente->delete();
 
         return response()->json(null, 204);

@@ -22,7 +22,7 @@ class ZonaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre_zona' => 'required|string|max:100',
+            'nombre' => 'required|string|max:100',
             'area' => 'required|array|min:4',
             'area.*' => 'required|array',
             'area.*.lat' => 'required|numeric|between:-90,90',

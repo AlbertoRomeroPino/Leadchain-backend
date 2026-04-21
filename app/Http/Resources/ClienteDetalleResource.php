@@ -38,7 +38,7 @@ class ClienteDetalleResource extends JsonResource
                 'id_zona' => $edificio->id_zona,
                 'zona' => $edificio->zona ? [
                     'id' => $edificio->zona->id,
-                    'nombre_zona' => $edificio->zona->nombre_zona,
+                    'nombre' => $edificio->zona->nombre,
                 ] : null,
             ] : null,
             'visitas' => [

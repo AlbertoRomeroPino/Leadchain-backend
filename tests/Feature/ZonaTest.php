@@ -30,7 +30,7 @@ class ZonaTest extends TestCase
     private function createZona(string $token): int
     {
         $zona = ZonaData::ZONA_POST;
-        $zona['nombre_zona'] = 'Zona Base ' . uniqid();
+        $zona['nombre'] = 'Zona Base ' . uniqid();
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -53,7 +53,7 @@ class ZonaTest extends TestCase
             ->assertJsonStructure([
                 '*' => [
                     'id',
-                    'nombre_zona',
+                    'nombre',
                     'area' => [['lat', 'lng']],
                     'created_at',
                     'updated_at',
@@ -72,7 +72,7 @@ class ZonaTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'id',
-                'nombre_zona',
+                'nombre',
                 'area' => [['lat', 'lng']],
                 'created_at',
                 'updated_at',
@@ -83,14 +83,14 @@ class ZonaTest extends TestCase
     {
         $token = $this->adminToken();
         $zona = ZonaData::ZONA_POST;
-        $zona['nombre_zona'] = 'Zona Test ' . time();
+        $zona['nombre'] = 'Zona Test ' . time();
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->postJson('/api/zonas', $zona);
 
         $response->assertStatus(201)
-            ->assertJsonPath('nombre_zona', $zona['nombre_zona']);
+            ->assertJsonPath('nombre', $zona['nombre']);
     }
 
     public function test_update_zona_with_put(): void
@@ -99,14 +99,14 @@ class ZonaTest extends TestCase
         $zonaId = $this->createZona($token);
 
         $zona = ZonaData::ZONA_PUT;
-        $zona['nombre_zona'] = 'Zona PUT ' . uniqid();
+        $zona['nombre'] = 'Zona PUT ' . uniqid();
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->putJson('/api/zonas/' . $zonaId, $zona);
 
         $response->assertStatus(200)
-            ->assertJsonPath('nombre_zona', $zona['nombre_zona']);
+            ->assertJsonPath('nombre', $zona['nombre']);
     }
 
     public function test_update_zona_with_patch(): void
@@ -115,14 +115,14 @@ class ZonaTest extends TestCase
         $zonaId = $this->createZona($token);
 
         $zona = ZonaData::ZONA_PUT;
-        $zona['nombre_zona'] = 'Zona PATCH ' . uniqid();
+        $zona['nombre'] = 'Zona PATCH ' . uniqid();
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->patchJson('/api/zonas/' . $zonaId, $zona);
 
         $response->assertStatus(200)
-            ->assertJsonPath('nombre_zona', $zona['nombre_zona']);
+            ->assertJsonPath('nombre', $zona['nombre']);
     }
 
     public function test_delete_zona(): void

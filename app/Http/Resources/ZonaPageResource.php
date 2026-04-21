@@ -17,7 +17,7 @@ class ZonaPageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'nombre_zona' => $this->nombre_zona,
+            'nombre' => $this->nombre,
             'area' => $this->area,
             'edificios' => EdificioResource::collection($this->whenLoaded('edificios')),
             'created_at' => $this->created_at,
