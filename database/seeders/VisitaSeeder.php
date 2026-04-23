@@ -15,7 +15,6 @@ class VisitaSeeder extends Seeder
 
         $visitas = [
             [
-                'id' => 1,
                 'id_usuario' => 3,
                 'id_cliente' => 13,
                 'fecha_hora' => '2026-04-22T09:44:00Z',
@@ -25,7 +24,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:45:06Z',
             ],
             [
-                'id' => 2,
                 'id_usuario' => 3,
                 'id_cliente' => 14,
                 'fecha_hora' => '2026-04-22T09:45:00Z',
@@ -35,7 +33,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:46:22Z',
             ],
             [
-                'id' => 3,
                 'id_usuario' => 4,
                 'id_cliente' => 1,
                 'fecha_hora' => '2026-04-22T02:47:00Z',
@@ -45,7 +42,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:54:26Z',
             ],
             [
-                'id' => 4,
                 'id_usuario' => 4,
                 'id_cliente' => 2,
                 'fecha_hora' => '2026-04-22T07:54:00Z',
@@ -55,7 +51,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:54:50Z',
             ],
             [
-                'id' => 5,
                 'id_usuario' => 4,
                 'id_cliente' => 3,
                 'fecha_hora' => '2026-04-22T07:55:00Z',
@@ -65,7 +60,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:55:05Z',
             ],
             [
-                'id' => 6,
                 'id_usuario' => 4,
                 'id_cliente' => 4,
                 'fecha_hora' => '2026-04-22T07:55:00Z',
@@ -75,7 +69,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:55:23Z',
             ],
             [
-                'id' => 7,
                 'id_usuario' => 4,
                 'id_cliente' => 5,
                 'fecha_hora' => '2026-04-22T07:55:00Z',
@@ -85,7 +78,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:55:33Z',
             ],
             [
-                'id' => 8,
                 'id_usuario' => 4,
                 'id_cliente' => 6,
                 'fecha_hora' => '2026-04-22T07:55:00Z',
@@ -95,7 +87,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:55:46Z',
             ],
             [
-                'id' => 9,
                 'id_usuario' => 5,
                 'id_cliente' => 24,
                 'fecha_hora' => '2026-04-22T09:56:00Z',
@@ -105,7 +96,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:57:10Z',
             ],
             [
-                'id' => 10,
                 'id_usuario' => 5,
                 'id_cliente' => 23,
                 'fecha_hora' => '2026-04-22T07:56:00Z',
@@ -115,7 +105,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:56:48Z',
             ],
             [
-                'id' => 11,
                 'id_usuario' => 7,
                 'id_cliente' => 19,
                 'fecha_hora' => '2026-04-22T07:58:00Z',
@@ -125,7 +114,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:58:13Z',
             ],
             [
-                'id' => 12,
                 'id_usuario' => 7,
                 'id_cliente' => 20,
                 'fecha_hora' => '2026-04-22T07:58:00Z',
@@ -135,7 +123,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:58:21Z',
             ],
             [
-                'id' => 13,
                 'id_usuario' => 7,
                 'id_cliente' => 21,
                 'fecha_hora' => '2026-04-22T07:58:00Z',
@@ -145,7 +132,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:58:38Z',
             ],
             [
-                'id' => 14,
                 'id_usuario' => 7,
                 'id_cliente' => 22,
                 'fecha_hora' => '2026-04-22T07:58:00Z',
@@ -155,7 +141,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:58:55Z',
             ],
             [
-                'id' => 15,
                 'id_usuario' => 7,
                 'id_cliente' => 25,
                 'fecha_hora' => '2026-04-22T07:59:00Z',
@@ -165,7 +150,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:59:18Z',
             ],
             [
-                'id' => 16,
                 'id_usuario' => 6,
                 'id_cliente' => 12,
                 'fecha_hora' => '2026-04-22T07:59:00.000Z',
@@ -175,7 +159,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:59:48.000Z',
             ],
             [
-                'id' => 17,
                 'id_usuario' => 6,
                 'id_cliente' => 16,
                 'fecha_hora' => '2026-04-22T08:00:00.000Z',
@@ -185,7 +168,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T08:00:11.000Z',
             ],
             [
-                'id' => 18,
                 'id_usuario' => 6,
                 'id_cliente' => 17,
                 'fecha_hora' => '2026-04-22T08:00:00.000Z',
@@ -195,7 +177,6 @@ class VisitaSeeder extends Seeder
                 'updated_at' => '2026-04-22T08:00:38.000Z',
             ],
             [
-                'id' => 19,
                 'id_usuario' => 6,
                 'id_cliente' => 11,
                 'fecha_hora' => '2026-04-22T08:00:00.000Z',

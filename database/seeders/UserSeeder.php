@@ -15,7 +15,6 @@ class UserSeeder extends Seeder
 
         $users = [
             [
-                'id' => 1,
                 'nombre' => 'Admin',
                 'apellidos' => 'Testing 1',
                 'email' => 'root@leadchain.com',
@@ -29,7 +28,6 @@ class UserSeeder extends Seeder
                 'updated_at' => '2026-04-22T05:52:14Z',
             ],
             [
-                'id' => 2,
                 'nombre' => 'Admin',
                 'apellidos' => 'Testing 2',
                 'email' => 'root2@leadchain.com',
@@ -43,7 +41,6 @@ class UserSeeder extends Seeder
                 'updated_at' => '2026-04-22T05:52:15Z',
             ],
             [
-                'id' => 3,
                 'nombre' => 'El Pato',
                 'apellidos' => 'Mareado De La Albolafia Que No Encuentra El Edificio',
                 'email' => 'pato.rio@guadalquivir.es',
@@ -57,7 +54,7 @@ class UserSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:40:28Z',
             ],
             [
-                'id' => 4,
+
                 'nombre' => 'Rafael',
                 'apellidos' => 'Cruz Montilla',
                 'email' => 'rafa.centro@comercial.es',
@@ -71,7 +68,6 @@ class UserSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:41:22Z',
             ],
             [
-                'id' => 5,
                 'nombre' => 'Carmen',
                 'apellidos' => 'Flores Jurado',
                 'email' => 'carmen.torrecilla@comercial.es',
@@ -85,7 +81,6 @@ class UserSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:41:54Z',
             ],
             [
-                'id' => 6,
                 'nombre' => 'Manuel',
                 'apellidos' => 'Ortiz Serrano',
                 'email' => 'manuel.sagunto@comercial.es',
@@ -99,7 +94,6 @@ class UserSeeder extends Seeder
                 'updated_at' => '2026-04-22T07:42:30Z',
             ],
             [
-                'id' => 7,
                 'nombre' => 'Lucía',
                 'apellidos' => 'García Roldán',
                 'email' => 'lucia.rabanales@comercial.es',
