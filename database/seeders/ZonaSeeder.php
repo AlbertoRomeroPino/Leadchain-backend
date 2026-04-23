@@ -46,7 +46,7 @@ class ZonaSeeder extends Seeder
 
         foreach ($zonas as $zona) {
             DB::insert("
-                INSERT INTO zonas (id, nombre, area, created_at, updated_at)
+                INSERT INTO zonas (nombre, area, created_at, updated_at)
                 VALUES (?, ?, ST_GeomFromText(?, 4326), ?, ?)
             ", [
                 $zona['nombre'],

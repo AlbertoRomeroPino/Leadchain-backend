@@ -46,7 +46,18 @@ class ClienteSeeder extends Seeder
         ];
 
         foreach ($clientes as $cliente) {
-            Cliente::create($cliente);
+            DB::insert(
+                "INSERT INTO clientes (nombre, apellidos, telefono, email, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)",
+                [
+                    $cliente['nombre'],
+                    $cliente['apellidos'],
+                    $cliente['telefono'],
+                    $cliente['email'],
+                    $cliente['created_at'],
+                    $cliente['updated_at'],
+                ]
+            );
         }
     }
 }

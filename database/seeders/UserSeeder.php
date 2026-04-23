@@ -109,7 +109,23 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($users as $user) {
-            User::create($user);
+            DB::insert(
+                "INSERT INTO users (nombre, apellidos, email, password, rol, id_responsable, id_zona, email_verified_at, remember_token, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [
+                    $user['nombre'],
+                    $user['apellidos'],
+                    $user['email'],
+                    $user['password'],
+                    $user['rol'],
+                    $user['id_responsable'],
+                    $user['id_zona'],
+                    $user['email_verified_at'],
+                    $user['remember_token'],
+                    $user['created_at'],
+                    $user['updated_at'],
+                ]
+            );
         }
     }
 }

@@ -45,7 +45,17 @@ class ClienteEdificioSeeder extends Seeder
         ];
 
         foreach ($relaciones as $relacion) {
-            DB::table('cliente_edificio')->insert($relacion);
+            DB::insert("
+                INSERT INTO cliente_edificio (cliente_id, edificio_id, planta, puerta, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ", [
+                $relacion['cliente_id'],
+                $relacion['edificio_id'],
+                $relacion['planta'],
+                $relacion['puerta'],
+                $relacion['created_at'],
+                $relacion['updated_at'],
+            ]);
         }
     }
 }
