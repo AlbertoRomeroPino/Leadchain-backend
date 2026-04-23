@@ -25,15 +25,12 @@ class EstadoVisitaSeeder extends Seeder
         ];
 
         foreach ($estados as $estado) {
-            DB::insert("
-                INSERT INTO estados_visita (id, etiqueta, color_hex, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?)
-            ", [
-                $estado['id'],
-                $estado['etiqueta'],
-                $estado['color_hex'],
-                $estado['created_at'],
-                $estado['updated_at'],
+            DB::table('EstadoVisita')->insert([
+                'id' => $estado['id'],
+                'etiqueta' => $estado['etiqueta'],
+                'color_hex' => $estado['color_hex'],
+                'created_at' => $estado['created_at'],
+                'updated_at' => $estado['updated_at'],
             ]);
         }
     }

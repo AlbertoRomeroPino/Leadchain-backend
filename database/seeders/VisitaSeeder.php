@@ -188,17 +188,14 @@ class VisitaSeeder extends Seeder
         ];
 
         foreach ($visitas as $visita) {
-            DB::insert("
-                INSERT INTO visitas (id_usuario, id_cliente, fecha_hora, id_estado, observaciones, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ", [
-                $visita['id_usuario'],
-                $visita['id_cliente'],
-                $visita['fecha_hora'],
-                $visita['id_estado'],
-                $visita['observaciones'],
-                $visita['created_at'],
-                $visita['updated_at'],
+            DB::table('visitas')->insert([
+                'id_usuario' => $visita['id_usuario'],
+                'id_cliente' => $visita['id_cliente'],
+                'fecha_hora' => $visita['fecha_hora'],
+                'id_estado' => $visita['id_estado'],
+                'observaciones' => $visita['observaciones'],
+                'created_at' => $visita['created_at'],
+                'updated_at' => $visita['updated_at'],
             ]);
         }
     }

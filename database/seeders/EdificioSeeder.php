@@ -88,16 +88,13 @@ class EdificioSeeder extends Seeder
         ];
 
         foreach ($edificios as $edificio) {
-           DB::insert("
-                INSERT INTO edificios (direccion_completa, id_zona, tipo, ubicacion, created_at, updated_at)
-                VALUES (?, ?, ?, ST_GeomFromText(?, 4326), ?, ?)
-            ", [
-                $edificio['direccion_completa'],
-                $edificio['id_zona'],
-                $edificio['tipo'],
-                $edificio['ubicacion'],
-                $edificio['created_at'],
-                $edificio['updated_at'],
+            DB::table('edificios')->insert([
+                'direccion_completa' => $edificio['direccion_completa'],
+                'id_zona' => $edificio['id_zona'],
+                'tipo' => $edificio['tipo'],
+                'ubicacion' => DB::raw("ST_GeomFromText('{$edificio['ubicacion']}', 4326)"),
+                'created_at' => $edificio['created_at'],
+                'updated_at' => $edificio['updated_at'],
             ]);
         }
     }
