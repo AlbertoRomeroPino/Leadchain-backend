@@ -43,7 +43,7 @@ class InicioController extends Controller
             new OA\Response(response: 403, description: 'No autorizado'),
         ]
     )]
-    public function comercial(): JsonResponse
+    public function datosInicioComercial(): JsonResponse
     {
         $user = Auth::user();
 
@@ -124,7 +124,7 @@ class InicioController extends Controller
             new OA\Response(response: 403, description: 'No autorizado'),
         ]
     )]
-    public function admin(): JsonResponse
+    public function datosInicioAdmin(): JsonResponse
     {
         $user = Auth::user();
 

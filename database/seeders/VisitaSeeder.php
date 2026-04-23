@@ -4,50 +4,206 @@ namespace Database\Seeders;
 
 use App\Models\Visita;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class VisitaSeeder extends Seeder
 {
     public function run(): void
     {
-        // Distribución POR ZONA (cada comercial solo con sus clientes de zona):
-        // Zona 1 (Juan García id=2, Pedro Martínez id=4): clientes 1, 4, 5, 9
-        // Zona 2 (María Fernández id=3, Sofía Hernández id=5): clientes 2, 6, 7, 10
-        // Zona 3 (Carlos López id=6): clientes 3, 8, 11, 15
-        // Zona 4: clientes 12, 13, 14, 16 (sin comercial asignado - distribuir entre comerciales multzona)
-        // REQUISITO: 2 visitas por estado (16 total), sin repetir cliente
+        // Limpiar tabla
+        DB::table('visitas')->truncate();
 
         $visitas = [
-            // Estado 1: Vendido - Juan García y María Fernández (zonas diferentes)
-            ['id_usuario' => 2, 'id_cliente' => 1, 'fecha_hora' => '2026-03-10 10:00:00', 'id_estado' => 1, 'observaciones' => 'Venta exitosa - Cliente muy interesado'],
-            ['id_usuario' => 3, 'id_cliente' => 2, 'fecha_hora' => '2026-03-11 11:00:00', 'id_estado' => 1, 'observaciones' => 'Venta cerrada - Producto premium'],
-            
-            // Estado 2: En Camino - Pedro Martínez y Sofía Hernández
-            ['id_usuario' => 4, 'id_cliente' => 4, 'fecha_hora' => '2026-03-12 09:00:00', 'id_estado' => 2, 'observaciones' => 'En ruta hacia el cliente'],
-            ['id_usuario' => 5, 'id_cliente' => 6, 'fecha_hora' => '2026-03-13 14:00:00', 'id_estado' => 2, 'observaciones' => 'Viajando hacia domicilio'],
-            
-            // Estado 3: Pendiente - Juan García y María Fernández
-            ['id_usuario' => 2, 'id_cliente' => 5, 'fecha_hora' => '2026-03-14 11:00:00', 'id_estado' => 3, 'observaciones' => 'Presupuesto enviado, pendiente respuesta'],
-            ['id_usuario' => 3, 'id_cliente' => 7, 'fecha_hora' => '2026-03-15 09:00:00', 'id_estado' => 3, 'observaciones' => 'Propuesta en análisis'],
-            
-            // Estado 4: Volver luego - Pedro Martínez y Sofía Hernández
-            ['id_usuario' => 4, 'id_cliente' => 9, 'fecha_hora' => '2026-03-16 14:00:00', 'id_estado' => 4, 'observaciones' => 'Cliente pide tiempo para decidir'],
-            ['id_usuario' => 5, 'id_cliente' => 10, 'fecha_hora' => '2026-03-17 10:00:00', 'id_estado' => 4, 'observaciones' => 'Cliente no disponible, agendar próxima visita'],
-            
-            // Estado 5: Ausente - Carlos López (Zona 3) y Juan García
-            ['id_usuario' => 6, 'id_cliente' => 3, 'fecha_hora' => '2026-03-18 10:00:00', 'id_estado' => 5, 'observaciones' => 'Nadie en casa, puerta cerrada'],
-            ['id_usuario' => 2, 'id_cliente' => 12, 'fecha_hora' => '2026-03-19 12:00:00', 'id_estado' => 5, 'observaciones' => 'No abrieron la puerta'],
-            
-            // Estado 6: Local Cerrado - Carlos López y María Fernández
-            ['id_usuario' => 6, 'id_cliente' => 8, 'fecha_hora' => '2026-03-20 16:00:00', 'id_estado' => 6, 'observaciones' => 'Local cerrado por reforma'],
-            ['id_usuario' => 3, 'id_cliente' => 13, 'fecha_hora' => '2026-03-21 10:00:00', 'id_estado' => 6, 'observaciones' => 'Negocio cerrado temporalmente'],
-            
-            // Estado 7: No Interesado - Carlos López y Pedro Martínez
-            ['id_usuario' => 6, 'id_cliente' => 11, 'fecha_hora' => '2026-03-22 12:00:00', 'id_estado' => 7, 'observaciones' => 'Cliente rechazó la propuesta'],
-            ['id_usuario' => 4, 'id_cliente' => 14, 'fecha_hora' => '2026-03-23 14:00:00', 'id_estado' => 7, 'observaciones' => 'No tiene presupuesto disponible'],
-            
-            // Estado 8: Cancelada - Carlos López y Sofía Hernández
-            ['id_usuario' => 6, 'id_cliente' => 15, 'fecha_hora' => '2026-03-24 09:00:00', 'id_estado' => 8, 'observaciones' => 'Visita cancelada por cliente'],
-            ['id_usuario' => 5, 'id_cliente' => 16, 'fecha_hora' => '2026-03-25 11:00:00', 'id_estado' => 8, 'observaciones' => 'Cliente cambió de proveedor'],
+            [
+                'id' => 1,
+                'id_usuario' => 3,
+                'id_cliente' => 13,
+                'fecha_hora' => '2026-04-22T09:44:00Z',
+                'id_estado' => 1,
+                'observaciones' => 'Un poco profundo y dificil de llegar pero el cliente muy amable',
+                'created_at' => '2026-04-22T07:45:06Z',
+                'updated_at' => '2026-04-22T07:45:06Z',
+            ],
+            [
+                'id' => 2,
+                'id_usuario' => 3,
+                'id_cliente' => 14,
+                'fecha_hora' => '2026-04-22T09:45:00Z',
+                'id_estado' => 7,
+                'observaciones' => 'Me pidio ayuda de como llegar a la orilla. Quizas en otro momento',
+                'created_at' => '2026-04-22T07:46:22Z',
+                'updated_at' => '2026-04-22T07:46:22Z',
+            ],
+            [
+                'id' => 3,
+                'id_usuario' => 4,
+                'id_cliente' => 1,
+                'fecha_hora' => '2026-04-22T02:47:00Z',
+                'id_estado' => 1,
+                'observaciones' => 'Cliente encantado con la oferta, firma y paga la señal ahora mismo.',
+                'created_at' => '2026-04-22T07:54:26Z',
+                'updated_at' => '2026-04-22T07:54:26Z',
+            ],
+            [
+                'id' => 4,
+                'id_usuario' => 4,
+                'id_cliente' => 2,
+                'fecha_hora' => '2026-04-22T07:54:00Z',
+                'id_estado' => 2,
+                'observaciones' => 'El camión está cruzando el Puente Romano, llega en unos 5 minutos.',
+                'created_at' => '2026-04-22T07:54:50Z',
+                'updated_at' => '2026-04-22T07:54:50Z',
+            ],
+            [
+                'id' => 5,
+                'id_usuario' => 4,
+                'id_cliente' => 3,
+                'fecha_hora' => '2026-04-22T07:55:00Z',
+                'id_estado' => 3,
+                'observaciones' => 'Dice que tiene que consultarlo con su mujer y me llama el lunes.',
+                'created_at' => '2026-04-22T07:55:05Z',
+                'updated_at' => '2026-04-22T07:55:05Z',
+            ],
+            [
+                'id' => 6,
+                'id_usuario' => 4,
+                'id_cliente' => 4,
+                'fecha_hora' => '2026-04-22T07:55:00Z',
+                'id_estado' => 4,
+                'observaciones' => 'Hay muchísima gente en la tienda ahora, me han pedido volver luego.',
+                'created_at' => '2026-04-22T07:55:23Z',
+                'updated_at' => '2026-04-22T07:55:23Z',
+            ],
+            [
+                'id' => 7,
+                'id_usuario' => 4,
+                'id_cliente' => 5,
+                'fecha_hora' => '2026-04-22T07:55:00Z',
+                'id_estado' => 5,
+                'observaciones' => 'He llamado tres veces al timbre y no sale nadie, dejo nota debajo.',
+                'created_at' => '2026-04-22T07:55:33Z',
+                'updated_at' => '2026-04-22T07:55:33Z',
+            ],
+            [
+                'id' => 8,
+                'id_usuario' => 4,
+                'id_cliente' => 6,
+                'fecha_hora' => '2026-04-22T07:55:00Z',
+                'id_estado' => 6,
+                'observaciones' => 'El local está cerrado por reforma hasta la semana que viene seguro.',
+                'created_at' => '2026-04-22T07:55:46Z',
+                'updated_at' => '2026-04-22T07:55:46Z',
+            ],
+            [
+                'id' => 9,
+                'id_usuario' => 5,
+                'id_cliente' => 24,
+                'fecha_hora' => '2026-04-22T09:56:00Z',
+                'id_estado' => 7,
+                'observaciones' => 'No le interesa el producto porque dice que ya tiene uno parecido.',
+                'created_at' => '2026-04-22T07:56:33Z',
+                'updated_at' => '2026-04-22T07:57:10Z',
+            ],
+            [
+                'id' => 10,
+                'id_usuario' => 5,
+                'id_cliente' => 23,
+                'fecha_hora' => '2026-04-22T07:56:00Z',
+                'id_estado' => 8,
+                'observaciones' => 'Visita cancelada porque el cliente se ha puesto enfermo de repente.',
+                'created_at' => '2026-04-22T07:56:48Z',
+                'updated_at' => '2026-04-22T07:56:48Z',
+            ],
+            [
+                'id' => 11,
+                'id_usuario' => 7,
+                'id_cliente' => 19,
+                'fecha_hora' => '2026-04-22T07:58:00Z',
+                'id_estado' => 1,
+                'observaciones' => 'Venta completada, quiere que le enviemos la factura por el correo.',
+                'created_at' => '2026-04-22T07:58:13Z',
+                'updated_at' => '2026-04-22T07:58:13Z',
+            ],
+            [
+                'id' => 12,
+                'id_usuario' => 7,
+                'id_cliente' => 20,
+                'fecha_hora' => '2026-04-22T07:58:00Z',
+                'id_estado' => 2,
+                'observaciones' => 'El repartidor está en la zona de La Torrecilla buscando el número.',
+                'created_at' => '2026-04-22T07:58:21Z',
+                'updated_at' => '2026-04-22T07:58:21Z',
+            ],
+            [
+                'id' => 13,
+                'id_usuario' => 7,
+                'id_cliente' => 21,
+                'fecha_hora' => '2026-04-22T07:58:00Z',
+                'id_estado' => 3,
+                'observaciones' => 'Tenemos que revisar si quedan unidades en el almacén de Rabanales.',
+                'created_at' => '2026-04-22T07:58:38Z',
+                'updated_at' => '2026-04-22T07:58:38Z',
+            ],
+            [
+                'id' => 14,
+                'id_usuario' => 7,
+                'id_cliente' => 22,
+                'fecha_hora' => '2026-04-22T07:58:00Z',
+                'id_estado' => 4,
+                'observaciones' => 'Está reunido con un proveedor, dice que pase después de comer hoy.',
+                'created_at' => '2026-04-22T07:58:55Z',
+                'updated_at' => '2026-04-22T07:58:55Z',
+            ],
+            [
+                'id' => 15,
+                'id_usuario' => 7,
+                'id_cliente' => 25,
+                'fecha_hora' => '2026-04-22T07:59:00Z',
+                'id_estado' => 6,
+                'observaciones' => 'Negocio cerrado permanentemente, hay un cartel de se alquila aquí.',
+                'created_at' => '2026-04-22T07:59:18Z',
+                'updated_at' => '2026-04-22T07:59:18Z',
+            ],
+            [
+                'id' => 16,
+                'id_usuario' => 6,
+                'id_cliente' => 12,
+                'fecha_hora' => '2026-04-22T07:59:00.000Z',
+                'id_estado' => 7,
+                'observaciones' => 'Dice que el precio es excesivo para su presupuesto de este año.',
+                'created_at' => '2026-04-22T07:59:48.000Z',
+                'updated_at' => '2026-04-22T07:59:48.000Z',
+            ],
+            [
+                'id' => 17,
+                'id_usuario' => 6,
+                'id_cliente' => 16,
+                'fecha_hora' => '2026-04-22T08:00:00.000Z',
+                'id_estado' => 1,
+                'observaciones' => 'Todo perfecto, cliente VIP que quiere ampliar el contrato pronto.',
+                'created_at' => '2026-04-22T08:00:11.000Z',
+                'updated_at' => '2026-04-22T08:00:11.000Z',
+            ],
+            [
+                'id' => 18,
+                'id_usuario' => 6,
+                'id_cliente' => 17,
+                'fecha_hora' => '2026-04-22T08:00:00.000Z',
+                'id_estado' => 3,
+                'observaciones' => 'Esperando a que el jefe de zona dé el visto bueno al descuento.',
+                'created_at' => '2026-04-22T08:00:38.000Z',
+                'updated_at' => '2026-04-22T08:00:38.000Z',
+            ],
+            [
+                'id' => 19,
+                'id_usuario' => 6,
+                'id_cliente' => 11,
+                'fecha_hora' => '2026-04-22T08:00:00.000Z',
+                'id_estado' => 7,
+                'observaciones' => 'Se ha mudado a otra zona y ya no le interesa nuestro servicio.',
+                'created_at' => '2026-04-22T08:01:03.000Z',
+                'updated_at' => '2026-04-22T08:01:03.000Z',
+            ],
         ];
 
         foreach ($visitas as $visita) {

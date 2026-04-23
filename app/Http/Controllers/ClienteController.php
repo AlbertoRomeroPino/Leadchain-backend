@@ -96,7 +96,7 @@ class ClienteController extends Controller
             new OA\Response(response: 404, description: 'Cliente no encontrado'),
         ]
     )]
-    public function detalle(Cliente $cliente): JsonResponse
+    public function detalleCliente(Cliente $cliente): JsonResponse
     {
         $cliente->load([
             'edificios.zona',
@@ -118,7 +118,7 @@ class ClienteController extends Controller
             new OA\Response(response: 403, description: 'No autorizado por rol'),
         ]
     )]
-    public function sinEdificio(): JsonResponse
+    public function clientesSinEdificio(): JsonResponse
     {
         $clientes = Cliente::doesntHave('edificios')->get();
 

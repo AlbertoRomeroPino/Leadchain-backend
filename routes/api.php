@@ -36,26 +36,25 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:api')->group(function () {
 
     // Lectura compartida (admin y comercial)
-    Route::get('cliente/detalles/{cliente}', [ClienteController::class, 'detalle'])->whereNumber('cliente');
+    Route::get('cliente/detalles/{cliente}', [ClienteController::class, 'detalleCliente'])->whereNumber('cliente');
     Route::apiResource('clientes',  ClienteController::class)->only(['index', 'show'])->whereNumber('cliente');
 
-    Route::apiResource('edificios', EdificioController::class)->only(['index', 'show']);
-    Route::get('edificios/{edificio}/detalle', [EdificioController::class, 'detalle'])->whereNumber('edificio');
-    Route::get('edificios/{edificio}/panel', [EdificioController::class, 'panel'])->whereNumber('edificio');
-    
-    Route::apiResource('estados-visita', EstadoVisitaController::class)->only(['index', 'show']);
 
-    
-
-    Route::apiResource('visitas',   VisitaController::class)->only(['index', 'show']);
-// Endpoint consolidado para página de Visitas (una sola consulta en lugar de 3)
-    Route::get('visitas/pagina/datos-consolidados', [VisitaController::class, 'paraVisitasPage']);
+    Route::apiResource('edificios', EdificioController::class)->only(['index']);
+    Route::get('edificios/{edificio}/detalle', [EdificioController::class, 'detalleEdificio'])->whereNumber('edificio');
 
 
-    Route::get('zonas/mapa', [ZonaController::class, 'mapa']);
-    Route::apiResource('zonas',     ZonaController::class)->only(['index', 'show']);
+    Route::apiResource('estados-visita', EstadoVisitaController::class)->only(['index']);
+
+
+    // Endpoint consolidado para página de Visitas (una sola consulta en lugar de 3)
+    Route::get('visitas/pagina/datos-consolidados', [VisitaController::class, 'datosPaginaVisitas']);
+
+
+    Route::get('zonas/mapa', [ZonaController::class, 'datosMapaZonas']);
+    Route::apiResource('zonas',     ZonaController::class)->only(['index']);
     // Endpoint consolidado para página de Zonas (una sola consulta con edificios y clientes)
-    Route::get('zonas/pagina/datos', [ZonaController::class, 'pageData']);
+    Route::get('zonas/pagina/datos', [ZonaController::class, 'datosPaginaZonas']);
 
 
     /*
@@ -65,7 +64,7 @@ Route::middleware('auth:api')->group(function () {
     */
     Route::middleware('role:comercial')->group(function () {
         // Endpoint para datos de inicio del comercial
-        Route::get('inicio/comercial', [InicioController::class, 'comercial']);
+        Route::get('inicio/comercial', [InicioController::class, 'datosInicioComercial']);
         Route::apiResource('visitas', VisitaController::class)->only(['store', 'update']);
     });
 
@@ -75,24 +74,29 @@ Route::middleware('auth:api')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware('role:admin')->group(function () {
-        Route::get('clientes/sin-edificio', [ClienteController::class, 'sinEdificio']);
-        Route::apiResource('clientes',  ClienteController::class)->only(['store', 'update', 'destroy'])->whereNumber('cliente');
-        Route::apiResource('edificios', EdificioController::class)->only(['store', 'update', 'destroy']);
 
+        Route::get('clientes/sin-edificio', [ClienteController::class, 'clientesSinEdificio']);
+        Route::apiResource('clientes',  ClienteController::class)->only(['store', 'update', 'destroy'])->whereNumber('cliente');
+
+
+        Route::apiResource('edificios', EdificioController::class)->only(['store', 'update', 'destroy']);
         // Gestión de clientes en edificios
-        Route::post('edificios/{edificio}/clientes/attach-bulk', [EdificioController::class, 'attachMultipleClientes'])->whereNumber('edificio');
-        Route::post('edificios/{edificio}/clientes/{clienteId}', [EdificioController::class, 'attachCliente'])->whereNumber(['edificio', 'clienteId']);
-        Route::delete('edificios/{edificio}/clientes/{clienteId}', [EdificioController::class, 'detachCliente'])->whereNumber(['edificio', 'clienteId']);
+        Route::post('edificios/{edificio}/clientes/adjuntar-varios', [EdificioController::class, 'adjuntarVariosClientes'])->whereNumber('edificio');
+        Route::delete('edificios/{edificio}/clientes/{clienteId}', [EdificioController::class, 'desadjuntarCliente'])->whereNumber(['edificio', 'clienteId']);
+
 
         Route::apiResource('visitas',   VisitaController::class)->only(['destroy']);
+
+
         Route::apiResource('zonas',     ZonaController::class)->only(['store', 'update', 'destroy']);
-        
+
+
         // Endpoint para obtener comerciales a cargo del admin (DEBE IR ANTES del apiResource de users)
-        Route::get('users/comerciales-a-cargo', [UserController::class, 'comercialesAMiCargo']);
-        
-        Route::apiResource('users',     UserController::class);
-        
+        Route::get('users/comerciales-a-cargo', [UserController::class, 'comercialesACargo']);
+        Route::apiResource('users', UserController::class)->only(['store', 'update', 'destroy']);
+
+
         // Endpoint para datos de inicio del admin
-        Route::get('inicio/admin', [InicioController::class, 'admin']);
+        Route::get('inicio/admin', [InicioController::class, 'datosInicioAdmin']);
     });
 });

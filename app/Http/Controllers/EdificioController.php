@@ -6,11 +6,9 @@ use App\Http\Requests\EdificioRequest;
 use App\Http\Resources\EdificioResource;
 use App\Http\Resources\EdificioDetailResource;
 use App\Http\Resources\PanelEdificioResource;
-use App\Http\Resources\ZonaResource;
 use App\Models\Edificio;
 use App\Models\Zona;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
 
@@ -32,23 +30,6 @@ class EdificioController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/edificios/{edificio}',
-        tags: ['Edificios'],
-        summary: 'Obtener un edificio por ID',
-        security: [['bearerAuth' => []]],
-        parameters: [new OA\Parameter(name: 'edificio', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
-        responses: [
-            new OA\Response(response: 200, description: 'Edificio encontrado', content: new OA\JsonContent(ref: '#/components/schemas/EdificioResource')),
-            new OA\Response(response: 401, description: 'No autenticado'),
-            new OA\Response(response: 404, description: 'Edificio no encontrado'),
-        ]
-    )]
-    public function show(Edificio $edificio): JsonResponse
-    {
-        return response()->json(new EdificioResource($edificio->load(['zona', 'clientes'])));
-    }
-
-    #[OA\Get(
         path: '/api/edificios/{edificio}/detalle',
         tags: ['Edificios'],
         summary: 'Obtener detalles completos de un edificio',
@@ -61,7 +42,7 @@ class EdificioController extends Controller
             new OA\Response(response: 404, description: 'Edificio no encontrado'),
         ]
     )]
-    public function detalle(Edificio $edificio): JsonResponse
+    public function detalleEdificio(Edificio $edificio): JsonResponse
     {
         // Obtener el edificio con sus clientes
         $edificio->load(['clientes']);
@@ -104,7 +85,7 @@ class EdificioController extends Controller
             new OA\Response(response: 404, description: 'Edificio no encontrado'),
         ]
     )]
-    public function panel(Edificio $edificio): JsonResponse
+    public function panelMapaEdificio(Edificio $edificio): JsonResponse
     {
         // Cargar solo lo necesario: zona y clientes
         $edificio->load(['zona', 'clientes']);
@@ -238,51 +219,11 @@ class EdificioController extends Controller
         return response()->json(null, 204);
     }
 
-    /**
-     * Adjuntar un cliente a un edificio
-     */
-    public function attachCliente(Edificio $edificio, int $clienteId): JsonResponse
-    {
-        try {
-            // Verificar que el cliente existe
-            $cliente = \App\Models\Cliente::findOrFail($clienteId);
-            
-            // Obtener datos de piso y puerta del request
-            $planta = request()->input('planta');
-            $puerta = request()->input('puerta');
-            
-            // Adjuntar el cliente al edificio con datos pivot
-            $pivotData = [];
-            if ($planta) {
-                $pivotData['planta'] = $planta;
-            }
-            if ($puerta) {
-                $pivotData['puerta'] = $puerta;
-            }
-            
-            $edificio->clientes()->syncWithoutDetaching([$clienteId => $pivotData]);
-
-            return response()->json(
-                new EdificioResource($edificio->load(['zona', 'clientes'])),
-                200
-            );
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(
-                ['error' => 'Cliente no encontrado'],
-                404
-            );
-        } catch (\Exception $e) {
-            return response()->json(
-                ['error' => $e->getMessage()],
-                500
-            );
-        }
-    }
 
     /**
      * Desadjuntar un cliente de un edificio
      */
-    public function detachCliente(Edificio $edificio, int $clienteId): JsonResponse
+    public function desadjuntarCliente(Edificio $edificio, int $clienteId): JsonResponse
     {
         try {
             // Desadjuntar el cliente del edificio
@@ -303,7 +244,7 @@ class EdificioController extends Controller
     /**
      * Adjuntar múltiples clientes a un edificio en una sola operación
      */
-    public function attachMultipleClientes(Edificio $edificio): JsonResponse
+    public function adjuntarVariosClientes(Edificio $edificio): JsonResponse
     {
         try {
             $clientes = request()->input('clientes', []);

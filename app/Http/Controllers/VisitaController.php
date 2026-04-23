@@ -14,54 +14,6 @@ use OpenApi\Attributes as OA;
 
 class VisitaController extends Controller
 {
-    #[OA\Get(
-        path: '/api/visitas',
-        tags: ['Visitas'],
-        summary: 'Listar todas las visitas',
-        security: [['bearerAuth' => []]],
-        responses: [
-            new OA\Response(response: 200, description: 'Listado de visitas', content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/VisitaResource'))),
-            new OA\Response(response: 401, description: 'No autenticado'),
-        ]
-    )]
-    public function index(): JsonResponse
-    {
-        $user = Auth::user();
-        $query = Visita::with(['usuario', 'cliente.edificios', 'estado']);
-
-        if ($user && $user->rol === 'comercial') {
-            $query = $query->where('id_usuario', $user->id);
-        } elseif ($user && $user->rol === 'admin') {
-            $query = $query->where(function ($query) use ($user) {
-                $query->where('id_usuario', $user->id)
-                    ->orWhereHas('usuario', function ($query) use ($user) {
-                        $query->where('id_responsable', $user->id);
-                    });
-            });
-        } else {
-            $query = $query->where('id_usuario', $user?->id ?? 0);
-        }
-
-        return response()->json(VisitaResource::collection($query->get()));
-    }
-
-    #[OA\Get(
-        path: '/api/visitas/{visita}',
-        tags: ['Visitas'],
-        summary: 'Obtener una visita por ID',
-        security: [['bearerAuth' => []]],
-        parameters: [new OA\Parameter(name: 'visita', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
-        responses: [
-            new OA\Response(response: 200, description: 'Visita encontrada', content: new OA\JsonContent(ref: '#/components/schemas/VisitaResource')),
-            new OA\Response(response: 401, description: 'No autenticado'),
-            new OA\Response(response: 404, description: 'Visita no encontrada'),
-        ]
-    )]
-    public function show(Visita $visita): JsonResponse
-    {
-        return response()->json(new VisitaResource($visita->load(['usuario', 'cliente', 'estado'])));
-    }
-
     #[OA\Post(
         path: '/api/visitas',
         tags: ['Visitas'],
@@ -136,11 +88,7 @@ class VisitaController extends Controller
         return response()->json(null, 204);
     }
 
-    /**
-     * Get consolidated data for visitas page
-     * Returns: visitas, clientes, and estados in a single optimized query
-     * This reduces 3 API calls to 1
-     */
+
     #[OA\Get(
         path: '/api/visitas/pagina/datos-consolidados',
         tags: ['Visitas'],
@@ -161,7 +109,7 @@ class VisitaController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
-    public function paraVisitasPage(): JsonResponse
+    public function datosPaginaVisitas(): JsonResponse
     {
         $user = Auth::user();
 

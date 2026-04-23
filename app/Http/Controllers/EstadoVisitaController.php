@@ -39,32 +39,4 @@ class EstadoVisitaController extends Controller
         return response()->json(EstadoVisitaResource::collection(EstadoVisita::all()));
     }
 
-    #[OA\Get(
-        path: '/api/estados-visita/{estadoVisita}',
-        tags: ['Estados de Visita'],
-        summary: 'Obtener un estado de visita por ID',
-        security: [['bearerAuth' => []]],
-        parameters: [new OA\Parameter(name: 'estadoVisita', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Estado de visita encontrado',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'id', type: 'integer'),
-                        new OA\Property(property: 'etiqueta', type: 'string'),
-                        new OA\Property(property: 'color_hex', type: 'string'),
-                        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
-                        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
-                    ]
-                )
-            ),
-            new OA\Response(response: 401, description: 'No autenticado'),
-            new OA\Response(response: 404, description: 'Estado de visita no encontrado'),
-        ]
-    )]
-    public function show(EstadoVisita $estadoVisita): JsonResponse
-    {
-        return response()->json(new EstadoVisitaResource($estadoVisita));
-    }
 }

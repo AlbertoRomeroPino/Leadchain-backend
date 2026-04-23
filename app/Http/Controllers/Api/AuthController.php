@@ -42,7 +42,7 @@ class AuthController extends Controller
                         new OA\Property(property: 'token_type', type: 'string', example: 'bearer'),
                         new OA\Property(property: 'expires_in', type: 'integer', example: 3600),
                         new OA\Property(property: 'user', type: 'object'),
-                        new OA\Property(property: 'dashboard', type: 'string', example: '/admin/dashboard'),
+                        new OA\Property(property: 'inicio', type: 'string', example: '/admin/inicio'),
                     ]
                 )
             ),
@@ -132,7 +132,7 @@ class AuthController extends Controller
                 'rol' => $user->rol,
                 'id_zona' => $user->id_zona,
             ],
-            'dashboard' => $this->getDashboardByRole($user->rol),
+            'inicio' => $this->getInicioByRole($user->rol),
         ]);
     }
 
@@ -175,11 +175,11 @@ class AuthController extends Controller
                 'rol' => $user->rol,
                 'id_zona' => $user->id_zona,
             ],
-            'dashboard' => $this->getDashboardByRole($user->rol),
+            'inicio' => $this->getInicioByRole($user->rol),
         ]);
     }
 
-    protected function getDashboardByRole(string $rol): string
+    protected function getInicioByRole(string $rol): string
     {
         return match ($rol) {
             'admin' => '/admin/dashboard',

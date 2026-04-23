@@ -40,27 +40,10 @@ class ZonaController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
-    public function pageData(): JsonResponse
+    public function datosPaginaZonas(): JsonResponse
     {
         $zonas = Zona::with(['edificios.clientes'])->get();
         return response()->json(ZonaPageResource::collection($zonas));
-    }
-
-    #[OA\Get(
-        path: '/api/zonas/{zona}',
-        tags: ['Zonas'],
-        summary: 'Obtener una zona por ID',
-        security: [['bearerAuth' => []]],
-        parameters: [new OA\Parameter(name: 'zona', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
-        responses: [
-            new OA\Response(response: 200, description: 'Zona encontrada', content: new OA\JsonContent(ref: '#/components/schemas/ZonaResource')),
-            new OA\Response(response: 401, description: 'No autenticado'),
-            new OA\Response(response: 404, description: 'Zona no encontrada'),
-        ]
-    )]
-    public function show(Zona $zona): JsonResponse
-    {
-        return response()->json(new ZonaResource($zona));
     }
 
     #[OA\Post(
@@ -223,7 +206,7 @@ class ZonaController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
-    public function mapa(): JsonResponse
+    public function datosMapaZonas(): JsonResponse
     {
         $user = Auth::user();
 
