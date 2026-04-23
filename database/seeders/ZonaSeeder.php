@@ -49,7 +49,6 @@ class ZonaSeeder extends Seeder
                 INSERT INTO zonas (id, nombre, area, created_at, updated_at)
                 VALUES (?, ?, ST_GeomFromText(?, 4326), ?, ?)
             ", [
-                $zona['id'],
                 $zona['nombre'],
                 $zona['area'],
                 $zona['created_at'],
