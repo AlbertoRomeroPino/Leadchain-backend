@@ -14,7 +14,6 @@ class EdificioSeeder extends Seeder
 
         $edificios = [
             [
-                'id' => 1,
                 'direccion_completa' => 'Calle Moricos, 34',
                 'id_zona' => 1,
                 'tipo' => 'Complejo residencial',
@@ -23,7 +22,6 @@ class EdificioSeeder extends Seeder
                 'updated_at' => '2026-04-22T06:07:11Z',
             ],
             [
-                'id' => 2,
                 'direccion_completa' => 'Calle Claudio Marcelo, 1',
                 'id_zona' => 1,
                 'tipo' => 'Residencial',
@@ -32,7 +30,6 @@ class EdificioSeeder extends Seeder
                 'updated_at' => '2026-04-22T06:08:06Z',
             ],
             [
-                'id' => 3,
                 'direccion_completa' => 'Calle Escañuela, 14',
                 'id_zona' => 1,
                 'tipo' => 'Edificio',
@@ -41,7 +38,6 @@ class EdificioSeeder extends Seeder
                 'updated_at' => '2026-04-22T06:09:22Z',
             ],
             [
-                'id' => 4,
                 'direccion_completa' => 'Calle 28 de Febrero, 10',
                 'id_zona' => 2,
                 'tipo' => 'Edificio',
@@ -50,7 +46,6 @@ class EdificioSeeder extends Seeder
                 'updated_at' => '2026-04-22T06:10:53Z',
             ],
             [
-                'id' => 5,
                 'direccion_completa' => 'Calle platero  Pedro de Bares, 7',
                 'id_zona' => 2,
                 'tipo' => 'Edificio',
@@ -59,7 +54,6 @@ class EdificioSeeder extends Seeder
                 'updated_at' => '2026-04-22T06:12:05Z',
             ],
             [
-                'id' => 6,
                 'direccion_completa' => 'Residencias de universidad Rabanales',
                 'id_zona' => 3,
                 'tipo' => 'Residencial',
@@ -68,7 +62,6 @@ class EdificioSeeder extends Seeder
                 'updated_at' => '2026-04-22T06:13:39Z',
             ],
             [
-                'id' => 7,
                 'direccion_completa' => 'Agrocor la torrecilla',
                 'id_zona' => 4,
                 'tipo' => 'Tienda',
@@ -77,7 +70,6 @@ class EdificioSeeder extends Seeder
                 'updated_at' => '2026-04-22T06:14:42Z',
             ],
             [
-                'id' => 8,
                 'direccion_completa' => 'Obramat',
                 'id_zona' => 4,
                 'tipo' => 'Supermercado',
@@ -86,7 +78,6 @@ class EdificioSeeder extends Seeder
                 'updated_at' => '2026-04-22T06:16:17Z',
             ],
             [
-                'id' => 9,
                 'direccion_completa' => 'Rio Guadalquivir',
                 'id_zona' => 5,
                 'tipo' => 'Rio',
@@ -98,7 +89,6 @@ class EdificioSeeder extends Seeder
 
         foreach ($edificios as $edificio) {
             DB::table('edificios')->insert([
-                'id' => $edificio['id'],
                 'direccion_completa' => $edificio['direccion_completa'],
                 'id_zona' => $edificio['id_zona'],
                 'tipo' => $edificio['tipo'],
@@ -109,4 +99,3 @@ class EdificioSeeder extends Seeder
         }
     }
 }
-

@@ -25,7 +25,13 @@ class EstadoVisitaSeeder extends Seeder
         ];
 
         foreach ($estados as $estado) {
-            EstadoVisita::create($estado);
+            DB::table('estados_visita')->insert([
+                'id' => $estado['id'],
+                'etiqueta' => $estado['etiqueta'],
+                'color_hex' => $estado['color_hex'],
+                'created_at' => $estado['created_at'],
+                'updated_at' => $estado['updated_at'],
+            ]);
         }
     }
 }
