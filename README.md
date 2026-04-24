@@ -1,21 +1,21 @@
-# LeadChain API - Backend Córdoba
+<h1 align="center">LeadChain API - Backend Córdoba</h1>
 
 **LeadChain** es una solución backend RESTful de alto rendimiento diseñada específicamente para la gestión inteligente de carteras de clientes, edificios y visitas comerciales en la ciudad de Córdoba.
 
 Lo que hace única a esta API es su integración profunda con **PostgreSQL y la extensión PostGIS**. Esta arquitectura permite que LeadChain no solo almacene datos, sino que comprenda la ubicación espacial: puede validar si un comercial está dentro de su zona asignada, ubicar edificios en un mapa con precisión milimétrica y optimizar rutas de venta basadas en coordenadas geográficas reales.
 
-## Guía de Despliegue
+<h2 align="center">Guía de Despliegue<h2>
 
 Para poner en marcha el proyecto, elige una de las dos opciones disponibles según tu entorno.
 
-## Opción A: Docker (Recomendado)
+<h3 align="center">Opción A: Docker (Recomendado)</h3>
 
-### Requisitos para Opción A
+<h4 align="center">Requisitos para Opción A</h4>
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/): Esencial para la contenerización. Docker permite que la API y la base de datos corran en un entorno idéntico al de producción.
 - [Git](https://git-scm.com/): Para la clonación y gestión del código fuente.
 
-### Pasos de Instalación con Docker
+<h4 align="center">Pasos de Instalación con Docker</h4>
 
 Este método es el más limpio, ya que Docker se encarga de configurar PostGIS y PHP por ti de forma totalmente aislada.
 
@@ -46,15 +46,15 @@ Este método es el más limpio, ya que Docker se encarga de configurar PostGIS y
    - Swagger: `http://localhost:8000/api/documentation`
    - API raíz: `http://localhost:8000`
 
-## Opción B: Instalación Local / Nativa
+<h3 align="center">Opción B: Instalación Local / Nativa</h3>
 
-### Requisitos para Opción B
+<h4 align="center">Requisitos para Opción B</h4>
 
 - **PHP 8.2 o superior**: Motor del lenguaje. Asegúrate de que en tu `php.ini` estén activas las extensiones `extension=sodium` (cifrado de tokens) y `extension=pdo_pgsql` (comunicación con PostgreSQL dockerizado).
 - [Composer](https://getcomposer.org/): Gestor de dependencias de PHP.
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/): Solo para dockerizar la BD (PostgreSQL + PostGIS). Laravel corre local.
 
-### Pasos de Instalación Local
+<h4 align="center">Pasos de Instalación Local</h4>
 
 Sigue estos pasos si prefieres ejecutar Laravel de forma nativa mientras usas Docker únicamente para la base de datos (Modo Híbrido).
 
@@ -87,24 +87,16 @@ Sigue estos pasos si prefieres ejecutar Laravel de forma nativa mientras usas Do
 
    Acceso: `http://127.0.0.1:8000/api/documentation` (Swagger)
 
-## Modelo de Accesos y Permisos
+<h2 align="center">Modelo de Accesos y Permisos</h2>
 
 La seguridad se gestiona mediante **JWT (JSON Web Tokens)**. El sistema implementa una lógica de roles estricta:
 
-| Recurso       | Administrador | Comercial   | Notas de Privacidad                                        |
-| ------------- | ------------- | ----------- | ---------------------------------------------------------- |
-| Clientes      | CRUD          | R (Lectura) | Los comerciales ven sus clientes pero no pueden borrarlos. |
-| Zonas         | CRUD          | R (Lectura) | Gestión geográfica reservada a gerencia.                 |
-| Usuarios      | CRUD          | -           | Datos de empleados privados.                               |
-| Edificios     | CRUD          | R (Lectura) | Catálogo de puntos de interés comercial.                 |
-| Visitas       | R / D         | C / R / U   | Gestión diaria de actividad comercial.                    |
-| Estado Visita | R / U         | R / U       | Flujo de estados (Pendiente, Éxito, etc).                 |
 
-## Comandos Personalizados
+<h2 align="center">Comandos Personalizados</h2>
 
 Este proyecto incluye cuatro comandos Artisan customizados para facilitar el desarrollo y despliegue:
 
-### 1. `php artisan start:complete`
+<h3 align="center"> 1. php artisan start:complete </h3>
 
 **Propósito:** Levanta el stack completo (app + BD) usando Docker Compose.
 
@@ -125,7 +117,7 @@ php artisan start:complete
 
 ---
 
-### 2. `php artisan start:hybrid`
+<h3 align="center"> 2. php artisan start:hybrid </h3>
 
 **Propósito:** Arranca la BD en Docker y la API en tu máquina local (Modo Híbrido).
 
@@ -149,7 +141,7 @@ php artisan start:hybrid
 
 ---
 
-### 3. `php artisan retest`
+<h3 align="center">3. php artisan retest </h3>
 
 **Propósito:** Ejecuta automáticamente el flujo completo de pruebas (reset + seed + tests).
 
@@ -169,7 +161,7 @@ php artisan retest
 
 ---
 
-### 4. `php artisan api:tree`
+<h3 align=center>4. php artisan api:tree</h3>
 
 **Propósito:** Visualiza la estructura y endpoints de la API de forma simplificada.
 
@@ -187,7 +179,7 @@ php artisan retest
 php artisan app:tree
 ```
 
-## Estructura del Sistema
+<h2 align="center">Estructura del Sistema </h2>
 
 ```bash
 Estructura del proyecto (filtrada):
@@ -287,7 +279,7 @@ Estructura del proyecto (filtrada):
         └── ZonaData.php
 ```
 
-# Soluciones a problemas
+<h1 align="center">Soluciones a problemas</h1>
 
 1º Windows estaba sobreponiendose al puerto de postman y no me dejaba hacer un start:complete. Lo que se realiza aqui es para el servicio que ocupa el puerto tirar la base de datos y luego activar el que habia parado para que cambie de puerto
 
@@ -301,7 +293,5 @@ net stop winnat
 # 3. Volver a iniciar el servicio
 net start winnat
 ```
-
-
 
 **Desarrollado por:** Alberto Romero Pino - [GitHub](https://github.com/AlbertoRomeroPino "null")
