@@ -92,6 +92,17 @@ Sigue estos pasos si prefieres ejecutar Laravel de forma nativa mientras usas Do
 La seguridad se gestiona mediante **JWT (JSON Web Tokens)**. El sistema implementa una lógica de roles estricta:
 
 
+
+| Recurso                 | Administrador | Comercial   | Notas de Privacidad                                        |
+| :---------------------- | :------------ | :---------- | :--------------------------------------------------------- |
+| **Clientes**      | CRUD          | R (Lectura) | Los comerciales ven sus clientes pero no pueden borrarlos. |
+| **Zonas**         | CRUD          | R (Lectura) | Gestión geográfica reservada a gerencia.                 |
+| **Usuarios**      | CRUD          | -           | Datos de empleados privados.                               |
+| **Edificios**     | CRUD          | R (Lectura) | Catálogo de puntos de interés comercial.                 |
+| **Visitas**       | R / D         | C / R / U   | Gestión diaria de actividad comercial.                    |
+| **Estado Visita** | R (Lectura)   | R (Lectura) | Flujo de estados (Pendiente, Éxito, etc).                 |
+
+
 <h2 align="center">Comandos Personalizados</h2>
 
 Este proyecto incluye cuatro comandos Artisan customizados para facilitar el desarrollo y despliegue:
