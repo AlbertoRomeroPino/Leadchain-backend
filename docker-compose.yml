@@ -11,7 +11,7 @@ services:
       BACKEND_BRANCH: ${BACKEND_BRANCH:-docker}
       APP_ENV: ${APP_ENV:-local}
       APP_DEBUG: ${APP_DEBUG:-true}
-      APP_KEY: ${APP_KEY:-base64:KlAZySTfmFdzK4yr8509iuigPTcXZlFSo/yumu/JQ7A=}
+      APP_KEY: ${APP_KEY}
       DB_CONNECTION: ${DB_CONNECTION:-pgsql}
       DB_HOST: db
       DB_PORT: ${DB_PORT:-5432}
@@ -20,21 +20,18 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-root}
       SESSION_DRIVER: ${SESSION_DRIVER:-file}
       JWT_ALGO: ${JWT_ALGO:-HS256}
-      JWT_SECRET: ${JWT_SECRET:-abPjIWHtPNVc1M7R4Lbb68ESf8N5f9sqWByU4k3x1Lx0YZmazYlnwCnugIyVOdZy}
+      JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
     command: >
-      sh -c "set -e;
-      if [ -d /var/www/html/.git ]; then
+      sh -c "set -e; if [ -d /var/www/html/.git ]; then
         git -C /var/www/html fetch origin && git -C /var/www/html checkout \"$$BACKEND_BRANCH\" && git -C /var/www/html reset --hard \"origin/$$BACKEND_BRANCH\";
       else
         rm -rf /var/www/html/* && git clone --branch \"$$BACKEND_BRANCH\" --single-branch \"$$BACKEND_REPO\" /var/www/html;
-      fi;
-      composer install --no-interaction --prefer-dist;
-      php artisan serve --host=0.0.0.0 --port=8000"
+      fi; composer install --no-interaction --prefer-dist; php artisan serve --host=0.0.0.0 --port=8000"
 
   db:
     image: postgis/postgis:15-3.3
@@ -47,7 +44,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-root} -d ${DB_DATABASE:-leadchain}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-root} -d ${DB_DATABASE:-leadchain}" ]
       interval: 5s
       timeout: 5s
       retries: 10
