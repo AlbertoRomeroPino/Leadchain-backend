@@ -264,8 +264,6 @@ Estructura del proyecto (filtrada):
 │       └── ZonaSeeder.php
 ├── docker-compose.yml
 ├── dockerfile
-├── init-db
-│   └── db-leadchain.sql    (Ejemplo de base de datos y como se ven todos los componentes)
 ├── routes
 │   ├── api.php
 │   ├── console.php

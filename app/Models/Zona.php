@@ -15,11 +15,19 @@ class Zona extends Model
 
     protected $fillable = [
         'nombre',
+        'area',
     ];
 
     protected $appends = [
         'area',
     ];
+
+    public function setAreaAttribute($value): void
+    {
+        if (is_array($value)) {
+            $this->attributes['area'] = DB::raw("ST_GeomFromText('" . self::buildPolygonWkt($value) . "', 4326)");
+        }
+    }
 
     /**
      * Parsear geometry Polygon a array de puntos [{lat, lng}, ...]
@@ -60,5 +68,26 @@ class Zona extends Model
     public function edificios(): HasMany
     {
         return $this->hasMany(Edificio::class, 'id_zona');
+    }
+
+    public static function buildPolygonWkt(array $points): string
+    {
+        if (count($points) < 4) {
+            throw new \InvalidArgumentException('El polígono debe contener al menos 4 puntos.');
+        }
+
+        $first = $points[0];
+        $last = $points[count($points) - 1];
+
+        if ($first !== $last) {
+            $points[] = $first;
+        }
+
+        $coordinates = array_map(
+            fn($point) => sprintf('%s %s', (float) $point['lng'], (float) $point['lat']),
+            $points
+        );
+
+        return 'POLYGON((' . implode(', ', $coordinates) . '))';
     }
 }

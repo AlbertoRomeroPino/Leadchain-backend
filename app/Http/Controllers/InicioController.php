@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\AdminInicioResource;
-use App\Http\Resources\ComercialInicioResource;
-use App\Http\Resources\EstadoVisitaResource;
+use App\Http\Resources\inicioAdminResource;
+use App\Http\Resources\inicioComercialResource;
 use App\Models\Cliente;
 use App\Models\Edificio;
 use App\Models\EstadoVisita;
@@ -15,11 +14,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes as OA;
 
+
 class InicioController extends Controller
 {
     /**
-     * Get consolidated data for commercial dashboard
-     * Returns: edificios, clientes, visitas y estados de visita
+     * Obtiene todos los datos consolidados necesarios para el inicio del Comercial, incluyendo:
+     * - Edificios
+     * - Clientes
+     * - Visitas
+     * - Estados de visita
      */
     #[OA\Get(
         path: '/api/inicio/comercial',
@@ -45,60 +48,45 @@ class InicioController extends Controller
     )]
     public function datosInicioComercial(): JsonResponse
     {
+        // El comentario de abajo es para evitar que el IDE marque como error la variable $user, 
+        // que se usa en el código pero no se asigna explícitamente (se obtiene de Auth::user())
+        /** @var User $user */
         $user = Auth::user();
 
-        if (!$user || $user->rol !== 'comercial') {
+        if (!$user || !$user->isComercial()) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
-        // Obtener edificios de la zona del comercial CON clientes anidados
-        $edificios = Edificio::where('id_zona', $user->id_zona)
-            ->with(['clientes'])
+        $edificios = Edificio::with(['clientes'])
+            ->where('id_zona', $user->id_zona)
             ->get();
 
-        // Obtener IDs únicos de clientes de esos edificios
         $clienteIds = $edificios
-            ->flatMap(fn($ed) => $ed->clientes ?? [])
-            ->unique('id')
+            ->flatMap(fn($edificio) => $edificio->clientes)
             ->pluck('id')
-            ->toArray();
+            ->unique();
 
-        // Obtener clientes
-        $clientes = Cliente::whereIn('id', $clienteIds)
+        $clientes = Cliente::whereIn('id', $clienteIds)->get();
+
+        $visitas = Visita::with(['usuario', 'cliente', 'estado'])
+            ->where('id_usuario', $user->id)
             ->get();
 
-        // Obtener visitas del comercial actual
-        $visitas = Visita::where('id_usuario', $user->id)
-            ->with(['usuario', 'cliente', 'estado'])
-            ->get();
-
-        // Crear un objeto con toda la información
-        $data = (object)[
+        return inicioComercialResource::make((object) [
+            'edificios' => $edificios,
             'clientes' => $clientes,
             'visitas' => $visitas,
-        ];
-
-        return response()->json([
-            'clientes' => $clientes->map(fn($c) => [
-                'id' => $c->id,
-                'nombre' => $c->nombre,
-                'apellidos' => $c->apellidos,
-                'telefono' => $c->telefono,
-                'email' => $c->email,
-            ]),
-            'visitas' => $visitas->map(fn($v) => [
-                'id' => $v->id,
-                'id_cliente' => $v->id_cliente,
-                'fecha_hora' => $v->fecha_hora,
-                'observaciones' => $v->observaciones,
-                'estado' => $v->estado ? ['etiqueta' => $v->estado->etiqueta] : null,
-            ]),
-        ]);
+        ])
+        ->response();
     }
 
     /**
-     * Get consolidated data for admin dashboard
-     * Returns: usuarios comerciales, visitas, clientes y tipos de edificios
+     * Obtiene todos los datos consolidados necesarios para el inicio del Admin, incluyendo:
+     * - Usuarios comerciales a su cargo
+     * - Visitas
+     * - Clientes
+     * - Estados de visita
+     * - Zonas
      */
     #[OA\Get(
         path: '/api/inicio/admin',
@@ -126,68 +114,38 @@ class InicioController extends Controller
     )]
     public function datosInicioAdmin(): JsonResponse
     {
+        /** @var User|null $user */
         $user = Auth::user();
 
-        if (!$user || $user->rol !== 'admin') {
+        if (!$user || !$user->isAdmin()) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
-        // Obtener todos los usuarios comerciales
         $usuariosComerciales = User::where('rol', 'comercial')
+            ->get(['id', 'nombre', 'apellidos', 'email', 'rol', 'id_responsable', 'id_zona']);
+
+        $visitas = Visita::with(['estado'])
             ->get();
 
-        // Obtener todas las visitas con relaciones
-        $visitas = Visita::with(['usuario', 'cliente', 'estado'])
+        $clientes = Cliente::select('id', 'nombre', 'apellidos', 'telefono', 'email')
             ->get();
 
-        // Obtener todos los clientes
-        $clientes = Cliente::get();
+        $edificios = Edificio::with(['clientes:id,nombre'])
+            ->select('id', 'id_zona', 'direccion_completa', 'tipo')
+            ->get();
 
-        // Obtener todos los edificios CON clientes anidados
-        $edificios = Edificio::with(['clientes'])->get();
-
-        // Obtener todos los estados de visita
         $estadosVisita = EstadoVisita::all();
 
-        // Obtener todas las zonas
-        $zonas = Zona::all();
+        $zonas = Zona::select('id', 'nombre')->get();
 
-        // Crear un objeto con toda la información
-        $data = (object)[
+        return inicioAdminResource::make((object) [
             'usuarios_comerciales' => $usuariosComerciales,
             'visitas' => $visitas,
             'clientes' => $clientes,
             'edificios' => $edificios,
             'estados_visita' => $estadosVisita,
             'zonas' => $zonas,
-        ];
-
-        return response()->json([
-            'usuarios_comerciales' => $usuariosComerciales->map(fn($u) => ['id' => $u->id, 'nombre' => $u->nombre, 'apellidos' => $u->apellidos, 'email' => $u->email, 'rol' => $u->rol, 'id_responsable' => $u->id_responsable, 'id_zona' => $u->id_zona]),
-            'visitas' => $visitas->map(fn($v) => [
-                'id' => $v->id,
-                'id_usuario' => $v->id_usuario,
-                'id_cliente' => $v->id_cliente,
-                'fecha_hora' => $v->fecha_hora,
-                'observaciones' => $v->observaciones,
-                'estado' => $v->estado ? ['id' => $v->estado->id, 'etiqueta' => $v->estado->etiqueta] : null,
-            ]),
-            'clientes' => $clientes->map(fn($c) => [
-                'id' => $c->id,
-                'nombre' => $c->nombre,
-                'apellidos' => $c->apellidos,
-                'telefono' => $c->telefono,
-                'email' => $c->email,
-            ]),
-            'edificios' => $edificios->map(fn($e) => [
-                'id' => $e->id,
-                'id_zona' => $e->id_zona,
-                'direccion_completa' => $e->direccion_completa,
-                'tipo' => $e->tipo,
-                'clientes' => $e->clientes ? $e->clientes->map(fn($c) => ['id' => $c->id, 'nombre' => $c->nombre]) : [],
-            ]),
-            'estados_visita' => $estadosVisita,
-            'zonas' => $zonas->map(fn($z) => ['id' => $z->id, 'nombre' => $z->nombre]),
-        ]);
+        ])
+        ->response();
     }
 }

@@ -21,12 +21,14 @@ class ZonaRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isPatch = $this->isMethod('patch');
+
         return [
-            'nombre' => 'required|string|max:100',
-            'area' => 'required|array|min:4',
-            'area.*' => 'required|array',
-            'area.*.lat' => 'required|numeric|between:-90,90',
-            'area.*.lng' => 'required|numeric|between:-180,180',
+            'nombre' => ($isPatch ? 'sometimes' : 'required') . '|string|max:50',
+            'area' => ($isPatch ? 'sometimes' : 'required') . '|array|min:4',
+            'area.*' => ($isPatch ? 'sometimes' : 'required') . '|array',
+            'area.*.lat' => ($isPatch ? 'sometimes' : 'required') . '|numeric|between:-90,90',
+            'area.*.lng' => ($isPatch ? 'sometimes' : 'required') . '|numeric|between:-180,180',
         ];
     }
 }

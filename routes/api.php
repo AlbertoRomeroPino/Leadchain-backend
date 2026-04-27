@@ -93,7 +93,7 @@ Route::middleware('auth:api')->group(function () {
 
         // Endpoint para obtener comerciales a cargo del admin (DEBE IR ANTES del apiResource de users)
         Route::get('users/comerciales-a-cargo', [UserController::class, 'comercialesACargo']);
-        Route::apiResource('users', UserController::class)->only(['store', 'update', 'destroy']);
+        Route::apiResource('users', UserController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
 
         // Endpoint para datos de inicio del admin

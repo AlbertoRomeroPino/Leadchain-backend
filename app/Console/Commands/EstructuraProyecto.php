@@ -36,8 +36,7 @@ class EstructuraProyecto extends Command
         'Providers',
         'factories',
         'Unit',
-        'init-db'
-    ];
+        ];
     private $excludeFiles = [
         '.editorconfig',
         '.gitattributes',
@@ -69,7 +68,7 @@ class EstructuraProyecto extends Command
 
     public function handle()
     {
-        $this->info("Estructura del proyecto (filtrada):");
+        $this->info("Estructura del proyecto:");
         $this->listDirectory(base_path());
     }
 

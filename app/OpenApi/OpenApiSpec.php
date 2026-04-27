@@ -244,17 +244,4 @@ use OpenApi\Attributes as OA;
     ],
     type: 'object'
 )]
-#[OA\Schema(
-    schema: 'PanelEdificioResource',
-    properties: [
-        new OA\Property(property: 'id', type: 'integer', example: 1),
-        new OA\Property(property: 'direccion_completa', type: 'string', example: 'Calle Cruz Conde 15, Córdoba'),
-        new OA\Property(property: 'tipo', type: 'string', example: 'residencial'),
-        new OA\Property(property: 'ubicacion', ref: '#/components/schemas/GeoPoint', nullable: true),
-        new OA\Property(property: 'id_zona', type: 'integer', example: 1),
-        new OA\Property(property: 'zona', ref: '#/components/schemas/ZonaResource', nullable: true),
-        new OA\Property(property: 'clientes', type: 'array', items: new OA\Items(ref: '#/components/schemas/ClienteResource')),
-    ],
-    type: 'object'
-)]
 class OpenApiSpec {}

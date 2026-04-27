@@ -94,4 +94,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+        public function isAdmin(): bool
+    {
+        return $this->rol === 'admin';
+    }
+
+    public function isComercial(): bool
+    {
+        return $this->rol === 'comercial';
+    }
 }

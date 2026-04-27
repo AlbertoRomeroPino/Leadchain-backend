@@ -17,7 +17,7 @@ class LoginAdmin
     {
         $user = $request->user();
 
-        if (!$user || $user->rol !== 'admin') {
+        if (!$user || !$user->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Acceso denegado. Se requiere rol de administrador.'

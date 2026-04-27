@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\VisitaRequest;
 use App\Http\Resources\VisitaResource;
-use App\Http\Resources\VisitasPaginaResource;
 use App\Models\Visita;
 use App\Models\Cliente;
 use App\Models\EstadoVisita;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes as OA;
+use App\Models\User;
+use App\Http\Resources\datosPaginaVisitasResources;
 
 class VisitaController extends Controller
 {
@@ -109,6 +110,14 @@ class VisitaController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Obtener datos consolidados para la página de visitas, incluyendo:
+     * - Visitas (con usuario, cliente y estado)
+     * - Clientes (con edificios)
+     * - Estados de visita
+     * 
+     * @return JsonResponse
+     */
     public function datosPaginaVisitas(): JsonResponse
     {
         $user = Auth::user();
@@ -116,9 +125,10 @@ class VisitaController extends Controller
         // Obtener visitas con relaciones eager loaded
         $visitasQuery = Visita::with(['usuario', 'cliente.edificios', 'estado']);
 
-        if ($user && $user->rol === 'comercial') {
+        /** @var User $user */
+        if ($user && $user->isComercial()) {
             $visitasQuery = $visitasQuery->where('id_usuario', $user->id);
-        } elseif ($user && $user->rol === 'admin') {
+        } elseif ($user && $user->isAdmin()) {
             $visitasQuery = $visitasQuery->where(function ($q) use ($user) {
                 $q->where('id_usuario', $user->id)
                     ->orWhereHas('usuario', function ($q) use ($user) {
@@ -126,33 +136,17 @@ class VisitaController extends Controller
                     });
             });
         }
-
+        // Obtener las visitas filtradas según el rol del usuario
         $visitas = $visitasQuery->get();
-
         // Obtener TODOS los clientes (necesarios para el formulario)
         $clientes = Cliente::with('edificios')->get();
-
         // Obtener TODOS los estados
         $estados = EstadoVisita::all();
 
-        return response()->json([
-            'visitas' => VisitasPaginaResource::collection($visitas),
-            'clientes' => $clientes->map(fn($c) => [
-                'id' => $c->id,
-                'nombre' => $c->nombre,
-                'apellidos' => $c->apellidos,
-                'telefono' => $c->telefono,
-                'email' => $c->email,
-                'edificios' => $c->edificios ? $c->edificios->map(fn($e) => [
-                    'id' => $e->id,
-                    'direccion_completa' => $e->direccion_completa,
-                ])->toArray() : [],
-            ])->toArray(),
-            'estados' => $estados->map(fn($e) => [
-                'id' => $e->id,
-                'etiqueta' => $e->etiqueta,
-                'color_hex' => $e->color_hex,
-            ])->toArray(),
-        ]);
+        return datosPaginaVisitasResources::make((object) [
+            'visitas' => $visitas,
+            'clientes' => $clientes,
+            'estados' => $estados,
+        ])->response();
     }
 }

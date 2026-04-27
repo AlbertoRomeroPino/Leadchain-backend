@@ -23,46 +23,11 @@ class ClienteController extends Controller
     )]
     public function index(): JsonResponse
     {
-        $user = request()->user();
-
-        if (!$user) {
-            return response()->json(['message' => 'No autenticado'], 401);
-        }
-
-        if ($user->rol === 'comercial') {
-            $clientes = Cliente::whereHas('edificios', function ($query) use ($user) {
-                if ($user->id_zona) {
-                    $query->where('id_zona', $user->id_zona);
-                }
-            })
-                ->with('edificios')
-                ->distinct()
-                ->get();
-        } elseif ($user->rol === 'admin') {
-            $zoneIds = $user->subordinados()->pluck('id_zona')->filter()->toArray();
-
-            if ($user->id_zona) {
-                $zoneIds[] = $user->id_zona;
-            }
-
-            $zoneIds = array_values(array_unique($zoneIds));
-
-            if (empty($zoneIds)) {
-                $clientes = Cliente::all();
-            } else {
-                $clientes = Cliente::whereHas('edificios', function ($query) use ($zoneIds) {
-                    $query->whereIn('id_zona', $zoneIds);
-                })
-                    ->with('edificios')
-                    ->distinct()
-                    ->get();
-            }
-        } else {
-            $clientes = Cliente::whereHas('edificios')
-                ->with('edificios')
-                ->distinct()
-                ->get();
-        }
+        $clientes = Cliente::query()
+            ->filtradoPorUsuario(request()->user())
+            ->with('edificios')
+            ->distinct()
+            ->get();
 
         return response()->json(ClienteResource::collection($clientes));
     }
@@ -209,6 +174,4 @@ class ClienteController extends Controller
 
         return response()->json(null, 204);
     }
-
-    
 }

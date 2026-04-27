@@ -21,11 +21,13 @@ class VisitaRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isPatch = $this->isMethod('patch');
+
         return [
-            'id_usuario' => 'required|exists:users,id',
-            'id_cliente' => 'required|exists:clientes,id',
-            'fecha_hora' => 'required|date',
-            'id_estado' => 'required|exists:estados_visita,id',
+            'id_usuario' => ($isPatch ? 'sometimes' : 'required') . '|exists:users,id',
+            'id_cliente' => ($isPatch ? 'sometimes' : 'required') . '|exists:clientes,id',
+            'fecha_hora' => ($isPatch ? 'sometimes' : 'required') . '|date',
+            'id_estado' => ($isPatch ? 'sometimes' : 'required') . '|exists:estados_visita,id',
             'observaciones' => 'nullable|string',
         ];
     }

@@ -23,24 +23,28 @@ class EdificioRequest extends FormRequest
     {
         if ($this->isMethod('post')) {
             return [
-                'direccion_completa' => 'required|string|max:255',
+                'direccion_completa' => 'required|string|max:40',
                 'ubicacion' => 'required|array',
                 'ubicacion.lat' => 'required|numeric|between:-90,90',
                 'ubicacion.lng' => 'required|numeric|between:-180,180',
                 'id_zona' => 'required|exists:zonas,id',
-                'tipo' => 'required|string|max:50',
+                'tipo' => 'required|string|max:25',
                 'id_cliente' => 'nullable|exists:clientes,id',
+                'cliente_planta' => 'nullable|string|max:20',
+                'cliente_puerta' => 'nullable|string|max:20',
             ];
         }
 
         return [
-            'direccion_completa' => 'sometimes|string|max:255',
+            'direccion_completa' => 'sometimes|string|max:40',
             'ubicacion' => 'sometimes|array',
             'ubicacion.lat' => 'required_with:ubicacion,ubicacion.lng|numeric|between:-90,90',
             'ubicacion.lng' => 'required_with:ubicacion,ubicacion.lat|numeric|between:-180,180',
             'id_zona' => 'sometimes|exists:zonas,id',
-            'tipo' => 'sometimes|string|max:50',
+            'tipo' => 'sometimes|string|max:25',
             'id_cliente' => 'nullable|exists:clientes,id',
+            'cliente_planta' => 'nullable|string|max:20',
+            'cliente_puerta' => 'nullable|string|max:20',
         ];
     }
 }
