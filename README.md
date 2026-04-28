@@ -4,7 +4,7 @@
 
 Lo que hace única a esta API es su integración profunda con **PostgreSQL y la extensión PostGIS**. Esta arquitectura permite que LeadChain no solo almacene datos, sino que comprenda la ubicación espacial: puede validar si un comercial está dentro de su zona asignada, ubicar edificios en un mapa con precisión milimétrica y optimizar rutas de venta basadas en coordenadas geográficas reales.
 
-<h2 align="center">Guía de Despliegue<h2>
+<h2 align="center">Guía de Despliegue</h2>
 
 Para poner en marcha el proyecto, elige una de las dos opciones disponibles según tu entorno.
 
