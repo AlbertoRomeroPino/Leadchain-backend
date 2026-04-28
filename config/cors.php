@@ -29,6 +29,8 @@ return [
 
     'max_age' => 0,
 
+    // Si tu frontend y backend están en dominios diferentes, es posible que necesites habilitar esta opción
+    // para permitir el envío de cookies (como tokens de autenticación) en solicitudes CORS.
     'supports_credentials' => true,
 
 ];

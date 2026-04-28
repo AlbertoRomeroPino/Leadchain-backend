@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRequest;
 use App\Http\Resources\AuthResponseResource;
+use App\Models\User;
 use OpenApi\Attributes as OA;
 use PHPOpenSourceSaver\JWTAuth\JWTGuard;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -146,11 +148,11 @@ class AuthController extends Controller
         if (!$user) {
             try {
                 // Decodificar el nuevo token para obtener datos del usuario
-                \PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth::setToken($token);
-                $decoded = \PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth::getPayload();
+                JWTAuth::setToken($token);
+                $decoded = JWTAuth::getPayload();
                 $userId = $decoded->get('sub'); // 'sub' es el user_id en JWT
                 
-                $user = \App\Models\User::find($userId);
+                $user = User::find($userId);
                 if (!$user) {
                     throw new \Exception('Usuario no encontrado');
                 }
