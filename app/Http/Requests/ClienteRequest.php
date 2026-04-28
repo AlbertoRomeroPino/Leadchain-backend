@@ -24,16 +24,31 @@ class ClienteRequest extends FormRequest
     {
         $cliente = $this->route('cliente');
         $clienteId = $cliente ? $cliente->id : $cliente;
+
+        if ($this->isMethod('post')) {
+            return [
+                'nombre' => 'required|string|max:50',
+                'apellidos' => 'required|string|max:100',
+                'email' => [
+                    'required',
+                    'email',
+                    'max:100',
+                    Rule::unique('clientes', 'email')
+                ],
+                'telefono' => 'required|string|max:15',
+            ];
+        }
+
         return [
-            'nombre' => 'sometimes|string|max:100',
-            'apellidos' => 'sometimes|string|max:150',
+            'nombre' => 'sometimes|string|max:50',
+            'apellidos' => 'sometimes|string|max:100',
             'email' => [
                 'sometimes',
                 'email',
-                'max:255',
+                'max:100',
                 Rule::unique('clientes', 'email')->ignore($clienteId)
             ],
-            'telefono' => 'sometimes|string|max:20',
+            'telefono' => 'sometimes|string|max:15',
         ];
     }
 }

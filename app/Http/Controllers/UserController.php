@@ -17,6 +17,41 @@ use OpenApi\Attributes as OA;
 
 class UserController extends Controller
 {
+    #[OA\Get(
+        path: '/api/users',
+        tags: ['Usuarios'],
+        summary: 'Obtener todos los usuarios',
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Lista de usuarios', content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/UserResource'))),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado por rol'),
+        ]
+    )]
+    public function index(): JsonResponse
+    {
+        $users = User::all();
+        return response()->json(UserResource::collection($users));
+    }
+
+    #[OA\Get(
+        path: '/api/users/{user}',
+        tags: ['Usuarios'],
+        summary: 'Obtener un usuario por ID',
+        security: [['bearerAuth' => []]],
+        parameters: [new OA\Parameter(name: 'user', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Usuario encontrado', content: new OA\JsonContent(ref: '#/components/schemas/UserResource')),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado por rol'),
+            new OA\Response(response: 404, description: 'Usuario no encontrado'),
+        ]
+    )]
+    public function show(User $user): JsonResponse
+    {
+        return response()->json(new UserResource($user));
+    }
+
     #[OA\Post(
         path: '/api/users',
         tags: ['Usuarios'],
@@ -135,7 +170,8 @@ class UserController extends Controller
         }
 
         // Solo admin puede ver sus comerciales
-        if ($user->rol !== 'admin') {
+        /** @var User $user */
+        if (!$user->isAdmin()) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
@@ -152,4 +188,5 @@ class UserController extends Controller
             'comerciales' => ComercialesAMiCargoResource::collection($comerciales),
             'zonas' => ZonaResource::collection($zonas),
         ]);
-    }}
+    }
+}

@@ -10,7 +10,7 @@ class LoginData
     ];
 
     const LOGIN_COMERCIAL = [
-    "email" => "juan.garcia@leadchain.com",
+    "email" => "rafa.centro@comercial.es",
     "password" => "12345678"
     ];
 }

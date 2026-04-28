@@ -16,14 +16,12 @@ class Visita extends Model
         'id_usuario',
         'id_cliente',
         'fecha_hora',
-        'hora_visita',
         'id_estado',
         'observaciones',
     ];
 
     protected $casts = [
         'fecha_hora' => 'datetime',
-        'hora_visita' => 'datetime:H:i:s',
     ];
 
     /**

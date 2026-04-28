@@ -91,8 +91,6 @@ Sigue estos pasos si prefieres ejecutar Laravel de forma nativa mientras usas Do
 
 La seguridad se gestiona mediante **JWT (JSON Web Tokens)**. El sistema implementa una lógica de roles estricta:
 
-
-
 | Recurso                 | Administrador | Comercial   | Notas de Privacidad                                        |
 | :---------------------- | :------------ | :---------- | :--------------------------------------------------------- |
 | **Clientes**      | CRUD          | R (Lectura) | Los comerciales ven sus clientes pero no pueden borrarlos. |
@@ -101,7 +99,6 @@ La seguridad se gestiona mediante **JWT (JSON Web Tokens)**. El sistema implemen
 | **Edificios**     | CRUD          | R (Lectura) | Catálogo de puntos de interés comercial.                 |
 | **Visitas**       | R / D         | C / R / U   | Gestión diaria de actividad comercial.                    |
 | **Estado Visita** | R (Lectura)   | R (Lectura) | Flujo de estados (Pendiente, Éxito, etc).                 |
-
 
 <h2 align="center">Comandos Personalizados</h2>
 
@@ -267,8 +264,6 @@ Estructura del proyecto (filtrada):
 │       └── ZonaSeeder.php
 ├── docker-compose.yml
 ├── dockerfile
-├── init-db
-│   └── db-leadchain.sql    (Ejemplo de base de datos y como se ven todos los componentes)
 ├── routes
 │   ├── api.php
 │   ├── console.php

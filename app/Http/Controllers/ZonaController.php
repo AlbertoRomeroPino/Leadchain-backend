@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ZonaRequest;
-use App\Http\Resources\MapaInicioResource;
+use App\Http\Resources\MapaZonasResource;
 use App\Http\Resources\ZonaResource;
 use App\Http\Resources\ZonaPageResource;
 use App\Models\Zona;
@@ -68,20 +68,10 @@ class ZonaController extends Controller
         try {
             DB::beginTransaction();
 
-            $zona = Zona::create(['nombre' => $request['nombre']]);
-            $polygonWkt = $this->buildPolygonWkt($request['area']);
-
-            DB::statement(
-                "
-            UPDATE zonas SET
-                area = ST_GeomFromText(?, 4326)
-            WHERE id = ?
-        ",
-                [
-                    $polygonWkt,
-                    $zona->id,
-                ]
-            );
+            $zona = Zona::create([
+                'nombre' => $request['nombre'],
+                'area' => $request['area'],
+            ]);
 
             DB::commit();
         } catch (\Exception $e) {
@@ -127,43 +117,11 @@ class ZonaController extends Controller
         }
 
         if (isset($request['area'])) {
-            DB::statement(
-                'UPDATE zonas SET area = ST_GeomFromText(?, 4326) WHERE id = ?',
-                [$this->buildPolygonWkt($request['area']), $zona->id]
-            );
+            $zona->area = $request['area'];
+            $zona->save();
         }
 
         return response()->json(new ZonaResource($zona->fresh()));
-    }
-
-    /**
-     * Convierte un array de puntos [{lat, lng}, ...] en WKT POLYGON.
-     */
-    private function buildPolygonWkt(array $points): string
-    {
-        if (count($points) < 4) {
-            throw new \InvalidArgumentException('El polígono debe contener al menos 4 puntos.');
-        }
-
-        $first = $points[0];
-        $last = $points[count($points) - 1];
-
-        if (!$this->isSamePoint($first, $last)) {
-            $points[] = $first;
-        }
-
-        $coordinates = array_map(
-            fn($point) => sprintf('%s %s', (float) $point['lng'], (float) $point['lat']),
-            $points
-        );
-
-        return 'POLYGON((' . implode(', ', $coordinates) . '))';
-    }
-
-    private function isSamePoint(array $pointA, array $pointB): bool
-    {
-        return (float) $pointA['lat'] === (float) $pointB['lat']
-            && (float) $pointA['lng'] === (float) $pointB['lng'];
     }
 
     #[OA\Delete(
@@ -199,7 +157,7 @@ class ZonaController extends Controller
                 description: 'Zonas con edificios y clientes anidados. Optimizado en una única query.',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'zonas', type: 'array', items: new OA\Items(ref: '#/components/schemas/ZonaResource')),
+                        new OA\Property(property: 'zonas', type: 'array', items: new OA\Items(ref: '#/components/schemas/MapaZonasResource')),
                     ]
                 )
             ),
@@ -208,64 +166,31 @@ class ZonaController extends Controller
     )]
     public function datosMapaZonas(): JsonResponse
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         if (!$user) {
             return response()->json(['message' => 'No autenticado'], 401);
         }
 
-        // Obtener zonas con edificios y clientes
-        // Usar query raw para obtener coordenadas geospatiales en una sola consulta
-        if ($user->rol === 'comercial' && $user->id_zona) {
-            $zonas = Zona::where('id', $user->id_zona)
-                ->with(['edificios.clientes'])
-                ->get();
-        } else {
-            $zonas = Zona::with(['edificios.clientes'])->get();
+        // Obtener zonas con edificios (incluyendo coordenadas en selectRaw) y clientes
+        // OPTIMIZACIÓN: selectRaw incluye coordenadas en la query principal, eliminando N queries extras
+        $zonas = Zona::query();
+
+        if ($user->isComercial() && $user->id_zona) {
+            $zonas->where('id', $user->id_zona);
         }
 
-        // Obtener coordenadas para todos los edificios en una sola query
-        $edificiosCoordenadas = DB::table('edificios')
-            ->select('id', DB::raw('ST_Y(ubicacion) as lat'), DB::raw('ST_X(ubicacion) as lng'))
-            ->get()
-            ->keyBy('id');
-
-        // Transformar directamente sin usar Resource
-        $zonasTransformadas = $zonas->map(function ($zona) use ($edificiosCoordenadas) {
-            return [
-                'id' => $zona->id,
-                'nombre' => $zona->nombre,
-                'area' => $zona->area,
-                'edificios' => $zona->edificios->map(function ($edificio) use ($edificiosCoordenadas) {
-                    $coordenadas = $edificiosCoordenadas->get($edificio->id);
-                    $ubicacion = $coordenadas ? [
-                        'lat' => (float) $coordenadas->lat,
-                        'lng' => (float) $coordenadas->lng,
-                    ] : null;
-
-                    return [
-                        'id' => $edificio->id,
-                        'nombre' => $edificio->nombre,
-                        'direccion_completa' => $edificio->direccion_completa,
-                        'tipo' => $edificio->tipo,
-                        'ubicacion' => $ubicacion,
-                        'id_zona' => $edificio->id_zona,
-                        'clientes' => $edificio->clientes ? $edificio->clientes->map(fn($c) => [
-                            'id' => $c->id,
-                            'nombre' => $c->nombre,
-                            'apellidos' => $c->apellidos,
-                            'telefono' => $c->telefono,
-                            'email' => $c->email,
-                            'planta' => $c->pivot?->planta,
-                            'puerta' => $c->pivot?->puerta,
-                        ])->toArray() : [],
-                    ];
-                })->toArray(),
-            ];
-        });
+        $zonas = $zonas->with([
+            'edificios' => function ($query) {
+                $query->select('id', 'direccion_completa', 'tipo', 'id_zona')
+                      ->selectRaw('ST_Y("ubicacion") as lat, ST_X("ubicacion") as lng');
+            },
+            'edificios.clientes',
+        ])->get();
 
         return response()->json([
-            'zonas' => $zonasTransformadas,
+            'zonas' => MapaZonasResource::collection($zonas),
         ]);
     }
 }

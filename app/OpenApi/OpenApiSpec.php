@@ -110,6 +110,45 @@ use OpenApi\Attributes as OA;
     type: 'object'
 )]
 #[OA\Schema(
+    schema: 'MapaZonasResource',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'nombre', type: 'string', example: 'Zona Norte'),
+        new OA\Property(property: 'area', type: 'array', items: new OA\Items(ref: '#/components/schemas/GeoPoint')),
+        new OA\Property(
+            property: 'edificios',
+            type: 'array',
+            items: new OA\Items(
+                properties: [
+                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                    new OA\Property(property: 'direccion_completa', type: 'string', example: 'Calle Gran Capitan 10'),
+                    new OA\Property(property: 'tipo', type: 'string', example: 'residencial'),
+                    new OA\Property(property: 'id_zona', type: 'integer', example: 1),
+                    new OA\Property(property: 'ubicacion', ref: '#/components/schemas/GeoPoint', nullable: true),
+                    new OA\Property(
+                        property: 'clientes',
+                        type: 'array',
+                        items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 1),
+                                new OA\Property(property: 'nombre', type: 'string', example: 'Antonio'),
+                                new OA\Property(property: 'apellidos', type: 'string', example: 'Perez Garcia'),
+                                new OA\Property(property: 'telefono', type: 'string', example: '612345678'),
+                                new OA\Property(property: 'email', type: 'string', format: 'email', example: 'antonio@ejemplo.com'),
+                                new OA\Property(property: 'planta', type: 'integer', nullable: true, example: 3),
+                                new OA\Property(property: 'puerta', type: 'integer', nullable: true, example: 5),
+                            ],
+                            type: 'object'
+                        )
+                    ),
+                ],
+                type: 'object'
+            )
+        ),
+    ],
+    type: 'object'
+)]
+#[OA\Schema(
     schema: 'ClienteDetalleResource',
     properties: [
         new OA\Property(
@@ -241,19 +280,6 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'edificios', type: 'array', items: new OA\Items(type: 'object')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
-    ],
-    type: 'object'
-)]
-#[OA\Schema(
-    schema: 'PanelEdificioResource',
-    properties: [
-        new OA\Property(property: 'id', type: 'integer', example: 1),
-        new OA\Property(property: 'direccion_completa', type: 'string', example: 'Calle Cruz Conde 15, Córdoba'),
-        new OA\Property(property: 'tipo', type: 'string', example: 'residencial'),
-        new OA\Property(property: 'ubicacion', ref: '#/components/schemas/GeoPoint', nullable: true),
-        new OA\Property(property: 'id_zona', type: 'integer', example: 1),
-        new OA\Property(property: 'zona', ref: '#/components/schemas/ZonaResource', nullable: true),
-        new OA\Property(property: 'clientes', type: 'array', items: new OA\Items(ref: '#/components/schemas/ClienteResource')),
     ],
     type: 'object'
 )]

@@ -29,12 +29,12 @@ class UserUpdateRequest extends FormRequest
 
         return [
 
-            'nombre' => 'sometimes|string|max:100',
-            'apellidos' => 'sometimes|string|max:150',
+            'nombre' => 'sometimes|string|max:50',
+            'apellidos' => 'sometimes|string|max:100',
             'email' => [
                 'sometimes',
                 'email',
-                'max:255',
+                'max:100',
                 Rule::unique('users', 'email')->ignore($userId)
             ],
             'password' => 'sometimes|string|min:8',

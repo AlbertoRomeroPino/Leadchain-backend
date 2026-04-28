@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\EdificioRequest;
 use App\Http\Resources\EdificioResource;
 use App\Http\Resources\EdificioDetailResource;
-use App\Http\Resources\PanelEdificioResource;
+use App\Models\Cliente;
 use App\Models\Edificio;
 use App\Models\Zona;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
@@ -67,32 +68,6 @@ class EdificioController extends Controller
         return response()->json(new EdificioDetailResource($edificio));
     }
 
-    /**
-     * Obtener datos ligeros del edificio para panel de mapa
-     * Retorna solo: id, dirección, tipo, ubicación, zona y clientes
-     * Optimizado para MapaEdificioPanel
-     */
-    #[OA\Get(
-        path: '/api/edificios/{edificio}/panel',
-        tags: ['Edificios'],
-        summary: 'Obtener datos ligeros de edificio para panel de mapa',
-        description: 'Retorna solo la información necesaria para el panel del mapa: dirección, tipo, zona y clientes',
-        security: [['bearerAuth' => []]],
-        parameters: [new OA\Parameter(name: 'edificio', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
-        responses: [
-            new OA\Response(response: 200, description: 'Panel del edificio', content: new OA\JsonContent(ref: '#/components/schemas/PanelEdificioResource')),
-            new OA\Response(response: 401, description: 'No autenticado'),
-            new OA\Response(response: 404, description: 'Edificio no encontrado'),
-        ]
-    )]
-    public function panelMapaEdificio(Edificio $edificio): JsonResponse
-    {
-        // Cargar solo lo necesario: zona y clientes
-        $edificio->load(['zona', 'clientes']);
-
-        return response()->json(new PanelEdificioResource($edificio));
-    }
-
     #[OA\Post(
         path: '/api/edificios',
         tags: ['Edificios'],
@@ -109,26 +84,17 @@ class EdificioController extends Controller
     )]
     public function store(EdificioRequest $request): JsonResponse
     {
-        $data = $request->all();
-        $ubicacion = $data['ubicacion'];
+        $data = $request->validated();
 
         try {
             DB::beginTransaction();
 
-            $inserted = DB::selectOne(
-                'INSERT INTO edificios (direccion_completa, id_zona, tipo, ubicacion, created_at, updated_at)
-                 VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), NOW(), NOW())
-                 RETURNING id',
-                [
-                    $data['direccion_completa'],
-                    $data['id_zona'],
-                    $data['tipo'],
-                    $ubicacion['lng'],
-                    $ubicacion['lat'],
-                ]
-            );
-
-            $edificio = Edificio::findOrFail($inserted->id);
+            $edificio = Edificio::create([
+                'direccion_completa' => $data['direccion_completa'],
+                'id_zona' => $data['id_zona'],
+                'tipo' => $data['tipo'],
+                'ubicacion' => $data['ubicacion'],
+            ]);
 
             DB::commit();
         } catch (\Exception $e) {
@@ -136,7 +102,10 @@ class EdificioController extends Controller
             return response()->json(['error' => 'Error al crear el edificio', 'message' => $e->getMessage()], 500);
         }
 
-        return response()->json(new EdificioResource($edificio->fresh()->load(['zona', 'clientes'])), 201);
+        return response()->json(
+            new EdificioResource($edificio->fresh()->load(['zona', 'clientes'])),
+            201
+        );
     }
 
     #[OA\Put(
@@ -169,26 +138,18 @@ class EdificioController extends Controller
     )]
     public function update(EdificioRequest $request, Edificio $edificio): JsonResponse
     {
-        $data = $request->all();
+        $data = $request->validated();
 
         try {
             DB::beginTransaction();
 
-            $updatable = $request->only([
-                'direccion_completa',
-                'id_zona',
-                'tipo',
-            ]);
+            $updatable = array_filter(
+                $request->only(['direccion_completa', 'id_zona', 'tipo', 'ubicacion']),
+                fn($value) => $value !== null
+            );
 
             if (!empty($updatable)) {
                 $edificio->update($updatable);
-            }
-
-            if (isset($data['ubicacion'])) {
-                DB::statement(
-                    'UPDATE edificios SET ubicacion = ST_SetSRID(ST_MakePoint(?, ?), 4326) WHERE id = ?',
-                    [$data['ubicacion']['lng'], $data['ubicacion']['lat'], $edificio->id]
-                );
             }
 
             DB::commit();
@@ -244,69 +205,48 @@ class EdificioController extends Controller
     /**
      * Adjuntar múltiples clientes a un edificio en una sola operación
      */
-    public function adjuntarVariosClientes(Edificio $edificio): JsonResponse
+    public function adjuntarVariosClientes(Edificio $edificio, Request $request): JsonResponse
     {
+        $clientes = $request->input('clientes', []);
+
+        if (!is_array($clientes) || empty($clientes)) {
+            return response()->json(['error' => 'No se proporcionaron clientes'], 400);
+        }
+
         try {
-            $clientes = request()->input('clientes', []);
+            DB::transaction(function () use ($edificio, $clientes) {
+                $clientesParaAdjuntar = collect($clientes)->mapWithKeys(function ($cliente) {
+                    $pivotData = array_filter([
+                        'planta' => $cliente['planta'] ?? null,
+                        'puerta' => $cliente['puerta'] ?? null,
+                    ], fn($value) => $value !== null && $value !== '');
 
-            if (empty($clientes)) {
-                return response()->json(
-                    ['error' => 'No se proporcionaron clientes'],
-                    400
-                );
-            }
+                    if (($cliente['mode'] ?? null) === 'crear') {
+                        $nuevoCliente = Cliente::create([
+                            'nombre' => $cliente['nombre'] ?? '',
+                            'apellidos' => $cliente['apellidos'] ?? '',
+                            'email' => $cliente['email'] ?? null,
+                            'telefono' => $cliente['telefono'] ?? null,
+                        ]);
 
-            // Usar transacción para garantizar integridad de datos
-            DB::beginTransaction();
+                        return [$nuevoCliente->id => $pivotData];
+                    }
 
-            $syncData = [];
+                    if (($cliente['mode'] ?? null) === 'seleccionar' && !empty($cliente['clienteId'])) {
+                        return [$cliente['clienteId'] => $pivotData];
+                    }
 
-            foreach ($clientes as $cliente) {
-                $mode = $cliente['mode'] ?? null;
-                $planta = $cliente['planta'] ?? null;
-                $puerta = $cliente['puerta'] ?? null;
+                    return [];
+                })->toArray();
 
-                $pivotData = [];
-                if ($planta) {
-                    $pivotData['planta'] = $planta;
+                if (!empty($clientesParaAdjuntar)) {
+                    $edificio->clientes()->syncWithoutDetaching($clientesParaAdjuntar);
                 }
-                if ($puerta) {
-                    $pivotData['puerta'] = $puerta;
-                }
+            });
 
-                if ($mode === 'crear') {
-                    // Crear nuevo cliente
-                    $nuevoCliente = \App\Models\Cliente::create([
-                        'nombre' => $cliente['nombre'] ?? '',
-                        'apellidos' => $cliente['apellidos'] ?? '',
-                        'email' => $cliente['email'] ?? null,
-                        'telefono' => $cliente['telefono'] ?? null,
-                    ]);
-                    $syncData[$nuevoCliente->id] = $pivotData;
-                } elseif ($mode === 'seleccionar' && isset($cliente['clienteId'])) {
-                    // Usar cliente existente
-                    $syncData[$cliente['clienteId']] = $pivotData;
-                }
-            }
-
-            // Adjuntar todos los clientes sin eliminar los existentes
-            if (!empty($syncData)) {
-                $edificio->clientes()->syncWithoutDetaching($syncData);
-            }
-
-            DB::commit();
-
-            return response()->json(
-                new EdificioResource($edificio->load(['zona', 'clientes'])),
-                200
-            );
+            return response()->json(new EdificioResource($edificio->load(['zona', 'clientes'])), 200);
         } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(
-                ['error' => 'Error al adjuntar clientes: ' . $e->getMessage()],
-                500
-            );
+            return response()->json(['error' => 'Error al adjuntar clientes: ' . $e->getMessage()], 500);
         }
     }
 }
-

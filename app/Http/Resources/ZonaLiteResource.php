@@ -9,7 +9,6 @@ class ZonaLiteResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     * Lightweight version without edificios and usuarios relations
      *
      * @return array<string, mixed>
      */
@@ -19,8 +18,6 @@ class ZonaLiteResource extends JsonResource
             'id' => $this->id,
             'nombre' => $this->nombre,
             'area' => $this->area,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

@@ -18,6 +18,7 @@ class Edificio extends Model
         'direccion_completa',
         'id_zona',
         'tipo',
+        'ubicacion',
     ];
 
     /**
@@ -54,24 +55,12 @@ class Edificio extends Model
             ->withPivot('planta', 'puerta');
     }
 
-    /**
-     * Dirección completa con planta y puerta (del primer cliente)
-     */
-    public function getDireccionCompletaConPisoAttribute(): string
+    public function setUbicacionAttribute($value): void
     {
-        $direccion = $this->direccion_completa;
-        
-        // Obtener datos del primer cliente en la relación
-        if ($this->relationLoaded('clientes') && $this->clientes->isNotEmpty()) {
-            $primerCliente = $this->clientes->first();
-            if ($primerCliente->pivot->planta) {
-                $direccion .= ", {$primerCliente->pivot->planta}";
-                if ($primerCliente->pivot->puerta) {
-                    $direccion .= "º{$primerCliente->pivot->puerta}";
-                }
-            }
+        if (is_array($value) && isset($value['lng'], $value['lat'])) {
+            $this->attributes['ubicacion'] = DB::raw(
+                "ST_SetSRID(ST_MakePoint({$value['lng']}, {$value['lat']}), 4326)"
+            );
         }
-        
-        return $direccion;
     }
 }

@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRequest;
+use App\Http\Resources\AuthResponseResource;
+use App\Models\User;
 use OpenApi\Attributes as OA;
 use PHPOpenSourceSaver\JWTAuth\JWTGuard;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -145,11 +148,11 @@ class AuthController extends Controller
         if (!$user) {
             try {
                 // Decodificar el nuevo token para obtener datos del usuario
-                \PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth::setToken($token);
-                $decoded = \PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth::getPayload();
+                JWTAuth::setToken($token);
+                $decoded = JWTAuth::getPayload();
                 $userId = $decoded->get('sub'); // 'sub' es el user_id en JWT
                 
-                $user = \App\Models\User::find($userId);
+                $user = User::find($userId);
                 if (!$user) {
                     throw new \Exception('Usuario no encontrado');
                 }
@@ -161,22 +164,13 @@ class AuthController extends Controller
             }
         }
 
-        return response()->json([
-            'success' => true,
+        return response()->json(new AuthResponseResource((object) [
             'message' => 'Login exitoso',
             'access_token' => $token,
-            'token_type' => 'bearer',
             'expires_in' => $this->guard()->factory()->getTTL() * 60,
-            'user' => [
-                'id' => $user->id,
-                'nombre' => $user->nombre,
-                'apellidos' => $user->apellidos,
-                'email' => $user->email,
-                'rol' => $user->rol,
-                'id_zona' => $user->id_zona,
-            ],
+            'user' => $user,
             'inicio' => $this->getInicioByRole($user->rol),
-        ]);
+        ]));
     }
 
     protected function getInicioByRole(string $rol): string
