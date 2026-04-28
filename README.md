@@ -8,6 +8,8 @@ Lo que hace única a esta API es su integración profunda con **PostgreSQL y la 
 
 Para poner en marcha el proyecto, elige una de las dos opciones disponibles según tu entorno.
 
+---
+
 <h3 align="center">Opción A: Docker (Recomendado)</h3>
 
 <h4 align="center">Requisitos para Opción A</h4>
@@ -45,6 +47,8 @@ Este método es el más limpio, ya que Docker se encarga de configurar PostGIS y
 
    - Swagger: `http://localhost:8000/api/documentation`
    - API raíz: `http://localhost:8000`
+
+---
 
 <h3 align="center">Opción B: Instalación Local / Nativa</h3>
 
@@ -87,6 +91,8 @@ Sigue estos pasos si prefieres ejecutar Laravel de forma nativa mientras usas Do
 
    Acceso: `http://127.0.0.1:8000/api/documentation` (Swagger)
 
+---
+
 <h2 align="center">Modelo de Accesos y Permisos</h2>
 
 La seguridad se gestiona mediante **JWT (JSON Web Tokens)**. El sistema implementa una lógica de roles estricta:
@@ -99,6 +105,8 @@ La seguridad se gestiona mediante **JWT (JSON Web Tokens)**. El sistema implemen
 | **Edificios**     | CRUD          | R (Lectura) | Catálogo de puntos de interés comercial.                 |
 | **Visitas**       | R / D         | C / R / U   | Gestión diaria de actividad comercial.                    |
 | **Estado Visita** | R (Lectura)   | R (Lectura) | Flujo de estados (Pendiente, Éxito, etc).                 |
+
+---
 
 <h2 align="center">Comandos Personalizados</h2>
 
@@ -186,6 +194,8 @@ php artisan retest
 ```bash
 php artisan app:tree
 ```
+
+---
 
 <h2 align="center">Estructura del Sistema </h2>
 
@@ -285,6 +295,16 @@ Estructura del proyecto (filtrada):
         └── ZonaData.php
 ```
 
+---
+
+<h2 align="center">Autor</h2>
+
+- **Alberto Romero Pino**
+- **Email**: albertoromeropino2004@gmail.com
+- **LinkedIn**: [linkedin.com/in/alberto-romero-pino-8aa0a32ba](linkedin.com/in/alberto-romero-pino-8aa0a32ba)
+
+---
+
 <h1 align="center">Soluciones a problemas</h1>
 
 1º Windows estaba sobreponiendose al puerto de postman y no me dejaba hacer un start:complete. Lo que se realiza aqui es para el servicio que ocupa el puerto tirar la base de datos y luego activar el que habia parado para que cambie de puerto
@@ -299,5 +319,3 @@ net stop winnat
 # 3. Volver a iniciar el servicio
 net start winnat
 ```
-
-**Desarrollado por:** Alberto Romero Pino - [GitHub](https://github.com/AlbertoRomeroPino "null")
