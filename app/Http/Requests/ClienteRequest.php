@@ -30,12 +30,12 @@ class ClienteRequest extends FormRequest
                 'nombre' => 'required|string|max:50',
                 'apellidos' => 'required|string|max:100',
                 'email' => [
-                    'required',
+                    'sometimes',
                     'email',
                     'max:100',
                     Rule::unique('clientes', 'email')
                 ],
-                'telefono' => 'required|string|max:15',
+                'telefono' => 'sometimes|string|max:15',
             ];
         }
 
