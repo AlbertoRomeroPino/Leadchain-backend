@@ -28,6 +28,7 @@ class AuthResponseResource extends JsonResource
                 'apellidos' => $this->user->apellidos,
                 'email' => $this->user->email,
                 'rol' => $this->user->rol,
+                'id_zona' => $this->user->id_zona,
             ],
             'inicio' => $this->inicio,
         ];
