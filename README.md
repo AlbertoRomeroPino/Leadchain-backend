@@ -305,6 +305,125 @@ Estructura del proyecto (filtrada):
 
 ---
 
+<h2 align="center"> Diagrama de clases</h2>
+
+```plantuml
+@startuml Leadchain
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #FFFFFF
+skinparam classBorderColor #333333
+
+class User {
+    +id: int
+    +nombre: string
+    +apellidos: string
+    +email: string
+    +password: string
+    +rol: string
+    +id_responsable: int
+    +id_zona: int
+    +created_at: timestamp
+    +updated_at: timestamp
+    --
+    +isAdmin(): bool
+    +isComercial(): bool
+    +responsable(): BelongsTo
+    +subordinados(): HasMany
+    +zona(): BelongsTo
+    +visitas(): HasMany
+}
+
+class Cliente {
+    +id: int
+    +nombre: string
+    +apellidos: string
+    +telefono: string
+    +email: string
+    +created_at: timestamp
+    +updated_at: timestamp
+    --
+    +getNombreCompletoAttribute(): string
+    +edificios(): BelongsToMany
+    +visitas(): HasMany
+}
+
+class Edificio {
+    +id: int
+    +direccion_completa: string
+    +id_zona: int
+    +tipo: string
+    +ubicacion: Point
+    +created_at: timestamp
+    +updated_at: timestamp
+    --
+    +getUbicacionAttribute(): array
+    +zona(): BelongsTo
+    +clientes(): BelongsToMany
+}
+
+class ClienteEdificio {
+    +cliente_id: int
+    +edificio_id: int
+    +planta: string
+    +puerta: string
+}
+
+class Visita {
+    +id: int
+    +id_usuario: int
+    +id_cliente: int
+    +fecha_hora: datetime
+    +id_estado: int
+    +observaciones: text
+    +created_at: timestamp
+    +updated_at: timestamp
+    --
+    +usuario(): BelongsTo
+    +cliente(): BelongsTo
+    +estado(): BelongsTo
+}
+
+class Zona {
+    +id: int
+    +nombre: string
+    +area: Polygon
+    +created_at: timestamp
+    +updated_at: timestamp
+    --
+    +getAreaAttribute(): array
+    +usuarios(): HasMany
+    +edificios(): HasMany
+}
+
+class EstadoVisita {
+    +id: int
+    +etiqueta: string
+    +color_hex: string
+    +created_at: timestamp
+    +updated_at: timestamp
+    --
+    +visitas(): HasMany
+}
+
+User "1" -- "0..*" User : responsable de
+User "1" -- "0..*" Visita : realiza
+User "*" -- "1" Zona : asignado a
+Cliente "1" -- "*" ClienteEdificio : tiene
+Edificio "1" -- "*" ClienteEdificio : tiene
+ClienteEdificio "*" -- "*" Cliente : pertenece a
+ClienteEdificio "*" -- "*" Edificio : pertenece a
+Cliente "1" -- "*" Visita : recibe
+Edificio "*" -- "1" Zona : ubicado en
+Visita "*" -- "1" EstadoVisita : tiene estado
+Zona "1" -- "*" User : contiene usuarios
+Zona "1" -- "*" Edificio : contiene edificios
+
+@enduml
+```
+
+---
+
 <h1 align="center">Soluciones a problemas</h1>
 
 1º Windows estaba sobreponiendose al puerto de postman y no me dejaba hacer un start:complete. Lo que se realiza aqui es para el servicio que ocupa el puerto tirar la base de datos y luego activar el que habia parado para que cambie de puerto
