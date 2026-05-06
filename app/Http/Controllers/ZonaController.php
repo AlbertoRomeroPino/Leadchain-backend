@@ -93,6 +93,7 @@ class ZonaController extends Controller
             new OA\Response(response: 200, description: 'Zona actualizada', content: new OA\JsonContent(ref: '#/components/schemas/ZonaResource')),
             new OA\Response(response: 401, description: 'No autenticado'),
             new OA\Response(response: 403, description: 'No autorizado por rol'),
+            new OA\Response(response: 409, description: 'Conflicto: la zona contiene edificios y no puede ser modificada'),
             new OA\Response(response: 422, description: 'Error de validación'),
         ]
     )]
@@ -107,11 +108,26 @@ class ZonaController extends Controller
             new OA\Response(response: 200, description: 'Zona actualizada', content: new OA\JsonContent(ref: '#/components/schemas/ZonaResource')),
             new OA\Response(response: 401, description: 'No autenticado'),
             new OA\Response(response: 403, description: 'No autorizado por rol'),
+            new OA\Response(response: 409, description: 'Conflicto: la zona contiene edificios y no puede ser modificada'),
             new OA\Response(response: 422, description: 'Error de validación'),
         ]
     )]
     public function update(ZonaRequest $request, Zona $zona): JsonResponse
     {
+        // Obtener el área actual de la zona
+        $areaActual = $zona->area;
+        
+        // Verificar si el área realmente cambió (no solo si se envía)
+        $areaFueModificada = isset($request['area']) && $request['area'] !== $areaActual;
+        
+        // Si intenta modificar el área y la zona tiene edificios, rechazar
+        if ($areaFueModificada && $zona->edificios()->exists()) {
+            return response()->json([
+                'error' => 'No se puede modificar el área de una zona que contiene edificios',
+                'message' => 'Elimina o reasigna los edificios antes de modificar la zona'
+            ], 409);
+        }
+
         if (isset($request['nombre'])) {
             $zona->update(['nombre' => $request['nombre']]);
         }

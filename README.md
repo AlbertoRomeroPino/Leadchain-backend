@@ -309,43 +309,36 @@ Estructura del proyecto (filtrada):
 
 ```plantuml
 @startuml Leadchain
+' --- Ajustes de Optimización de Espacio ---
 !theme plain
+left to right direction
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 50
+skinparam classFontSize 11
+skinparam classAttributeFontSize 10
+
 skinparam backgroundColor #FEFEFE
 skinparam classBackgroundColor #FFFFFF
 skinparam classBorderColor #333333
+
+' --- Definición de Clases ---
 
 class User {
     +id: int
     +nombre: string
     +apellidos: string
     +email: string
-    +password: string
     +rol: string
-    +id_responsable: int
-    +id_zona: int
-    +created_at: timestamp
-    +updated_at: timestamp
     --
     +isAdmin(): bool
     +isComercial(): bool
-    +responsable(): BelongsTo
-    +subordinados(): HasMany
-    +zona(): BelongsTo
-    +visitas(): HasMany
 }
 
-class Cliente {
+class Zona {
     +id: int
     +nombre: string
-    +apellidos: string
-    +telefono: string
-    +email: string
-    +created_at: timestamp
-    +updated_at: timestamp
-    --
-    +getNombreCompletoAttribute(): string
-    +edificios(): BelongsToMany
-    +visitas(): HasMany
+    +area: Polygon
 }
 
 class Edificio {
@@ -354,15 +347,17 @@ class Edificio {
     +id_zona: int
     +tipo: string
     +ubicacion: Point
-    +created_at: timestamp
-    +updated_at: timestamp
-    --
-    +getUbicacionAttribute(): array
-    +zona(): BelongsTo
-    +clientes(): BelongsToMany
 }
 
-class ClienteEdificio {
+class Cliente {
+    +id: int
+    +nombre: string
+    +apellidos: string
+    +telefono: string
+    +email: string
+}
+
+class ClienteEdificio <<pivot>> {
     +cliente_id: int
     +edificio_id: int
     +planta: string
@@ -376,48 +371,27 @@ class Visita {
     +fecha_hora: datetime
     +id_estado: int
     +observaciones: text
-    +created_at: timestamp
-    +updated_at: timestamp
-    --
-    +usuario(): BelongsTo
-    +cliente(): BelongsTo
-    +estado(): BelongsTo
-}
-
-class Zona {
-    +id: int
-    +nombre: string
-    +area: Polygon
-    +created_at: timestamp
-    +updated_at: timestamp
-    --
-    +getAreaAttribute(): array
-    +usuarios(): HasMany
-    +edificios(): HasMany
 }
 
 class EstadoVisita {
     +id: int
     +etiqueta: string
     +color_hex: string
-    +created_at: timestamp
-    +updated_at: timestamp
-    --
-    +visitas(): HasMany
 }
 
+' --- Relaciones Optimizadas ---
+
+Zona "1" -- "*" User : contiene
+Zona "1" -- "*" Edificio : contiene
+
 User "1" -- "0..*" User : responsable de
-User "1" -- "0..*" Visita : realiza
-User "*" -- "1" Zona : asignado a
-Cliente "1" -- "*" ClienteEdificio : tiene
-Edificio "1" -- "*" ClienteEdificio : tiene
-ClienteEdificio "*" -- "*" Cliente : pertenece a
-ClienteEdificio "*" -- "*" Edificio : pertenece a
+User "1" -- "*" Visita : realiza
+
+Edificio "1" *-- "*" ClienteEdificio
+Cliente "1" *-- "*" ClienteEdificio
+
 Cliente "1" -- "*" Visita : recibe
-Edificio "*" -- "1" Zona : ubicado en
 Visita "*" -- "1" EstadoVisita : tiene estado
-Zona "1" -- "*" User : contiene usuarios
-Zona "1" -- "*" Edificio : contiene edificios
 
 @enduml
 ```
