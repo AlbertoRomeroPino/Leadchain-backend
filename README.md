@@ -38,7 +38,7 @@
 
 ---
 
-<h2 align="center">📌 Acerca del Proyecto</h2>
+<h2 align="center">Acerca del Proyecto</h2>
 
 **LeadChain** es una solución backend RESTful de alto rendimiento diseñada específicamente para la gestión inteligente de carteras de clientes, edificios y visitas comerciales en la ciudad de Córdoba.
 
@@ -51,7 +51,7 @@ Lo que hace única a esta API es su integración profunda con **PostgreSQL y la 
 * **Seguridad y Control de Acceso (RBAC):** Sistema robusto de autenticación mediante JWT (*JSON Web Tokens*) acoplado a un sistema de *middlewares* para la protección y restricción de rutas según el rol de usuario (`Administrador` vs `Comercial`).
 * **Documentación Viva:** Especificación completa de los contratos de la API mediante **Swagger / OpenAPI**, permitiendo la auditoría y prueba interactiva de los *endpoints* en entornos de desarrollo.
 
-<h2 align="center" id="despliegue"> ⚙️ Guía de Despliegue </h2>
+<h2 align="center" id="despliegue">Guía de Despliegue </h2>
 
 Para poner en marcha el proyecto, dispones de dos alternativas. Se recomienda encarecidamente el uso del entorno contenerizado para evitar conflictos de versiones y configuraciones manuales complejas del motor espacial.
 
@@ -116,9 +116,8 @@ docker compose exec app php artisan db:seed --force
 4. Acceso a los Servicios:
    Una vez finalizado el proceso, la API estará operativa en los siguientes endpoints:
 
-📄 Documentación (Swagger): `http://localhost:8000/api/documentation`
-
-🔌 API Raíz: `http://localhost:8000/api`
+> **Documentación (Swagger):** `http://127.0.0.1:8000/api/documentation`
+> **API Raíz:** `http://127.0.0.1:8000/api`
 
 ---
 
@@ -168,8 +167,8 @@ php artisan start:hybrid
 **4. Acceso a los Servicios:**
 El servidor local quedará en escucha activa. Puedes acceder a la plataforma a través de:
 
-* 📄 **Documentación (Swagger):** `http://127.0.0.1:8000/api/documentation`
-* 🔌 **API Raíz:** `http://127.0.0.1:8000/api`
+> **Documentación (Swagger):** `http://127.0.0.1:8000/api/documentation`
+> **API Raíz:** `http://127.0.0.1:8000/api`
 
 ---
 
