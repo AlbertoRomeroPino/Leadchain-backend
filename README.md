@@ -93,14 +93,14 @@ php artisan jwt:secret
    Una vez configurado el entorno, dispones de dos alternativas para levantar la infraestructura y la base de datos espacial:
 
 - Alternativa 1: Automatizada (Recomendada)
-Utiliza el comando de consola personalizado que orquesta todo el proceso de inicialización de una sola vez:
+  Utiliza el comando de consola personalizado que orquesta todo el proceso de inicialización de una sola vez:
 
 ```bash
 php artisan start:complete
 ```
 
 - Alternativa 2: Manual paso a paso
-Si prefieres tener control absoluto sobre cada fase del despliegue:
+  Si prefieres tener control absoluto sobre cada fase del despliegue:
 
 ```bash
 # 1. Construye las imágenes y levanta los contenedores en segundo plano
@@ -176,14 +176,15 @@ El servidor local quedará en escucha activa. Puedes acceder a la plataforma a t
 
 La seguridad de la API y el control de sesiones están protegidos mediante **JWT (JSON Web Tokens)**. El sistema implementa una estricta arquitectura de control de acceso basado en roles (*Role-Based Access Control*) a través de *middlewares* de Laravel, garantizando que cada perfil interactúe únicamente con los recursos que le corresponden:
 
-| Recurso | Administrador | Comercial | Notas de Privacidad y Lógica de Negocio |
-| :--- | :---: | :---: | :--- |
-| **Clientes** | CRUD | R (Lectura) | Los comerciales consumen su cartera asignada, pero la eliminación de registros está restringida. |
-| **Zonas** | CRUD | R (Lectura) | La configuración y delimitación geográfica está reservada exclusivamente a gerencia. |
-| **Usuarios** | CRUD | - | Contiene datos sensibles de la plantilla. Acceso totalmente denegado para comerciales. |
-| **Edificios** | CRUD | R (Lectura) | Catálogo unificado de puntos de interés; los comerciales lo usan para geolocalizar sus objetivos. |
-| **Visitas** | R / D | C / R / U | El comercial crea y gestiona su actividad diaria; el administrador audita o elimina en caso de error. |
-| **Estado Visita** | R (Lectura) | R (Lectura) | Catálogo inmutable del flujo de ventas (Pendiente, Realizada, Fallida, etc.). |
+| Recurso                 | Administrador |  Comercial  | Notas de Privacidad y Lógica de Negocio                                                              |
+| :---------------------- | :-----------: | :---------: | :---------------------------------------------------------------------------------------------------- |
+| **Clientes**      |     CRUD     | R (Lectura) | Los comerciales consumen su cartera asignada, pero la eliminación de registros está restringida.    |
+| **Zonas**         |     CRUD     | R (Lectura) | La configuración y delimitación geográfica está reservada exclusivamente a gerencia.              |
+| **Usuarios**      |     CRUD     |      -      | Contiene datos sensibles de la plantilla. Acceso totalmente denegado para comerciales.                |
+| **Edificios**     |     CRUD     | R (Lectura) | Catálogo unificado de puntos de interés; los comerciales lo usan para geolocalizar sus objetivos.   |
+| **Visitas**       |     R / D     |  C / R / U  | El comercial crea y gestiona su actividad diaria; el administrador audita o elimina en caso de error. |
+| **Estado Visita** |  R (Lectura)  | R (Lectura) | Catálogo inmutable del flujo de ventas (Pendiente, Realizada, Fallida, etc.).                        |
+
 ---
 
 <h2 align="center" id="comandos-artisan"> Comandos Personalizados (Artisan) </h2>
@@ -197,15 +198,17 @@ Este proyecto extiende la consola nativa de Laravel con comandos desarrollados a
 **Propósito:** Automatizar el despliegue del stack completo (Aplicación + Base de Datos espacial) utilizando Docker Compose con un solo comando.
 
 **Flujo de ejecución:**
+
 1. Ejecuta `docker compose up -d --build` para compilar imágenes y levantar la infraestructura en segundo plano.
 2. Implementa un sistema de espera para garantizar que el contenedor principal esté inicializado (dependencias instaladas y CLI disponible).
 3. Inyecta y ejecuta `php artisan migrate --force` dentro del contenedor para construir el esquema relacional.
 4. Lanza `php artisan db:seed --force` para poblar las tablas con catálogos, geometrías y usuarios de prueba.
 
-**Casos de uso:** 
+**Casos de uso:**
 Ideal para el primer despliegue del proyecto en un entorno limpio (Opción A de instalación) o para realizar un reseteo total tras haber destruido los volúmenes con `docker compose down -v`.
 
 **Ejemplo de uso:**
+
 ```bash
 php artisan start:complete
 ```
@@ -217,6 +220,7 @@ php artisan start:complete
 **Propósito:** Orquestar un entorno de desarrollo mixto, delegando la capa de base de datos geoespacial a Docker mientras la API REST se ejecuta nativamente en la máquina local del desarrollador.
 
 **Flujo de ejecución:**
+
 1. Aprovisiona exclusivamente el servicio de persistencia (`docker compose up -d db`), omitiendo el contenedor de la aplicación.
 2. Implementa un sondeo activo (*healthcheck*) hasta confirmar que PostgreSQL está listo para aceptar conexiones.
 3. Asegura el enrutamiento local forzando temporalmente la variable `DB_HOST=127.0.0.1` para que el framework pueda conectar.
@@ -225,32 +229,36 @@ php artisan start:complete
 6. Invalida y purga las cachés de configuración del framework (`php artisan optimize:clear`).
 7. Levanta el servidor embebido de PHP, escuchando peticiones en `http://127.0.0.1:8000`.
 
-**Ventajas y Casos de Uso:** 
+**Ventajas y Casos de Uso:**
 Es la opción recomendada para el desarrollo diario (*DX*). Ofrece un rendimiento superior al no tener que virtualizar el entorno de PHP, facilita el uso de depuradores (*debuggers*) como Xdebug, y permite un acceso directo a los *logs* sin necesidad de inspeccionar contenedores.
 
 **Ejemplo de uso:**
+
 ```bash
 php artisan start:hybrid
 ```
----
 
+---
 
 ### 🧪 3. `php artisan retest`
 
 **Propósito:** Automatizar el ciclo completo de validación del código, garantizando un entorno de base de datos limpio y determinista antes de la ejecución de la suite de pruebas.
 
 **Flujo de ejecución:**
+
 1. Destruye y reconstruye todo el esquema relacional de la base de datos desde cero mediante `php artisan migrate:refresh`, eliminando posibles inconsistencias por datos residuales.
 2. Puebla las tablas con los catálogos necesarios para los tests utilizando `php artisan db:seed`.
 3. Lanza la suite completa de pruebas (tanto Unitarias como de Integración/Feature) a través de `php artisan test`, evaluando la lógica de negocio, los *endpoints* de la API y las consultas espaciales.
 
-**Casos de Uso y Ventajas:** 
+**Casos de Uso y Ventajas:**
 Funciona como una herramienta de Integración Continua (CI) a nivel local. Es de uso obligatorio antes de realizar *commits* críticos o integrar nuevas ramas (*Merge/Pull Requests*) para asegurar la estabilidad del sistema y prevenir regresiones en el código.
 
 **Ejemplo de uso:**
+
 ```bash
 php artisan retest
 ```
+
 ---
 
 ### 📂 4. `php artisan app:tree`
@@ -258,6 +266,7 @@ php artisan retest
 **Propósito:** Muestra la estructura de directorios y archivos del proyecto en forma de árbol visual, filtrando elementos del framework para centrarse únicamente en tu código.
 
 **Qué hace exactamente:**
+
 * Ejecuta una función recursiva que escanea desde la raíz del proyecto (`base_path()`).
 * Dibuja conectores visuales (`├──` y `└──`) para representar la jerarquía de las carpetas.
 * **Aplica una lista negra de exclusión de carpetas:** Oculta automáticamente directorios que generan "ruido" como `bootstrap`, `public`, `storage`, `vendor`, `.git`, `test`, `Providers` y `factories`.
@@ -266,6 +275,7 @@ php artisan retest
 **Cuándo usarlo:** Cuando necesitas visualizar o copiar la arquitectura limpia de los archivos que tú has programado, sin que la terminal se inunde con las dependencias y la estructura estándar de Laravel.
 
 **Ejemplo de uso:**
+
 ```bash
 php artisan api:tree
 ```
@@ -298,6 +308,9 @@ Estructura del proyecto (filtrada):
 ---
 
 <h2 align="center"> Diagrama de clases</h2>
+
+
+![diagrama](public/Diagrama%20de%20clases.svg)
 
 ```plantuml
 @startuml Leadchain
