@@ -1,198 +1,274 @@
-<h1 align="center">LeadChain API - Backend Córdoba</h1>
+<h1 align="center">
+  <a href="https://github.com/AlbertoRomeroPino/Leadchain-backend" style="text-decoration: none; color: inherit;">LeadChain API - Backend</a>
+</h1>
+
+<h3 align="center">API REST de alto rendimiento para la gestión de rutas comerciales, edificios, clientes y visitas técnicas geolocalizadas.</h3>
+
+<p align="center">
+  <a href="https://github.com/AlbertoRomeroPino/Leadchain-backend">
+    <img alt="Backend Repo" src="https://img.shields.io/badge/Repositorio-Backend-000000?style=for-the-badge&logo=github&logoColor=white">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/AlbertoRomeroPino/Leadchain-frontend">
+    <img alt="Frontend Repo" src="https://img.shields.io/badge/Repositorio-Frontend-E34F26?style=for-the-badge&logo=github&logoColor=white">
+  </a>
+  <a href="https://github.com/AlbertoRomeroPino/Leadchain.git">
+    <img alt="Docker Repo" src="https://img.shields.io/badge/Repositorio-Docker-blue?style=for-the-badge&logo=github&logoColor=white">
+  </a>
+</p>
+
+<h4 align="center">Frameworks, lenguajes y herramientas usadas</h4>
+
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=laravel,php,postgres,docker,postman,github,markdown&theme=dark" height="50" />
+</div>
+
+<h4 align="center">Base de Datos Geoespacial y Documentación</h4>
+
+<p align="center"> 
+  <a href="https://postgis.net/">
+    <img alt="PostGIS" src="https://img.shields.io/badge/PostGIS-152240?style=for-the-badge&logo=postgresql&logoColor=white">
+  </a>
+  <a href="https://swagger.io/">
+    <img alt="Swagger" src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black">
+  </a>
+</p>
+
+---
+
+<h2 align="center">📌 Acerca del Proyecto</h2>
 
 **LeadChain** es una solución backend RESTful de alto rendimiento diseñada específicamente para la gestión inteligente de carteras de clientes, edificios y visitas comerciales en la ciudad de Córdoba.
 
 Lo que hace única a esta API es su integración profunda con **PostgreSQL y la extensión PostGIS**. Esta arquitectura permite que LeadChain no solo almacene datos, sino que comprenda la ubicación espacial: puede validar si un comercial está dentro de su zona asignada, ubicar edificios en un mapa con precisión milimétrica y optimizar rutas de venta basadas en coordenadas geográficas reales.
 
-<h2 align="center">Guía de Despliegue</h2>
+`<H3 align="center">`Características Principales `</H3>`
 
-Para poner en marcha el proyecto, elige una de las dos opciones disponibles según tu entorno.
+* **Procesamiento Geoespacial Avanzado:** Almacenamiento nativo de coordenadas y polígonos, permitiendo la ejecución de consultas espaciales complejas desde el servidor de forma optimizada.
+* **Arquitectura RESTful:** Diseño de *endpoints* semánticos y estandarizados para la orquestación del CRUD de entidades clave (Comerciales, Zonas, Edificios, Clientes y Visitas).
+* **Seguridad y Control de Acceso (RBAC):** Sistema robusto de autenticación mediante JWT (*JSON Web Tokens*) acoplado a un sistema de *middlewares* para la protección y restricción de rutas según el rol de usuario (`Administrador` vs `Comercial`).
+* **Documentación Viva:** Especificación completa de los contratos de la API mediante **Swagger / OpenAPI**, permitiendo la auditoría y prueba interactiva de los *endpoints* en entornos de desarrollo.
 
----
+<h2 align="center" id="despliegue"> ⚙️ Guía de Despliegue </h2>
 
-<h3 align="center">Opción A: Docker (Recomendado)</h3>
-
-<h4 align="center">Requisitos para Opción A</h4>
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/): Esencial para la contenerización. Docker permite que la API y la base de datos corran en un entorno idéntico al de producción.
-- [Git](https://git-scm.com/): Para la clonación y gestión del código fuente.
-
-<h4 align="center">Pasos de Instalación con Docker</h4>
-
-Este método es el más limpio, ya que Docker se encarga de configurar PostGIS y PHP por ti de forma totalmente aislada.
-
-1. **Clonar el repositorio:**
-
-   ```bash
-   git clone https://github.com/AlbertoRomeroPino/Leadchain-backend.git
-   cd leadchain-backend
-   ```
-2. **Levantar los contenedores con un comando:**
-   Aqui puedes hacer 2 opciones:
-
-   ```bash
-   composer install
-   php artisan start:complete
-
-   -------------------------------------------------------------------
-
-   docker compose up -d --build
-   # para las migraciones tienes que pararte un poco tras ejecutar el --build o te dara fallo
-   docker compose exec -T app php artisan migrate --force
-   docker compose exec -T app php artisan db:seed --force
-   ```
-
-   Este comando se encarga de todo: construye imágenes, levanta contenedores, ejecuta migraciones y carga datos iniciales.
-3. **Acceso a la API:**
-
-   - Swagger: `http://localhost:8000/api/documentation`
-   - API raíz: `http://localhost:8000`
+Para poner en marcha el proyecto, dispones de dos alternativas. Se recomienda encarecidamente el uso del entorno contenerizado para evitar conflictos de versiones y configuraciones manuales complejas del motor espacial.
 
 ---
 
-<h3 align="center">Opción B: Instalación Local / Nativa</h3>
+<h3 align="center"> Opción A: Entorno Dockerizado (Recomendado) </h3>
 
-<h4 align="center">Requisitos para Opción B</h4>
+Este método es el más limpio y seguro. Docker se encarga de aprovisionar y enlazar los contenedores de PHP, Nginx y la base de datos PostgreSQL con PostGIS de forma totalmente aislada.
 
-- **PHP 8.2 o superior**: Motor del lenguaje. Asegúrate de que en tu `php.ini` estén activas las extensiones `extension=sodium` (cifrado de tokens) y `extension=pdo_pgsql` (comunicación con PostgreSQL dockerizado).
-- [Composer](https://getcomposer.org/): Gestor de dependencias de PHP.
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/): Solo para dockerizar la BD (PostgreSQL + PostGIS). Laravel corre local.
+<h4 align="center">Requisitos Previos</h4>
 
-<h4 align="center">Pasos de Instalación Local</h4>
+* 🐳 [**Docker Desktop**](https://www.docker.com/products/docker-desktop/): Esencial para la orquestación.
+* 🐙 [**Git**](https://git-scm.com/): Para la clonación del código fuente.
 
-Sigue estos pasos si prefieres ejecutar Laravel de forma nativa mientras usas Docker únicamente para la base de datos (Modo Híbrido).
+<h4 align="center">Pasos de Instalación</h4>
 
-1. **Preparar el código:**
+**1. Clonar el repositorio y preparar el entorno:**
+Descarga el código y crea tu archivo de variables de entorno a partir del ejemplo.
 
-   ```bash
-   git clone https://github.com/AlbertoRomeroPino/Leadchain-backend.git
-   cd leadchain-backend
-   ```
-2. **Instalar las dependencias y configurar entorno:**
+```bash
+git clone https://github.com/AlbertoRomeroPino/Leadchain-backend.git
 
-   ```bash
-   # Instalar librerías de Laravel
-   composer install
+cd leadchain-backend
 
-   # Configurar archivo de entorno
-   cp .env.example .env
+cp .env.example .env
+```
 
-   # Generar claves de seguridad
-   php artisan key:generate
-   php artisan jwt:secret
-   ```
-3. **Iniciar desarrollo con un comando:**
+2. Instalar dependencias y generar claves:
+   Ejecuta estos comandos en tu terminal local para instalar los paquetes y generar las firmas de seguridad criptográficas. Esto insertará las claves directamente en tu archivo .env local para que Docker las detecte.
 
-   ```bash
-   php artisan start:hybrid
-   ```
+```bash
+composer install
 
-   Este comando levanta la BD en Docker, ejecuta migraciones, seeders y arranca el servidor local automáticamente.
+php artisan key:generate
+php artisan jwt:secret
+```
 
-   Acceso: `http://127.0.0.1:8000/api/documentation` (Swagger)
+3. Despliegue e Inicialización:
+   Una vez configurado el entorno, dispones de dos alternativas para levantar la infraestructura y la base de datos espacial:
+
+- Alternativa 1: Automatizada (Recomendada)
+Utiliza el comando de consola personalizado que orquesta todo el proceso de inicialización de una sola vez:
+
+```bash
+php artisan start:complete
+```
+
+- Alternativa 2: Manual paso a paso
+Si prefieres tener control absoluto sobre cada fase del despliegue:
+
+```bash
+# 1. Construye las imágenes y levanta los contenedores en segundo plano
+docker compose up -d --build
+
+# ⚠️ IMPORTANTE: Espera ~10 segundos a que PostGIS esté listo para aceptar conexiones
+
+# 2. Ejecuta las migraciones y la carga de datos iniciales dentro del contenedor
+docker compose exec app php artisan migrate --force
+docker compose exec app php artisan db:seed --force
+```
+
+4. Acceso a los Servicios:
+   Una vez finalizado el proceso, la API estará operativa en los siguientes endpoints:
+
+📄 Documentación (Swagger): `http://localhost:8000/api/documentation`
+
+🔌 API Raíz: `http://localhost:8000/api`
 
 ---
 
-<h2 align="center">Modelo de Accesos y Permisos</h2>
+<h3 align="center"> Opción B: Entorno Híbrido (Laravel Local + DB Dockerizada) </h3>
 
-La seguridad se gestiona mediante **JWT (JSON Web Tokens)**. El sistema implementa una lógica de roles estricta:
+Sigue estos pasos si prefieres ejecutar el servidor embebido de Laravel de forma nativa en tu máquina, delegando únicamente el motor de base de datos geoespacial a Docker.
 
-| Recurso                 | Administrador | Comercial   | Notas de Privacidad                                        |
-| :---------------------- | :------------ | :---------- | :--------------------------------------------------------- |
-| **Clientes**      | CRUD          | R (Lectura) | Los comerciales ven sus clientes pero no pueden borrarlos. |
-| **Zonas**         | CRUD          | R (Lectura) | Gestión geográfica reservada a gerencia.                 |
-| **Usuarios**      | CRUD          | -           | Datos de empleados privados.                               |
-| **Edificios**     | CRUD          | R (Lectura) | Catálogo de puntos de interés comercial.                 |
-| **Visitas**       | R / D         | C / R / U   | Gestión diaria de actividad comercial.                    |
-| **Estado Visita** | R (Lectura)   | R (Lectura) | Flujo de estados (Pendiente, Éxito, etc).                 |
+<h4 align="center">Requisitos Previos</h4>
+
+* 🐘 **PHP 8.2 o superior:** Asegúrate de habilitar en tu archivo `php.ini` las extensiones `extension=sodium` (necesaria para el cifrado de tokens) y `extension=pdo_pgsql` (para la comunicación con PostgreSQL).
+* 📦 [**Composer**](https://getcomposer.org/): Gestor de dependencias de PHP.
+* 🐳 [**Docker Desktop**](https://www.docker.com/products/docker-desktop/): Necesario para contenerizar PostgreSQL y PostGIS.
+* 🐙 [**Git**](https://git-scm.com/): Para la clonación del código fuente.
+
+<h4 align="center">Pasos de Instalación</h4>
+
+**1. Clonar el repositorio:**
+
+```bash
+git clone https://github.com/AlbertoRomeroPino/Leadchain-backend.git
+
+cd leadchain-backend
+```
+
+**2. Preparar el entorno y generar claves:**
+Instala las dependencias y prepara tu archivo de configuración con las claves criptográficas necesarias para la seguridad del proyecto:
+
+```bash
+# Configurar archivo de variables de entorno
+cp .env.example .env
+
+# Instalar librerías del framework
+composer install
+
+# Generar claves criptográficas (App y JWT)
+php artisan key:generate
+php artisan jwt:secret
+```
+
+**3. Inicialización Híbrida Automatizada:**
+Para simplificar el despliegue de este entorno mixto, puedes utilizar el siguiente comando personalizado. Este *script* levanta el contenedor de la base de datos en segundo plano, ejecuta las migraciones/seeders y arranca el servidor de desarrollo local automáticamente:
+
+```bash
+php artisan start:hybrid
+```
+
+**4. Acceso a los Servicios:**
+El servidor local quedará en escucha activa. Puedes acceder a la plataforma a través de:
+
+* 📄 **Documentación (Swagger):** `http://127.0.0.1:8000/api/documentation`
+* 🔌 **API Raíz:** `http://127.0.0.1:8000/api`
 
 ---
 
-<h2 align="center">Comandos Personalizados</h2>
+<h2 align="center" id="modelo-accesos">Modelo de Accesos y Permisos (RBAC) </h2>
 
-Este proyecto incluye cuatro comandos Artisan customizados para facilitar el desarrollo y despliegue:
+La seguridad de la API y el control de sesiones están protegidos mediante **JWT (JSON Web Tokens)**. El sistema implementa una estricta arquitectura de control de acceso basado en roles (*Role-Based Access Control*) a través de *middlewares* de Laravel, garantizando que cada perfil interactúe únicamente con los recursos que le corresponden:
 
-<h3 align="center"> 1. php artisan start:complete </h3>
+| Recurso | Administrador | Comercial | Notas de Privacidad y Lógica de Negocio |
+| :--- | :---: | :---: | :--- |
+| **Clientes** | CRUD | R (Lectura) | Los comerciales consumen su cartera asignada, pero la eliminación de registros está restringida. |
+| **Zonas** | CRUD | R (Lectura) | La configuración y delimitación geográfica está reservada exclusivamente a gerencia. |
+| **Usuarios** | CRUD | - | Contiene datos sensibles de la plantilla. Acceso totalmente denegado para comerciales. |
+| **Edificios** | CRUD | R (Lectura) | Catálogo unificado de puntos de interés; los comerciales lo usan para geolocalizar sus objetivos. |
+| **Visitas** | R / D | C / R / U | El comercial crea y gestiona su actividad diaria; el administrador audita o elimina en caso de error. |
+| **Estado Visita** | R (Lectura) | R (Lectura) | Catálogo inmutable del flujo de ventas (Pendiente, Realizada, Fallida, etc.). |
+---
 
-**Propósito:** Levanta el stack completo (app + BD) usando Docker Compose.
+<h2 align="center" id="comandos-artisan"> Comandos Personalizados (Artisan) </h2>
 
-**Qué hace:**
+Este proyecto extiende la consola nativa de Laravel con comandos desarrollados a medida. Su objetivo es automatizar el ciclo de vida del despliegue, gestionar los entornos (Docker/Híbrido) y facilitar la evaluación del proyecto.
 
-- Ejecuta `docker compose up -d --build` para construir y levantar todos los contenedores.
-- Espera a que el contenedor app esté completamente inicializado (artisan listo, vendor instalado).
-- Ejecuta automáticamente `php artisan migrate --force` dentro del contenedor.
-- Ejecuta automáticamente `php artisan db:seed --force` para cargar datos iniciales.
+---
 
-**Cuándo usarlo:** Primera vez que necesites levantar el proyecto completo en Docker o tras un `docker compose down -v`.
+### 🐳 1. `php artisan start:complete`
 
-**Ejemplo:**
+**Propósito:** Automatizar el despliegue del stack completo (Aplicación + Base de Datos espacial) utilizando Docker Compose con un solo comando.
 
+**Flujo de ejecución:**
+1. Ejecuta `docker compose up -d --build` para compilar imágenes y levantar la infraestructura en segundo plano.
+2. Implementa un sistema de espera para garantizar que el contenedor principal esté inicializado (dependencias instaladas y CLI disponible).
+3. Inyecta y ejecuta `php artisan migrate --force` dentro del contenedor para construir el esquema relacional.
+4. Lanza `php artisan db:seed --force` para poblar las tablas con catálogos, geometrías y usuarios de prueba.
+
+**Casos de uso:** 
+Ideal para el primer despliegue del proyecto en un entorno limpio (Opción A de instalación) o para realizar un reseteo total tras haber destruido los volúmenes con `docker compose down -v`.
+
+**Ejemplo de uso:**
 ```bash
 php artisan start:complete
 ```
 
 ---
 
-<h3 align="center"> 2. php artisan start:hybrid </h3>
+### ⚡ 2. `php artisan start:hybrid`
 
-**Propósito:** Arranca la BD en Docker y la API en tu máquina local (Modo Híbrido).
+**Propósito:** Orquestar un entorno de desarrollo mixto, delegando la capa de base de datos geoespacial a Docker mientras la API REST se ejecuta nativamente en la máquina local del desarrollador.
 
-**Qué hace:**
+**Flujo de ejecución:**
+1. Aprovisiona exclusivamente el servicio de persistencia (`docker compose up -d db`), omitiendo el contenedor de la aplicación.
+2. Implementa un sondeo activo (*healthcheck*) hasta confirmar que PostgreSQL está listo para aceptar conexiones.
+3. Asegura el enrutamiento local forzando temporalmente la variable `DB_HOST=127.0.0.1` para que el framework pueda conectar.
+4. Aplica las migraciones del esquema (`php artisan migrate --force`) utilizando un sistema de reintentos automáticos para tolerar latencias durante el arranque del motor de la BD.
+5. Ejecuta la carga de datos maestros, geometrías y usuarios (`php artisan db:seed --force`).
+6. Invalida y purga las cachés de configuración del framework (`php artisan optimize:clear`).
+7. Levanta el servidor embebido de PHP, escuchando peticiones en `http://127.0.0.1:8000`.
 
-- Levanta solo el contenedor PostgreSQL con `docker compose up -d db`.
-- Espera a que PostgreSQL esté completamente listo y funcional.
-- Configura automáticamente `DB_HOST=127.0.0.1` para que Laravel local pueda conectar.
-- Ejecuta `php artisan migrate --force` con reintentos automáticos (tolera fallos transitorios).
-- Ejecuta `php artisan db:seed --force` para cargar datos iniciales.
-- Limpia cachés con `php artisan optimize:clear`.
-- Arranca el servidor local en `http://127.0.0.1:8000`.
+**Ventajas y Casos de Uso:** 
+Es la opción recomendada para el desarrollo diario (*DX*). Ofrece un rendimiento superior al no tener que virtualizar el entorno de PHP, facilita el uso de depuradores (*debuggers*) como Xdebug, y permite un acceso directo a los *logs* sin necesidad de inspeccionar contenedores.
 
-**Ventajas:** Mejor para desarrollo local, más rápido que Docker completo, acceso directo a logs sin contenedor.
-
-**Ejemplo:**
-
+**Ejemplo de uso:**
 ```bash
 php artisan start:hybrid
 ```
-
 ---
 
-<h3 align="center">3. php artisan retest </h3>
 
-**Propósito:** Ejecuta automáticamente el flujo completo de pruebas (reset + seed + tests).
+### 🧪 3. `php artisan retest`
 
-**Qué hace:**
+**Propósito:** Automatizar el ciclo completo de validación del código, garantizando un entorno de base de datos limpio y determinista antes de la ejecución de la suite de pruebas.
 
-- Limpia la BD con `php artisan migrate:refresh` (borra todos los datos).
-- Carga datos de prueba con `php artisan db:seed`.
-- Ejecuta todos los tests unitarios y de feature con `php artisan test`.
+**Flujo de ejecución:**
+1. Destruye y reconstruye todo el esquema relacional de la base de datos desde cero mediante `php artisan migrate:refresh`, eliminando posibles inconsistencias por datos residuales.
+2. Puebla las tablas con los catálogos necesarios para los tests utilizando `php artisan db:seed`.
+3. Lanza la suite completa de pruebas (tanto Unitarias como de Integración/Feature) a través de `php artisan test`, evaluando la lógica de negocio, los *endpoints* de la API y las consultas espaciales.
 
-**Cuándo usarlo:** Antes de mergear cambios, para asegurar que nada está roto.
+**Casos de Uso y Ventajas:** 
+Funciona como una herramienta de Integración Continua (CI) a nivel local. Es de uso obligatorio antes de realizar *commits* críticos o integrar nuevas ramas (*Merge/Pull Requests*) para asegurar la estabilidad del sistema y prevenir regresiones en el código.
 
-**Ejemplo:**
-
+**Ejemplo de uso:**
 ```bash
 php artisan retest
 ```
-
 ---
 
-<h3 align=center>4. php artisan api:tree</h3>
+### 📂 4. `php artisan app:tree`
 
-**Propósito:** Visualiza la estructura y endpoints de la API de forma simplificada.
+**Propósito:** Muestra la estructura de directorios y archivos del proyecto en forma de árbol visual, filtrando elementos del framework para centrarse únicamente en tu código.
 
-**Qué hace:**
+**Qué hace exactamente:**
+* Ejecuta una función recursiva que escanea desde la raíz del proyecto (`base_path()`).
+* Dibuja conectores visuales (`├──` y `└──`) para representar la jerarquía de las carpetas.
+* **Aplica una lista negra de exclusión de carpetas:** Oculta automáticamente directorios que generan "ruido" como `bootstrap`, `public`, `storage`, `vendor`, `.git`, `test`, `Providers` y `factories`.
+* **Aplica una lista negra de exclusión de archivos:** Ignora archivos de configuración internos (`app.php`, `database.php`, `session.php`), archivos de entorno (`composer.json`, `phpunit.xml`) y migraciones base por defecto de Laravel (como `jobs` o `personal_access_tokens`).
 
-- Muestra un árbol de rutas organizadas jerárquicamente.
-- Indica método HTTP (GET, POST, PUT, DELETE).
-- Agrupa por controlador.
+**Cuándo usarlo:** Cuando necesitas visualizar o copiar la arquitectura limpia de los archivos que tú has programado, sin que la terminal se inunde con las dependencias y la estructura estándar de Laravel.
 
-**Cuándo usarlo:** Para documentar rápidamente o explorar los endpoints sin abrir el Swagger.
-
-**Ejemplo:**
-
+**Ejemplo de uso:**
 ```bash
-php artisan app:tree
+php artisan api:tree
 ```
 
 ---
@@ -201,107 +277,24 @@ php artisan app:tree
 
 ```bash
 Estructura del proyecto (filtrada):
-├── .dockerignore
-├── .env
-├── .env.example
-├── README.md
 ├── app
-│   ├── Console
-│   │   └── Commands
-│   │       ├── EstructuraProyecto.php
-│   │       ├── ResetAndTest.php
-│   │       ├── StartComplete.php
-│   │       └── StartHybrid.php
+│   ├── Console/Commands        # Comandos Artisan personalizados (start, retest, etc.)
 │   ├── Http
-│   │   ├── Controllers
-│   │   │   ├── Api
-│   │   │   │   └── AuthController.php
-│   │   │   ├── ClienteController.php
-│   │   │   ├── Controller.php
-│   │   │   ├── EdificioController.php
-│   │   │   ├── EstadoVisitaController.php
-│   │   │   ├── UserController.php
-│   │   │   ├── VisitaController.php
-│   │   │   └── ZonaController.php
-│   │   ├── Middleware
-│   │   │   ├── CheckRole.php
-│   │   │   └── LoginAdmin.php
-│   │   ├── Requests
-│   │   │   ├── AuthRequest.php
-│   │   │   ├── ClienteRequest.php
-│   │   │   ├── EdificioRequest.php
-│   │   │   ├── UserRequest.php
-│   │   │   ├── UserUpdateRequest.php
-│   │   │   ├── VisitaRequest.php
-│   │   │   └── ZonaRequest.php
-│   │   └── Resources
-│   │       ├── ClienteResource.php
-│   │       ├── EdificioResource.php
-│   │       ├── EstadoVisitaResource.php
-│   │       ├── UserResource.php
-│   │       ├── VisitaResource.php
-│   │       └── ZonaResource.php
-│   ├── Models
-│   │   ├── Cliente.php
-│   │   ├── Edificio.php
-│   │   ├── EstadoVisita.php
-│   │   ├── User.php
-│   │   ├── Visita.php
-│   │   └── Zona.php
-│   └── OpenApi
-│       └── OpenApiSpec.php
-├── config
-│   ├── auth.php
-│   ├── cors.php
-│   ├── jwt.php
-│   └── l5-swagger.php
+│   │   ├── Controllers         # Lógica de los Endpoints (Agrupados por entidad)
+│   │   ├── Middleware          # Control de acceso (JWT) y seguridad por Roles
+│   │   ├── Requests            # Capa de validación de datos (Form Requests)
+│   │   ├── Resources           # Transformación de Modelos a respuestas JSON uniformes
+│   ├── Models                  # Entidades de negocio y lógica de persistencia
+│   └── OpenApi                 # Definiciones y anotaciones para Swagger (L5-Swagger)
+├── config                      # Ajustes de seguridad (JWT, Auth, CORS)
 ├── database
-│   ├── migrations
-│   │   ├── 2026_03_09_000001_create_zonas_table.php
-│   │   ├── 2026_03_09_000002_create_estados_visita_table.php
-│   │   ├── 2026_03_09_000003_create_users_table.php
-│   │   ├── 2026_03_09_000006_create_clientes_table.php
-│   │   ├── 2026_03_09_000007_create_edificios_table.php
-│   │   ├── 2026_03_09_000008_create_visitas_table.php
-│   │   └── 2026_03_19_000010_convert_zonas_points_to_polygon.php
-│   └── seeders
-│       ├── ClienteSeeder.php
-│       ├── DatabaseSeeder.php
-│       ├── EdificioSeeder.php
-│       ├── EstadoVisitaSeeder.php
-│       ├── UserSeeder.php
-│       ├── VisitaSeeder.php
-│       └── ZonaSeeder.php
-├── docker-compose.yml
-├── dockerfile
-├── routes
-│   ├── api.php
-│   ├── console.php
-│   └── web.php
+│   ├── migrations              # Definición de tablas y tipos espaciales (PostGIS)
+│   └── seeders                 # Generación de datos maestros y geometrías de prueba
+├── routes                      # Definición de rutas de la API y Consola
 └── tests
-    ├── Feature
-    │   ├── ClienteTest.php
-    │   ├── EdificioTest.php
-    │   ├── LoginTest.php
-    │   ├── UserTest.php
-    │   ├── VisitasTest.php
-    │   └── ZonaTest.php
-    └── Fixture
-        ├── ClienteData.php
-        ├── EdificioData.php
-        ├── LoginData.php
-        ├── UserData.php
-        ├── VisitasData.php
-        └── ZonaData.php
+    ├── Feature                 # Pruebas de integración de los Endpoints
+    └── Fixture                 # Datos centralizados para pruebas repetibles
 ```
-
----
-
-<h2 align="center">Autor</h2>
-
-- **Alberto Romero Pino**
-- **Email**: albertoromeropino2004@gmail.com
-- **LinkedIn**: [linkedin.com/in/alberto-romero-pino-8aa0a32ba](linkedin.com/in/alberto-romero-pino-8aa0a32ba)
 
 ---
 
@@ -398,17 +391,16 @@ Visita "*" -- "1" EstadoVisita : tiene estado
 
 ---
 
-<h1 align="center">Soluciones a problemas</h1>
+<h2 align="center">Autor</h2>
 
-1º Windows estaba sobreponiendose al puerto de postman y no me dejaba hacer un start:complete. Lo que se realiza aqui es para el servicio que ocupa el puerto tirar la base de datos y luego activar el que habia parado para que cambie de puerto
+- **Alberto Romero Pino**
+- **Email**: albertoromeropino2004@gmail.com
+- **LinkedIn**: [linkedin.com/in/alberto-romero-pino-8aa0a32ba](linkedin.com/in/alberto-romero-pino-8aa0a32ba)
 
-```powershell
-# 1. Detener el servicio que gestiona el NAT y las reservas de puertos
-net stop winnat
-
-# 2. Levanta tu contenedor de Docker (ahora debería dejarte usar el puerto 5432)
-# docker-compose up -d (o el comando que uses)
-
-# 3. Volver a iniciar el servicio
-net start winnat
-```
+<hr>
+<p align="center">
+  <b>Trabajo de Fin de Grado</b> | <i>Grado en Desarrollo de Aplicaciones Web</i><br>
+  I.E.S.Francisco de los Rios - Curso 2025/2026<br>
+  <i>El código fuente expuesto forma parte de los entregables técnicos para la defensa del proyecto.</i>
+</p>
+<br>

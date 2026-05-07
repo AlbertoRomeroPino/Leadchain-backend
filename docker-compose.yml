@@ -8,7 +8,7 @@ services:
     working_dir: /var/www/html
     environment:
       BACKEND_REPO: ${BACKEND_REPO:-https://github.com/AlbertoRomeroPino/Leadchain-backend.git}
-      BACKEND_BRANCH: ${BACKEND_BRANCH:-docker}
+      BACKEND_BRANCH: ${BACKEND_BRANCH:-main}
       APP_ENV: ${APP_ENV:-local}
       APP_DEBUG: ${APP_DEBUG:-true}
       APP_KEY: ${APP_KEY}
