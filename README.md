@@ -309,9 +309,11 @@ Estructura del proyecto (filtrada):
 
 <h2 align="center">Autor</h2>
 
-- **Alberto Romero Pino**
+**Alberto Romero Pino**
+
 - **Email**: albertoromeropino2004@gmail.com
 - **LinkedIn**: [linkedin.com/in/alberto-romero-pino-8aa0a32ba](linkedin.com/in/alberto-romero-pino-8aa0a32ba)
+- **GitHub:** [@AlbertoRomeroPino](https://github.com/AlbertoRomeroPino)
 
 <hr>
 <p align="center">
